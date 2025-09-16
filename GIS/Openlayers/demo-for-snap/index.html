@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <!--
+      OpenLayers自定义捕捉交互示例
+      功能：在天地图卫星影像上进行绘制，支持线段捕捉和要素编辑
+    -->
+    <title>天地图卫星影像 + 自定义线段捕捉功能</title>
+
+    <!-- 引入OpenLayers样式文件 -->
+    <link rel="stylesheet" href="node_modules/ol/ol.css">
+
+    <style>
+      /* 清除浏览器默认边距，实现全屏显示 */
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;  /* 隐藏滚动条 */
+      }
+
+      /* 地图容器样式 */
+      .map {
+        width: 100vw;       /* 宽度占满视口 */
+        height: 100vh;      /* 高度占满视口 */
+        position: fixed;    /* 固定定位 */
+        top: 0;             /* 顶部对齐 */
+        left: 0;            /* 左侧对齐 */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 地图容器div -->
+    <div id="map" class="map"></div>
+
+    <!-- 引入主程序脚本，使用ES模块方式 -->
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
