@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>测量工具</title>
+    <link rel="stylesheet" href="node_modules/ol/ol.css">
+    <style>
+      .map {
+        width: 100%;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      .tool-container {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .tool-button {
+        width: 36px;
+        height: 36px;
+        background-color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .tool-button:hover {
+        background-color: #f0f0f0;
+      }
+      .tool-button.active {
+        background-color: #2196F3;
+      }
+      .tool-button svg {
+        width: 20px;
+        height: 20px;
+        fill: #333;
+      }
+      .tool-button.active svg {
+        fill: white;
+      }
+      .tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 1001;
+      }
+      .tooltip.show {
+        opacity: 1;
+      }
+      .ol-tooltip {
+        position: relative;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+        color: white;
+        padding: 4px 8px;
+        opacity: 0.7;
+        white-space: nowrap;
+        font-size: 12px;
+        cursor: default;
+        user-select: none;
+      }
+      .ol-tooltip-measure {
+        opacity: 1;
+        font-weight: bold;
+      }
+      .ol-tooltip-static {
+        background-color: #ffcc33;
+        color: black;
+        border: 1px solid white;
+      }
+      .ol-tooltip-measure:before,
+      .ol-tooltip-static:before {
+        border-top: 6px solid rgba(0, 0, 0, 0.5);
+        border-right: 6px solid transparent;
+        border-left: 6px solid transparent;
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        margin-left: -7px;
+        left: 50%;
+      }
+      .ol-tooltip-static:before {
+        border-top-color: #ffcc33;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <div class="tool-container">
+      <button id="measure-length" class="tool-button" data-tooltip="测量距离">
+        <svg viewBox="0 0 24 24">
+          <path d="M3.5 18.5l6-6 4 4L22 8" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="3.5" cy="18.5" r="1.5" fill="currentColor"/>
+          <circle cx="9.5" cy="12.5" r="1.5" fill="currentColor"/>
+          <circle cx="13.5" cy="16.5" r="1.5" fill="currentColor"/>
+          <circle cx="22" cy="8" r="1.5" fill="currentColor"/>
+        </svg>
+      </button>
+      <button id="measure-area" class="tool-button" data-tooltip="测量面积">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3v18h18V3H3zm16 16H5V5h14v14z" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 5l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 19l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        </svg>
+      </button>
+      <button id="clear-button" class="tool-button" data-tooltip="清除痕迹">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+        </svg>
+      </button>
+      <div id="tooltip" class="tooltip"></div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
