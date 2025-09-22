@@ -351,6 +351,8 @@ function checkTopology() {
           const type1 = feature1.properties.type;
           const type2 = feature2.properties.type;
           errors.push(`${type1}${index1}与${type2}${index2}存在重叠`);
+          errorFeatureIndices.add(feature1.properties.originalIndex);
+          errorFeatureIndices.add(feature2.properties.originalIndex);
         }
       } catch (error) {
         // 重叠检查可能失败，跳过
@@ -361,6 +363,8 @@ function checkTopology() {
         try {
           if (turf.booleanCrosses(feature1, feature2)) {
             errors.push(`线${index1}与线${index2}存在交叉`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } catch (error) {
           // 交叉检查可能失败
@@ -369,6 +373,8 @@ function checkTopology() {
         try {
           if (turf.booleanCrosses(feature1, feature2)) {
             errors.push(`线${index1}与面${index2}存在交叉`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } catch (error) {
           // 交叉检查可能失败
@@ -377,6 +383,8 @@ function checkTopology() {
         try {
           if (turf.booleanCrosses(feature2, feature1)) {
             errors.push(`线${index2}与面${index1}存在交叉`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } catch (error) {
           // 交叉检查可能失败
@@ -395,10 +403,14 @@ function checkTopology() {
               const intersectionArea = turf.area(intersection);
               if (intersectionArea > 0.0001) { // 大于1平方米的相交
                 errors.push(`面${index1}与面${index2}相交，相交面积约${intersectionArea.toFixed(2)}平方米`);
+                errorFeatureIndices.add(feature1.properties.originalIndex);
+                errorFeatureIndices.add(feature2.properties.originalIndex);
               }
             }
           } catch (error) {
             errors.push(`面${index1}与面${index2}存在相交，但计算相交面积时出错`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         }
 
@@ -408,11 +420,15 @@ function checkTopology() {
             const area1 = turf.area(feature1);
             const area2 = turf.area(feature2);
             errors.push(`面${index1}包含面${index2}（包含${(area2/area1*100).toFixed(1)}%的面积）`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
           if (turf.booleanContains(feature2, feature1)) {
             const area1 = turf.area(feature1);
             const area2 = turf.area(feature2);
             errors.push(`面${index2}包含面${index1}（包含${(area1/area2*100).toFixed(1)}%的面积）`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } catch (error) {
           // 包含关系检查可能失败
@@ -423,6 +439,7 @@ function checkTopology() {
           const sharedDistance = turf.distanceToLine(feature1, feature2, { units: 'meters' });
           if (sharedDistance < 0.1) { // 距离小于10厘米认为相邻
             errors.push(`面${index1}与面${index2}相邻`);
+            // 相邻不是错误，所以不添加到高亮集合
           }
         } catch (error) {
           // 如果无法计算距离，跳过相邻检查
@@ -439,6 +456,8 @@ function checkTopology() {
 
             if (gapArea > 0.0001) { // 缝隙大于1平方米
               errors.push(`面${index1}与面${index2}之间存在缝隙，面积约${gapArea.toFixed(2)}平方米`);
+              errorFeatureIndices.add(feature1.properties.originalIndex);
+              errorFeatureIndices.add(feature2.properties.originalIndex);
             }
           }
         } catch (error) {
@@ -452,6 +471,7 @@ function checkTopology() {
         try {
           if (turf.booleanContains(feature2, feature1)) {
             errors.push(`线${index1}完全在面${index2}内`);
+            // 线在面内不是错误，所以不添加到高亮集合
           }
         } catch (error) {
           // 包含检查可能失败
@@ -462,6 +482,8 @@ function checkTopology() {
           const intersectionPoints = turf.lineIntersect(feature1, feature2);
           if (intersectionPoints.features.length > 0) {
             errors.push(`线${index1}与面${index2}边界有${intersectionPoints.features.length}个交点`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } catch (error) {
           // 交点计算可能失败
@@ -474,6 +496,7 @@ function checkTopology() {
         try {
           if (turf.booleanContains(feature1, feature2)) {
             errors.push(`线${index2}完全在面${index1}内`);
+            // 线在面内不是错误，所以不添加到高亮集合
           }
         } catch (error) {
           // 包含检查可能失败
@@ -484,6 +507,8 @@ function checkTopology() {
           const intersectionPoints = turf.lineIntersect(feature2, feature1);
           if (intersectionPoints.features.length > 0) {
             errors.push(`线${index2}与面${index1}边界有${intersectionPoints.features.length}个交点`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } catch (error) {
           // 交点计算可能失败
@@ -523,10 +548,14 @@ function checkTopology() {
 
           if (minDistance < 1.0) { // 小于1米认为是潜在的悬挂线
             errors.push(`线${index1}与线${index2}存在潜在悬挂点（距离${minDistance.toFixed(2)}米）`);
+            errorFeatureIndices.add(feature1.properties.originalIndex);
+            errorFeatureIndices.add(feature2.properties.originalIndex);
           }
         } else if (connectionPoints.length === 1) {
           // 只有一个端点连接，可能是悬挂线
           errors.push(`线${index1}与线${index2}只有一个端点连接，可能存在悬挂`);
+          errorFeatureIndices.add(feature1.properties.originalIndex);
+          errorFeatureIndices.add(feature2.properties.originalIndex);
         }
       }
     }
@@ -571,9 +600,21 @@ function checkTopology() {
     }
   }
 
+  // 创建高亮要素
+  errorFeatureIndices.forEach(index => {
+    const originalFeature = features[index];
+    if (originalFeature) {
+      const geometry = originalFeature.getGeometry().clone();
+      const highlightFeature = new Feature({
+        geometry: geometry
+      });
+      highlightSource.addFeature(highlightFeature);
+    }
+  });
+
   // 显示结果
   if (errors.length > 0) {
-    const errorMessage = `发现 ${errors.length} 个拓扑错误：\n\n${errors.join('\n')}`;
+    const errorMessage = `发现 ${errors.length} 个拓扑错误：\n\n${errors.join('\n')}\n\n有错误的要素已在地图上高亮显示（红色加粗）`;
     app.$alert(errorMessage, '拓扑检查结果', {
       confirmButtonText: '确定',
       type: 'error',
@@ -660,7 +701,8 @@ const map = new Map({
         projection: 'EPSG:3857'
       })
     }),
-    drawLayer
+    drawLayer,
+    highlightLayer
   ],
   target: 'map',
   view: new View({
