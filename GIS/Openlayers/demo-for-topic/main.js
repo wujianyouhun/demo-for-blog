@@ -176,40 +176,12 @@ function switchMapLayer(mapType) {
   }
 }
 
-// 加载GeoJSON数据
-fetch('./data.geojson')
-  .then(response => response.json())
-  .then(data => {
-    const features = new GeoJSON().readFeatures(data, {
-      featureProjection: 'EPSG:3857'
-    });
-    vectorLayer.getSource().addFeatures(features);
+// ================ UI控件创建 ================
 
-    // 自动调整视图以适应所有要素
-    const extent = vectorLayer.getSource().getExtent();
-    map.getView().fit(extent, {
-      padding: [50, 50, 50, 50],
-      duration: 1000
-    });
-  })
-  .catch(error => {
-    console.error('加载GeoJSON数据失败:', error);
-  });
-
-// 地图切换功能
-function switchMapLayer(mapType) {
-  if (mapType === 'tianditu') {
-    tiandituLayer.setVisible(true);
-    tiandituLabelLayer.setVisible(true);
-    osmLayer.setVisible(false);
-  } else {
-    tiandituLayer.setVisible(false);
-    tiandituLabelLayer.setVisible(false);
-    osmLayer.setVisible(true);
-  }
-}
-
-// 创建地图切换控件
+/**
+ * 创建地图切换控件
+ * 提供天地图和OSM地图的切换按钮
+ */
 function createMapSwitcher() {
   const switcher = document.createElement('div');
   switcher.className = 'map-switcher';
@@ -224,6 +196,7 @@ function createMapSwitcher() {
     padding: 5px;
   `;
 
+  // OSM按钮
   const osmButton = document.createElement('button');
   osmButton.textContent = 'OSM';
   osmButton.style.cssText = `
@@ -236,6 +209,7 @@ function createMapSwitcher() {
     cursor: pointer;
   `;
 
+  // 天地图按钮
   const tiandituButton = document.createElement('button');
   tiandituButton.textContent = '天地图';
   tiandituButton.style.cssText = `
@@ -248,6 +222,7 @@ function createMapSwitcher() {
     cursor: pointer;
   `;
 
+  // 按钮事件绑定
   osmButton.addEventListener('click', () => {
     switchMapLayer('osm');
     updateButtonStyles();
@@ -258,6 +233,10 @@ function createMapSwitcher() {
     updateButtonStyles();
   });
 
+  /**
+   * 更新按钮样式状态
+   * 根据图层可见性更新按钮的背景色和文字颜色
+   */
   function updateButtonStyles() {
     osmButton.style.background = osmLayer.getVisible() ? '#007bff' : 'white';
     osmButton.style.color = osmLayer.getVisible() ? 'white' : 'black';
@@ -271,20 +250,27 @@ function createMapSwitcher() {
   document.getElementById('map').appendChild(switcher);
 }
 
-// 全屏功能
+/**
+ * 全屏切换功能
+ * 切换地图容器的全屏显示状态
+ */
 function toggleFullscreen() {
   const mapElement = document.getElementById('map');
 
   if (!document.fullscreenElement) {
+    // 进入全屏模式
     mapElement.requestFullscreen().catch(err => {
       console.error('无法进入全屏模式:', err);
     });
   } else {
+    // 退出全屏模式
     document.exitFullscreen();
   }
 }
 
-// 创建全屏按钮
+/**
+ * 创建全屏按钮
+ */
 function createFullscreenButton() {
   const button = document.createElement('button');
   button.textContent = '全屏';
@@ -307,7 +293,13 @@ function createFullscreenButton() {
   document.getElementById('map').appendChild(button);
 }
 
-// 创建信息提示框
+// ================ 鼠标交互功能 ================
+
+/**
+ * 创建信息提示框
+ * 用于显示鼠标悬停时的农田用水详细信息
+ * @returns {HTMLElement} 返回创建的提示框元素
+ */
 function createTooltip() {
   const tooltip = document.createElement('div');
   tooltip.className = 'ol-tooltip';
@@ -329,35 +321,44 @@ function createTooltip() {
   return tooltip;
 }
 
-// 创建鼠标悬停交互
+/**
+ * 创建鼠标悬停交互
+ * 实现鼠标移动时显示农田用水信息和高亮效果
+ */
 function createHoverInteraction() {
   const tooltip = createTooltip();
-  let highlightFeature = null;
+  let highlightFeature = null; // 当前高亮的要素
 
-  // 鼠标移动事件
+  /**
+   * 鼠标移动事件处理
+   * 检测鼠标位置下的要素，显示提示信息和高亮效果
+   */
   map.on('pointermove', function(evt) {
     const pixel = evt.pixel;
     const feature = map.forEachFeatureAtPixel(pixel, function(feature) {
       return feature;
     });
 
+    // 如果鼠标悬停在有效要素上
     if (feature && feature.get('农田用水')) {
       const waterUsage = feature.get('农田用水');
       const name = feature.get('name') || '未知区域';
 
+      // 设置提示框内容
       tooltip.innerHTML = `
         <div><strong>${name}</strong></div>
         <div>农田用水: ${waterUsage} 万立方米</div>
         <div>行政区划代码: ${feature.get('adcode') || '无'}</div>
       `;
 
+      // 显示提示框
       tooltip.style.display = 'block';
       tooltip.style.left = (pixel[0] + 10) + 'px';
       tooltip.style.top = (pixel[1] - 10) + 'px';
 
       // 高亮效果
       if (highlightFeature !== feature) {
-        // 重置之前的高亮
+        // 重置之前的高亮要素
         if (highlightFeature) {
           highlightFeature.setStyle(null);
         }
@@ -365,17 +366,19 @@ function createHoverInteraction() {
         // 设置新的高亮样式
         feature.setStyle(new Style({
           fill: new Fill({
+            // 增加透明度，使高亮效果更明显
             color: getWaterColor(feature.get('农田用水')).replace('0.4', '0.6'),
           }),
           stroke: new Stroke({
-            color: '#ff6b35',
-            width: 2,
+            color: '#ff6b35', // 橙色边框
+            width: 2,          // 加粗边框
           }),
         }));
 
         highlightFeature = feature;
       }
     } else {
+      // 隐藏提示框
       tooltip.style.display = 'none';
 
       // 重置高亮
@@ -386,7 +389,10 @@ function createHoverInteraction() {
     }
   });
 
-  // 鼠标离开地图区域
+  /**
+   * 鼠标离开地图区域事件处理
+   * 隐藏提示框并重置高亮状态
+   */
   map.getTargetElement().addEventListener('mouseleave', function() {
     tooltip.style.display = 'none';
 
@@ -398,27 +404,48 @@ function createHoverInteraction() {
   });
 }
 
-// 初始化控件
-createMapSwitcher();
-createFullscreenButton();
-createHoverInteraction();
+// ================ 应用初始化 ================
 
-// 设置地图全屏样式
-document.getElementById('map').style.cssText = `
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-`;
+/**
+ * 初始化所有UI控件
+ */
+function initializeApp() {
+  // 创建地图切换控件
+  createMapSwitcher();
 
+  // 创建全屏按钮
+  createFullscreenButton();
+
+  // 创建鼠标悬停交互
+  createHoverInteraction();
+
+  // 设置地图容器样式为全屏显示
+  document.getElementById('map').style.cssText = `
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+  `;
+}
+
+// ================ 地图响应式处理 ================
+
+/**
+ * 检查地图尺寸并调整版权信息控件
+ * 在小屏幕设备上自动折叠版权信息
+ */
 function checkSize() {
   const small = map.getSize()[0] < 600;
   attribution.setCollapsible(small);
   attribution.setCollapsed(small);
 }
 
+// 监听地图尺寸变化
 map.on('change:size', checkSize);
+
+// 初始化应用
+initializeApp();
 checkSize();
