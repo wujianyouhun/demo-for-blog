@@ -1,16 +1,15 @@
 /**
- * OpenLayers 地图绘制工具 - 完整教学案例
+ * OpenLayers 地图展示应用 - 农田用水数据可视化
  *
- * 这个案例演示了如何使用OpenLayers创建一个功能丰富的地图绘制应用，
- * 包括绘制点、线、面，拓扑检查，范围限制等功能。
+ * 这个应用演示了如何使用OpenLayers创建一个地图展示应用，
+ * 包括天地图和OSM地图切换、GeoJSON数据加载、农田用水数据渲染等功能。
  *
  * 主要技术要点：
  * 1. OpenLayers基础架构和使用
- * 2. 地图绘制交互的实现
- * 3. 坐标系统转换（经纬度与投影坐标）
- * 4. 空间分析和拓扑检查
- * 5. Vue.js与地图组件的集成
- * 6. 用户界面设计和交互优化
+ * 2. 多地图源切换功能
+ * 3. GeoJSON数据加载和渲染
+ * 4. 农田用水数据可视化
+ * 5. 全屏地图展示
  */
 
 // ==================== 导入必要的模块 ====================
@@ -26,26 +25,15 @@ import TileLayer from 'ol/layer/Tile.js';       // 瓦片图层类
 import XYZ from 'ol/source/XYZ.js';             // XYZ瓦片数据源
 import VectorLayer from 'ol/layer/Vector.js';   // 矢量图层类
 import VectorSource from 'ol/source/Vector.js'; // 矢量数据源
-
-// 交互功能模块
-import Draw from 'ol/interaction/Draw.js';     // 绘制交互类
+import GeoJSON from 'ol/format/GeoJSON.js';     // GeoJSON数据格式
 
 // 地理要素模块
 import {fromLonLat, toLonLat} from 'ol/proj.js'; // 坐标转换函数
 import Feature from 'ol/Feature.js';             // 地理要素类
-import Point from 'ol/geom/Point.js';            // 点几何类
-import LineString from 'ol/geom/LineString.js';  // 线几何类
 import Polygon from 'ol/geom/Polygon.js';       // 面几何类
 
 // 样式相关模块
-import {Style, Circle, Fill, Stroke} from 'ol/style.js'; // 样式类
-import {Icon} from 'ol/style.js';                 // 图标样式类
-
-// 工具模块
-import * as olExtent from 'ol/extent.js';        // 范围计算工具
-
-// 第三方库
-import * as turf from '@turf/turf';              // Turf.js 空间分析库
+import {Style, Fill, Stroke} from 'ol/style.js'; // 样式类
 
 // ==================== 全局变量定义 ====================
 
