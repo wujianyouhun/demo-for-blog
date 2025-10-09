@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <title>拖拽上传地图数据</title>
+    <link rel="stylesheet" href="node_modules/ol/ol.css">
+    <style>
+      /* 全局样式 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .map {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .control-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        width: 280px;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .panel-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 12px 16px;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .panel-header h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .panel-content {
+        padding: 16px;
+      }
+
+      .control-section {
+        margin-bottom: 20px;
+      }
+
+      .control-section:last-child {
+        margin-bottom: 0;
+      }
+
+      .control-section h4 {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        color: #555;
+        font-weight: 600;
+      }
+
+      .control-section label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .control-section input[type="checkbox"] {
+        margin-right: 8px;
+      }
+
+      .control-section button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .map-type-buttons {
+        display: flex;
+        gap: 5px;
+      }
+
+      .map-type-btn {
+        flex: 1;
+        margin: 0;
+        padding: 6px 10px;
+        font-size: 12px;
+        border: 1px solid #ddd;
+        background-color: #f8f9fa;
+        color: #666;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .map-type-btn.active {
+        background-color: #007cba;
+        color: white;
+        border-color: #007cba;
+      }
+
+      .map-type-btn:hover:not(.active) {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+      }
+
+      button {
+        padding: 8px 16px;
+        margin: 0 5px;
+        background-color: #007cba;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #005a8a;
+      }
+
+      #info {
+        padding: 8px 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        min-height: 40px;
+        font-size: 13px;
+        color: #666;
+        word-wrap: break-word;
+      }
+
+  
+      #fullscreen-btn {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <div class="control-panel">
+      <div class="panel-header">
+        <h3>控制面板</h3>
+      </div>
+      <div class="panel-content">
+        <div class="control-section">
+          <h4>地图类型:</h4>
+          <div class="map-type-buttons">
+            <button id="map-tianditu" class="map-type-btn active">天地图</button>
+            <button id="map-osm" class="map-type-btn">OpenStreetMap</button>
+          </div>
+        </div>
+        <div class="control-section">
+          <label><input type="checkbox" id="extractstyles" checked /> 从KML提取样式</label>
+        </div>
+        <div class="control-section">
+          <h4>下载示例数据:</h4>
+          <a id="download" download></a>
+          <button id="download-gpx">GPX格式</button>
+          <button id="download-geojson">GeoJSON格式</button>
+          <button id="download-igc">IGC格式</button>
+          <button id="download-kml">KML格式</button>
+          <button id="download-topojson">TopoJSON格式</button>
+        </div>
+        <div class="control-section">
+          <h4>要素信息:</h4>
+          <div id="info">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
