@@ -1,0 +1,54 @@
+{
+  "ffmpeg_path": "ffmpeg",
+  "streams": {},
+  "global_settings": {
+    "timeout": 30,
+    "reconnect_delay": 5,
+    "max_reconnect_attempts": 10
+  },
+  "output_formats": {
+    "hls": {
+      "enabled": true,
+      "segment_time": 4,
+      "segment_list_size": 6
+    },
+    "dash": {
+      "enabled": true,
+      "segment_duration": 4
+    },
+    "webm": {
+      "enabled": false,
+      "chunk_duration": 1
+    }
+  },
+  "web_server": {
+    "port": 8080,
+    "ws_port": 8081,
+    "enable_ssl": false
+  },
+  "default_stream_config": {
+    "video_codec": "libx264",
+    "audio_codec": "aac",
+    "bitrate": "2000k",
+    "resolution": "1280x720",
+    "framerate": 25,
+    "preset": "ultrafast",
+    "tune": "zerolatency",
+    "output_formats": ["hls", "dash"]
+  },
+  "rtsp_config": {
+    "url": "rtsp://admin:Aa147258@192.168.109.213",
+    "timeout": 30,
+    "reconnect_delay": 5,
+    "max_reconnect_attempts": 10
+  },
+  "stream_settings": {
+    "video_codec": "libx264",
+    "audio_codec": "aac",
+    "bitrate": "2000k",
+    "resolution": "1280x720",
+    "framerate": 25,
+    "preset": "ultrafast",
+    "tune": "zerolatency"
+  }
+}

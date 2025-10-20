@@ -1,0 +1,27 @@
+# 核心深度学习框架
+torch>=2.0.0
+torchvision>=0.9.0
+torchaudio>=0.10.0  # 可选，音频处理
+
+# YOLOv8 + 跟踪功能（核心）
+ultralytics>=8.0.196
+
+# 计算机视觉
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0  # 额外模块（DNN加速）
+
+# 科学计算（跟踪器必需）
+numpy>=1.21.0
+scipy>=1.9.0
+lapx>=0.5.0  # 匈牙利算法优化（BOTSORT必需）
+
+# 数据处理
+Pillow>=9.0.0
+pandas>=1.5.0  # 数据分析（可选）
+
+# 系统和并发
+psutil>=5.9.0  # 系统监控
+tqdm>=4.65.0  # 进度条
+
+# 日志和序列化
+pyyaml>=6.0  # 配置文件

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>go2rtc 视频墙测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .video-preview {
+            width: 320px;
+            height: 180px;
+            background: #000;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .config-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>go2rtc 视频墙测试工具</h1>
+
+    <div class="test-section">
+        <h2>1. 系统检查</h2>
+        <div id="system-check"></div>
+        <button onclick="checkSystem()">重新检查</button>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 连接测试</h2>
+        <div id="connection-test"></div>
+        <button onclick="testConnections()">测试连接</button>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 视频流测试</h2>
+        <div id="stream-test"></div>
+        <button onclick="testStreams()">测试视频流</button>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 配置信息</h2>
+        <div id="config-info" class="config-display"></div>
+    </div>
+
+    <script>
+        // HLS 配置
+        const HLS_CONFIG = {
+            baseUrl: 'http://localhost:8083',
+            streams: [
+                { id: 'hls-1', path: '/camera1/index.m3u8' },
+                { id: 'hls-2', path: '/camera2/index.m3u8' },
+                { id: 'hls-3', path: '/camera3/index.m3u8' }
+            ]
+        };
+
+        // WebRTC 配置
+        const WEBRTC_CONFIG = {
+            baseUrl: 'http://localhost:1984',
+            wsUrl: 'ws://localhost:1984/api/ws',
+            streams: [
+                { id: 'webrtc-1', src: 'camera1' },
+                { id: 'webrtc-2', src: 'camera2' },
+                { id: 'webrtc-3', src: 'camera3' }
+            ]
+        };
+
+        // 检查系统
+        async function checkSystem() {
+            const results = document.getElementById('system-check');
+            results.innerHTML = '<div>正在检查系统...</div>';
+
+            let output = '';
+
+            // 检查 HLS.js
+            if (typeof Hls !== 'undefined') {
+                output += '<div class="test-result success">✓ HLS.js 已加载</div>';
+            } else {
+                output += '<div class="test-result error">✗ HLS.js 未加载</div>';
+            }
+
+            // 检查 WebRTC 支持
+            if (RTCPeerConnection) {
+                output += '<div class="test-result success">✓ WebRTC 支持</div>';
+            } else {
+                output += '<div class="test-result error">✗ WebRTC 不支持</div>';
+            }
+
+            // 检查 WebSocket 支持
+            if (WebSocket) {
+                output += '<div class="test-result success">✓ WebSocket 支持</div>';
+            } else {
+                output += '<div class="test-result error">✗ WebSocket 不支持</div>';
+            }
+
+            results.innerHTML = output;
+        }
+
+        // 测试连接
+        async function testConnections() {
+            const results = document.getElementById('connection-test');
+            results.innerHTML = '<div>正在测试连接...</div>';
+
+            let output = '';
+
+            // 测试 HLS 服务
+            try {
+                const hlsResponse = await fetch(`${HLS_CONFIG.baseUrl}/api/status`, {
+                    method: 'GET',
+                    timeout: 5000
+                });
+                if (hlsResponse.ok) {
+                    output += '<div class="test-result success">✓ HLS 服务连接成功</div>';
+                } else {
+                    output += '<div class="test-result warning">⚠ HLS 服务响应异常</div>';
+                }
+            } catch (error) {
+                output += '<div class="test-result error">✗ HLS 服务连接失败: ' + error.message + '</div>';
+            }
+
+            // 测试 WebRTC 服务
+            try {
+                const webrtcResponse = await fetch(`${WEBRTC_CONFIG.baseUrl}/api/status`, {
+                    method: 'GET',
+                    timeout: 5000
+                });
+                if (webrtcResponse.ok) {
+                    output += '<div class="test-result success">✓ WebRTC 服务连接成功</div>';
+                } else {
+                    output += '<div class="test-result warning">⚠ WebRTC 服务响应异常</div>';
+                }
+            } catch (error) {
+                output += '<div class="test-result error">✗ WebRTC 服务连接失败: ' + error.message + '</div>';
+            }
+
+            // 测试 WebSocket 连接
+            try {
+                const ws = new WebSocket(WEBRTC_CONFIG.wsUrl);
+                ws.onopen = function() {
+                    output += '<div class="test-result success">✓ WebSocket 连接成功</div>';
+                    ws.close();
+                };
+                ws.onerror = function() {
+                    output += '<div class="test-result error">✗ WebSocket 连接失败</div>';
+                };
+            } catch (error) {
+                output += '<div class="test-result error">✗ WebSocket 连接失败: ' + error.message + '</div>';
+            }
+
+            results.innerHTML = output;
+        }
+
+        // 测试视频流
+        async function testStreams() {
+            const results = document.getElementById('stream-test');
+            results.innerHTML = '<div>正在测试视频流...</div>';
+
+            let output = '';
+
+            // 测试 HLS 流
+            output += '<h3>HLS 流测试</h3>';
+            for (const stream of HLS_CONFIG.streams) {
+                output += `<div class="test-result">测试 ${stream.id}...`;
+                output += `<video id="${stream.id}-test" class="video-preview" controls></video>`;
+
+                setTimeout(() => {
+                    const video = document.getElementById(`${stream.id}-test`);
+                    if (Hls.isSupported()) {
+                        const hls = new Hls();
+                        hls.loadSource(HLS_CONFIG.baseUrl + stream.path);
+                        hls.attachMedia(video);
+
+                        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                            output += '<div class="test-result success">✓ HLS 流加载成功</div>';
+                            results.innerHTML = output;
+                        });
+
+                        hls.on(Hls.Events.ERROR, function(event, data) {
+                            output += '<div class="test-result error">✗ HLS 流加载失败</div>';
+                            results.innerHTML = output;
+                        });
+                    }
+                }, 100);
+            }
+
+            // 测试 WebRTC 流
+            output += '<h3>WebRTC 流测试</h3>';
+            for (const stream of WEBRTC_CONFIG.streams) {
+                output += `<div class="test-result">测试 ${stream.id}...`;
+
+                try {
+                    const ws = new WebSocket(`${WEBRTC_CONFIG.wsUrl}?src=${stream.src}`);
+                    ws.onopen = function() {
+                        ws.send(JSON.stringify({ type: 'webrtc', src: stream.src }));
+                    };
+
+                    ws.onmessage = async function(event) {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'webrtc' && data.sdp) {
+                            const pc = new RTCPeerConnection({
+                                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                            });
+
+                            await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                            const answer = await pc.createAnswer();
+                            await pc.setLocalDescription(answer);
+
+                            ws.send(JSON.stringify({ type: 'webrtc_answer', sdp: answer }));
+
+                            pc.ontrack = function(event) {
+                                output += '<div class="test-result success">✓ WebRTC 流连接成功</div>';
+                                results.innerHTML = output;
+                            };
+                        }
+                    };
+                } catch (error) {
+                    output += '<div class="test-result error">✗ WebRTC 流连接失败</div>';
+                    results.innerHTML = output;
+                }
+            }
+
+            results.innerHTML = output;
+        }
+
+        // 显示配置信息
+        function showConfig() {
+            const configInfo = document.getElementById('config-info');
+            configInfo.innerHTML = `
+HLS 配置:
+  基础URL: ${HLS_CONFIG.baseUrl}
+  流数量: ${HLS_CONFIG.streams.length}
+
+WebRTC 配置:
+  基础URL: ${WEBRTC_CONFIG.baseUrl}
+  WebSocket URL: ${WEBRTC_CONFIG.wsUrl}
+  流数量: ${WEBRTC_CONFIG.streams.length}
+
+浏览器信息:
+  用户代理: ${navigator.userAgent}
+  语言: ${navigator.language}
+
+视频支持:
+  HLS.js: ${typeof Hls !== 'undefined' ? '是' : '否'}
+  WebRTC: ${RTCPeerConnection ? '是' : '否'}
+  WebSocket: ${WebSocket ? '是' : '否'}
+            `;
+        }
+
+        // 页面加载时执行
+        window.addEventListener('DOMContentLoaded', function() {
+            checkSystem();
+            showConfig();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+api:
+  listen: ":1984"
+  username: ""
+  password: ""
+
+webrtc:
+  listen: ":1984"
+  ice_servers:
+    - urls: ["stun:stun.l.google.com:19302"]
+
+# MSE 配置 (通过 MediaSource API 使用 MP4 流)
+# go2rtc 原生不提供 MSE 端点，但我们使用 MP4 流 + MediaSource API 实现 MSE 功能
+
+# HLS 配置
+hls:
+  # 启用 HLS
+  enable: true
+  # HLS 路径配置
+  dir: /tmp/hls
+  # 分段时长
+  segment_duration: 2
+  # 播放列表时长
+  playlist_duration: 10
+
+streams:
+  camera1:
+    - "rtsp://admin:Aa147258@192.168.109.213"
+  camera2:
+    - "rtsp://admin:Aa147258@192.168.109.213"
+  camera3:
+    - "rtsp://admin:Aa147258@192.168.109.213"
+  camera4:
+    - "rtsp://admin:Aa147258@192.168.109.213"
+
+log:
+  level: info

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单视频测试页面</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .video-item {
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            background: #000;
+        }
+        .video-item h3 {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 14px;
+        }
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+            border-radius: 4px;
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #333;
+            border-radius: 4px;
+        }
+        button {
+            margin: 0 5px;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #222;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>简单视频测试页面</h1>
+
+    <div class="controls">
+        <button onclick="testConnection()">测试连接</button>
+        <button onclick="loadStreams()">加载流</button>
+        <button onclick="openGo2rtc()">打开 go2rtc 界面</button>
+    </div>
+
+    <div class="status" id="status">点击"测试连接"开始</div>
+
+    <div class="video-container" id="videoContainer">
+        <div class="video-item">
+            <h3>Camera 1</h3>
+            <iframe id="camera1" src="" allowfullscreen></iframe>
+        </div>
+        <div class="video-item">
+            <h3>Camera 2</h3>
+            <iframe id="camera2" src="" allowfullscreen></iframe>
+        </div>
+        <div class="video-item">
+            <h3>Camera 3</h3>
+            <iframe id="camera3" src="" allowfullscreen></iframe>
+        </div>
+        <div class="video-item">
+            <h3>Camera 4</h3>
+            <iframe id="camera4" src="" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8081';
+        let statusDiv = document.getElementById('status');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            statusDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+            console.log(message);
+        }
+
+        async function testConnection() {
+            statusDiv.innerHTML = '';
+            log('测试连接到: ' + baseUrl);
+
+            try {
+                const response = await fetch(`${baseUrl}/api/streams`);
+                if (response.ok) {
+                    const streams = await response.json();
+                    log('✅ 连接成功!');
+                    log(`📊 可用流: ${Object.keys(streams).join(', ')}`);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ 连接失败: ${error.message}`);
+            }
+        }
+
+        function loadStreams() {
+            log('加载视频流...');
+
+            // 加载 go2rtc 内置的 WebRTC 播放器
+            const streams = ['camera1', 'camera2', 'camera3', 'camera4'];
+
+            streams.forEach(stream => {
+                const iframe = document.getElementById(stream);
+                iframe.src = `${baseUrl}/api/webrtc?src=${stream}`;
+                log(`加载 ${stream}: ${iframe.src}`);
+            });
+        }
+
+        function openGo2rtc() {
+            window.open(`${baseUrl}/`, '_blank');
+            log('在新窗口打开 go2rtc 界面');
+        }
+
+        // 页面加载时自动测试连接
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>go2rtc 视频监控墙</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #1a1a1a;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 2px;
+            width: 100vw;
+            height: 100vh;
+            padding: 2px;
+            background-color: #333;
+        }
+
+        .video-card {
+            position: relative;
+            background-color: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .video-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .video-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .video-card video.error {
+            object-fit: contain;
+        }
+
+        .stream-type-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+        }
+
+        .stream-type-badge.hls {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+        }
+
+        .stream-type-badge.webrtc {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            backdrop-filter: blur(4px);
+            z-index: 1;
+        }
+
+        .video-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            animation: pulse 2s infinite;
+            z-index: 2;
+        }
+
+        .video-status.online {
+            background-color: #27ae60;
+        }
+
+        .video-status.loading {
+            background-color: #f39c12;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #e74c3c;
+            text-align: center;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: none;
+            max-width: 80%;
+        }
+
+        .stream-info {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ccc;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-family: monospace;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(12, 1fr);
+            }
+        }
+
+        /* 全屏模式 */
+        .video-card.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            border-radius: 0;
+            transform: none;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s ease;
+            z-index: 2;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .reload-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 80px;
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s ease;
+            z-index: 2;
+        }
+
+        .reload-btn:hover {
+            background: rgba(52, 152, 219, 1);
+        }
+
+        /* 行标签 */
+        .row-label {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 4px;
+            font-size: 12px;
+            font-weight: bold;
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            border-radius: 4px;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 第一行: HLS 流 -->
+        <div class="video-card">
+            <div class="stream-type-badge hls">HLS</div>
+            <video
+                id="hls-1"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 1 (HLS)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">HLS Load Failed</div>
+            <div class="stream-info">hls-1</div>
+            <button class="reload-btn" onclick="reloadStream('hls-1', 'hls')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge hls">HLS</div>
+            <video
+                id="hls-2"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 2 (HLS)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">HLS Load Failed</div>
+            <div class="stream-info">hls-2</div>
+            <button class="reload-btn" onclick="reloadStream('hls-2', 'hls')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge hls">HLS</div>
+            <video
+                id="hls-3"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 3 (HLS)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">HLS Load Failed</div>
+            <div class="stream-info">hls-3</div>
+            <button class="reload-btn" onclick="reloadStream('hls-3', 'hls')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <!-- 第二行: WebRTC 流 -->
+        <div class="video-card">
+            <div class="stream-type-badge webrtc">WebRTC</div>
+            <video
+                id="webrtc-1"
+                autoplay
+                muted
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 4 (WebRTC)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">WebRTC Load Failed</div>
+            <div class="stream-info">webrtc-1</div>
+            <button class="reload-btn" onclick="reloadStream('webrtc-1', 'webrtc')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge webrtc">WebRTC</div>
+            <video
+                id="webrtc-2"
+                autoplay
+                muted
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 5 (WebRTC)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">WebRTC Load Failed</div>
+            <div class="stream-info">webrtc-2</div>
+            <button class="reload-btn" onclick="reloadStream('webrtc-2', 'webrtc')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge webrtc">WebRTC</div>
+            <video
+                id="webrtc-3"
+                autoplay
+                muted
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 6 (WebRTC)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">WebRTC Load Failed</div>
+            <div class="stream-info">webrtc-3</div>
+            <button class="reload-btn" onclick="reloadStream('webrtc-3', 'webrtc')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <!-- 第三行: 混合展示 -->
+        <div class="video-card">
+            <div class="stream-type-badge hls">HLS</div>
+            <video
+                id="hls-4"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 7 (HLS)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">HLS Load Failed</div>
+            <div class="stream-info">hls-4</div>
+            <button class="reload-btn" onclick="reloadStream('hls-4', 'hls')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge webrtc">WebRTC</div>
+            <video
+                id="webrtc-4"
+                autoplay
+                muted
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 8 (WebRTC)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">WebRTC Load Failed</div>
+            <div class="stream-info">webrtc-4</div>
+            <button class="reload-btn" onclick="reloadStream('webrtc-4', 'webrtc')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge hls">HLS</div>
+            <video
+                id="hls-5"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 9 (HLS)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">HLS Load Failed</div>
+            <div class="stream-info">hls-5</div>
+            <button class="reload-btn" onclick="reloadStream('hls-5', 'hls')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <!-- 第四行: 备用和监控 -->
+        <div class="video-card">
+            <div class="stream-type-badge webrtc">WebRTC</div>
+            <video
+                id="webrtc-5"
+                autoplay
+                muted
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 10 (WebRTC)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">WebRTC Load Failed</div>
+            <div class="stream-info">webrtc-5</div>
+            <button class="reload-btn" onclick="reloadStream('webrtc-5', 'webrtc')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge hls">HLS</div>
+            <video
+                id="hls-6"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 11 (HLS)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">HLS Load Failed</div>
+            <div class="stream-info">hls-6</div>
+            <button class="reload-btn" onclick="reloadStream('hls-6', 'hls')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+
+        <div class="video-card">
+            <div class="stream-type-badge webrtc">WebRTC</div>
+            <video
+                id="webrtc-6"
+                autoplay
+                muted
+                playsinline>
+            </video>
+            <div class="video-overlay">Camera 12 (WebRTC)</div>
+            <div class="video-status loading"></div>
+            <div class="loading-spinner"></div>
+            <div class="error-message">WebRTC Load Failed</div>
+            <div class="stream-info">webrtc-6</div>
+            <button class="reload-btn" onclick="reloadStream('webrtc-6', 'webrtc')">Reload</button>
+            <button class="fullscreen-btn" onclick="toggleFullscreen(this)">Fullscreen</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/8.2.0/adapter.min.js"></script>
+    <script>
+        // go2rtc 流配置
+        const STREAM_CONFIG = {
+            hls: {
+                baseUrl: 'http://localhost:8083',
+                streams: [
+                    { id: 'hls-1', path: '/camera1/index.m3u8' },
+                    { id: 'hls-2', path: '/camera2/index.m3u8' },
+                    { id: 'hls-3', path: '/camera3/index.m3u8' },
+                    { id: 'hls-4', path: '/camera4/index.m3u8' },
+                    { id: 'hls-5', path: '/camera5/index.m3u8' },
+                    { id: 'hls-6', path: '/camera6/index.m3u8' }
+                ]
+            },
+            webrtc: {
+                baseUrl: 'http://localhost:1984',
+                streams: [
+                    { id: 'webrtc-1', path: '/api/stream?src=camera1&format=webrtc' },
+                    { id: 'webrtc-2', path: '/api/stream?src=camera2&format=webrtc' },
+                    { id: 'webrtc-3', path: '/api/stream?src=camera3&format=webrtc' },
+                    { id: 'webrtc-4', path: '/api/stream?src=camera4&format=webrtc' },
+                    { id: 'webrtc-5', path: '/api/stream?src=camera5&format=webrtc' },
+                    { id: 'webrtc-6', path: '/api/stream?src=camera6&format=webrtc' }
+                ]
+            }
+        };
+
+        // 初始化所有流
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeHLSStreams();
+            initializeWebRTCStreams();
+            setupKeyboardShortcuts();
+            setupLayoutToggle();
+        });
+
+        // 初始化 HLS 流
+        function initializeHLSStreams() {
+            STREAM_CONFIG.hls.streams.forEach(stream => {
+                const video = document.getElementById(stream.id);
+                if (!video) return;
+
+                const card = video.parentElement;
+                const status = card.querySelector('.video-status');
+                const spinner = card.querySelector('.loading-spinner');
+                const errorMsg = card.querySelector('.error-message');
+
+                if (Hls.isSupported()) {
+                    const hls = new Hls({
+                        debug: false,
+                        enableWorker: true,
+                        lowLatencyMode: true,
+                        backBufferLength: 90,
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        liveSyncDurationCount: 3,
+                        liveMaxLatencyDurationCount: 10,
+                        // go2rtc 特定配置
+                        xhrSetup: function(xhr, url) {
+                            xhr.setRequestHeader('Cache-Control', 'no-cache');
+                            xhr.setRequestHeader('Pragma', 'no-cache');
+                        }
+                    });
+
+                    const streamUrl = STREAM_CONFIG.hls.baseUrl + stream.path;
+
+                    // HLS 事件处理
+                    hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+                        console.log(`HLS media attached for ${stream.id}`);
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+                        console.log(`HLS manifest parsed for ${stream.id}:`, data);
+                        status.classList.remove('loading');
+                        status.classList.add('online');
+                        spinner.style.display = 'none';
+                        errorMsg.style.display = 'none';
+
+                        // 自动播放
+                        video.play().catch(error => {
+                            console.warn('Autoplay prevented:', error);
+                        });
+                    });
+
+                    hls.on(Hls.Events.FRAG_LOADED, function() {
+                        // 重置重连计时器
+                        if (status.dataset.loadingStartTime) {
+                            delete status.dataset.loadingStartTime;
+                        }
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error('HLS Error for', stream.id, ':', data);
+                        if (data.fatal) {
+                            switch(data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    errorMsg.textContent = 'HLS 网络错误，尝试重连...';
+                                    // 网络错误时尝试重连
+                                    setTimeout(() => {
+                                        hls.startLoad();
+                                    }, 1000);
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    errorMsg.textContent = 'HLS 媒体错误，尝试恢复...';
+                                    // 媒体错误时尝试恢复
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    status.classList.remove('loading');
+                                    spinner.style.display = 'none';
+                                    errorMsg.style.display = 'block';
+                                    errorMsg.textContent = 'HLS: ' + data.details;
+                            }
+                        }
+                    });
+
+                    // 加载流
+                    hls.loadSource(streamUrl);
+                    hls.attachMedia(video);
+
+                    // 存储 hls 实例用于重载
+                    video.hlsInstance = hls;
+
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // Safari 原生支持
+                    video.src = STREAM_CONFIG.hls.baseUrl + stream.path;
+
+                    video.addEventListener('loadstart', function() {
+                        console.log(`Native HLS loading for ${stream.id}`);
+                    });
+
+                    video.addEventListener('loadeddata', function() {
+                        status.classList.remove('loading');
+                        status.classList.add('online');
+                        spinner.style.display = 'none';
+                        errorMsg.style.display = 'none';
+                    });
+
+                    video.addEventListener('error', function(e) {
+                        console.error('Native HLS error for', stream.id, ':', e);
+                        status.classList.remove('loading');
+                        spinner.style.display = 'none';
+                        errorMsg.style.display = 'block';
+                        errorMsg.textContent = 'HLS 播放错误';
+                    });
+                } else {
+                    errorMsg.textContent = '浏览器不支持 HLS';
+                    errorMsg.style.display = 'block';
+                    spinner.style.display = 'none';
+                }
+            });
+        }
+
+        // WebRTC 连接管理
+        const webRTCConnections = new Map();
+
+        // 初始化 WebRTC 流
+        function initializeWebRTCStreams() {
+            STREAM_CONFIG.webrtc.streams.forEach(stream => {
+                const video = document.getElementById(stream.id);
+                if (!video) return;
+
+                const card = video.parentElement;
+                const status = card.querySelector('.video-status');
+                const spinner = card.querySelector('.loading-spinner');
+                const errorMsg = card.querySelector('.error-message');
+
+                // 建立 WebSocket 连接
+                const wsUrl = `ws://localhost:1984/api/ws?src=${stream.path.split('=')[1].split('&')[0]}`;
+                const ws = new WebSocket(wsUrl);
+
+                ws.onopen = function() {
+                    console.log(`WebSocket connected for ${stream.id}`);
+                    // 发送 WebRTC 请求
+                    ws.send(JSON.stringify({
+                        type: 'webrtc',
+                        src: stream.path.split('=')[1].split('&')[0]
+                    }));
+                };
+
+                ws.onmessage = async function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'webrtc' && data.sdp) {
+                            // 创建 WebRTC 连接
+                            const pc = new RTCPeerConnection({
+                                iceServers: [
+                                    { urls: 'stun:stun.l.google.com:19302' }
+                                ]
+                            });
+
+                            // 设置远程描述
+                            await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+
+                            // 添加轨道事件
+                            pc.ontrack = function(event) {
+                                video.srcObject = event.streams[0];
+                                status.classList.remove('loading');
+                                status.classList.add('online');
+                                spinner.style.display = 'none';
+                                errorMsg.style.display = 'none';
+                            };
+
+                            // 创建并设置本地描述
+                            const answer = await pc.createAnswer();
+                            await pc.setLocalDescription(answer);
+
+                            // 发送 answer
+                            ws.send(JSON.stringify({
+                                type: 'webrtc_answer',
+                                sdp: answer
+                            }));
+
+                            // 存储 WebRTC 连接
+                            webRTCConnections.set(stream.id, { pc, ws });
+
+                            // 监听连接状态
+                            pc.onconnectionstatechange = function() {
+                                console.log(`WebRTC connection state for ${stream.id}:`, pc.connectionState);
+                                if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                                    status.classList.remove('online');
+                                    status.classList.add('loading');
+                                    errorMsg.style.display = 'block';
+                                    errorMsg.textContent = 'WebRTC 连接断开';
+                                }
+                            };
+                        }
+                    } catch (error) {
+                        console.error('WebRTC message error:', error);
+                        status.classList.remove('loading');
+                        spinner.style.display = 'none';
+                        errorMsg.style.display = 'block';
+                        errorMsg.textContent = 'WebRTC: ' + error.message;
+                    }
+                };
+
+                ws.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    status.classList.remove('loading');
+                    spinner.style.display = 'none';
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'WebSocket 连接失败';
+                };
+
+                ws.onclose = function() {
+                    console.log(`WebSocket closed for ${stream.id}`);
+                    status.classList.remove('online');
+                    status.classList.add('loading');
+                };
+
+                // 存储 WebSocket 连接用于重载
+                video.wsConnection = ws;
+            });
+        }
+
+        // 重载流
+        function reloadStream(videoId, streamType) {
+            const video = document.getElementById(videoId);
+            if (!video) return;
+
+            const card = video.parentElement;
+            const status = card.querySelector('.video-status');
+            const spinner = card.querySelector('.loading-spinner');
+            const errorMsg = card.querySelector('.error-message');
+
+            // 重置状态
+            status.classList.add('loading');
+            status.classList.remove('online');
+            spinner.style.display = 'block';
+            errorMsg.style.display = 'none';
+
+            // 停止当前流
+            if (video.hlsInstance) {
+                video.hlsInstance.destroy();
+                video.hlsInstance = null;
+            }
+
+            // 关闭 WebSocket 和 WebRTC 连接
+            if (webRTCConnections.has(videoId)) {
+                const connection = webRTCConnections.get(videoId);
+                connection.pc.close();
+                connection.ws.close();
+                webRTCConnections.delete(videoId);
+            }
+
+            // 清理视频源
+            video.src = '';
+            video.srcObject = null;
+
+            // 重新初始化
+            setTimeout(() => {
+                if (streamType === 'hls') {
+                    initializeHLSStreams();
+                } else if (streamType === 'webrtc') {
+                    initializeWebRTCStreams();
+                }
+            }, 1000);
+        }
+
+        // 全屏切换
+        function toggleFullscreen(button) {
+            const card = button.parentElement;
+            const video = card.querySelector('video');
+
+            if (card.classList.contains('fullscreen')) {
+                card.classList.remove('fullscreen');
+                button.textContent = 'Fullscreen';
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            } else {
+                card.classList.add('fullscreen');
+                button.textContent = 'Exit Fullscreen';
+                if (card.requestFullscreen) {
+                    card.requestFullscreen();
+                }
+            }
+        }
+
+        // 键盘快捷键
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.video-card.fullscreen').forEach(card => {
+                        card.classList.remove('fullscreen');
+                        card.querySelector('.fullscreen-btn').textContent = 'Fullscreen';
+                    });
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    const videos = document.querySelectorAll('video');
+                    videos.forEach(video => {
+                        if (video.paused) {
+                            video.play().catch(console.error);
+                        } else {
+                            video.pause();
+                        }
+                    });
+                }
+
+                // R 键重载所有流
+                if (e.key === 'r' || e.key === 'R') {
+                    reloadAllStreams();
+                }
+            });
+        }
+
+        // 重载所有流
+        function reloadAllStreams() {
+            STREAM_CONFIG.hls.streams.forEach(stream => {
+                reloadStream(stream.id, 'hls');
+            });
+            STREAM_CONFIG.webrtc.streams.forEach(stream => {
+                reloadStream(stream.id, 'webrtc');
+            });
+        }
+
+        // 布局切换
+        function setupLayoutToggle() {
+            let currentLayout = '4x3';
+            document.querySelectorAll('.video-card').forEach(card => {
+                card.addEventListener('dblclick', function() {
+                    const container = document.querySelector('.container');
+
+                    if (currentLayout === '4x3') {
+                        container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                        container.style.gridTemplateRows = 'repeat(6, 1fr)';
+                        currentLayout = '6x2';
+                    } else if (currentLayout === '6x2') {
+                        container.style.gridTemplateColumns = '1fr';
+                        container.style.gridTemplateRows = 'repeat(12, 1fr)';
+                        currentLayout = '12x1';
+                    } else {
+                        container.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                        container.style.gridTemplateRows = 'repeat(4, 1fr)';
+                        currentLayout = '4x3';
+                    }
+                });
+            });
+        }
+
+        // 定期检查连接状态
+        setInterval(() => {
+            document.querySelectorAll('video').forEach(video => {
+                const card = video.parentElement;
+                const status = card.querySelector('.video-status');
+
+                if (video.readyState === 4) { // HAVE_ENOUGH_DATA
+                    status.classList.add('online');
+                    status.classList.remove('loading');
+                } else if (video.readyState === 0) { // HAVE_NOTHING
+                    status.classList.add('loading');
+                    status.classList.remove('online');
+                }
+            });
+        }, 5000);
+
+        // 自动重连机制
+        setInterval(() => {
+            document.querySelectorAll('.video-status.loading').forEach(status => {
+                const card = status.parentElement;
+                const videoId = card.querySelector('video').id;
+                const streamType = videoId.startsWith('hls') ? 'hls' : 'webrtc';
+
+                // 如果超过30秒还是loading状态，尝试重连
+                if (status.dataset.loadingStartTime) {
+                    const loadingTime = Date.now() - parseInt(status.dataset.loadingStartTime);
+                    if (loadingTime > 30000) {
+                        reloadStream(videoId, streamType);
+                        status.dataset.loadingStartTime = Date.now();
+                    }
+                } else {
+                    status.dataset.loadingStartTime = Date.now();
+                }
+            });
+        }, 10000);
+    </script>
+</body>
+</html>

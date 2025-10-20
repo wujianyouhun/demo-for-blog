@@ -1,0 +1,20 @@
+# RTSP流媒体转换器依赖包
+# 基础Python库（标准库，无需额外安装）
+
+# WebSocket支持
+websockets==11.0.3
+
+# 可选：如果需要更高级的Web功能
+# Flask==2.3.3
+# requests==2.31.0
+
+# 可选：如果需要更强大的日志功能
+# loguru==0.7.2
+
+# 可选：如果需要配置文件验证
+# pydantic==2.4.2
+# pyyaml==6.0.1
+
+# 可选：如果需要更好的异步支持
+# aiohttp==3.8.5
+# asyncio-mqtt==0.16.1

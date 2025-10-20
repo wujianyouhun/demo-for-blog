@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTSP视频矩阵 - go2rtc</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .container {
+            display: grid;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            height: calc(100vh - 120px);
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+        .video-cell {
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .video-cell h3 {
+            margin: 5px;
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: rgba(0,0,0,0.7);
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .video-player {
+            width: 100%;
+            height: calc(100% - 40px);
+            background: #000;
+        }
+        .status {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 10px;
+            color: #00ff00;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .row-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .error { color: #ff4444 !important; }
+        .warning { color: #ffaa00 !important; }
+        .controls, #config-panel {
+            background: #333;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        button {
+            margin: 0 5px;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #666; cursor: not-allowed; }
+        input {
+            padding: 5px;
+            margin: 0 5px;
+            border: 1px solid #555;
+            background: #222;
+            color: white;
+            border-radius: 3px;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            font-size: 12px;
+            height: 100px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">RTSP视频矩阵 (go2rtc)</h1>
+    
+    <div id="config-panel">
+        <label>go2rtc HTTP: </label>
+        <input type="text" id="go2rtc-http" value="http://localhost:1984" placeholder="http://localhost:1984">
+        <label>go2rtc WS: </label>
+        <input type="text" id="go2rtc-ws" value="ws://localhost:1984" placeholder="ws://localhost:1984">
+        <label>RTSP源: </label>
+        <input type="text" id="rtsp-source" value="rtsp://admin:Aa147258@192.168.109.213" style="width:300px">
+        <button onclick="updateConfig()">更新配置</button>
+        <button onclick="testConnection()">测试连接</button>
+        <button onclick="initAllPlayers()">初始化播放器</button>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <div class="container" id="videoMatrix">
+        <!-- 第一行：HLS -->
+        <div class="video-cell" data-row="HLS" data-col="1">
+            <div class="row-label">HLS-1</div>
+            <h3>HLS Stream 1</h3>
+            <video class="video-player" id="hls1" controls muted playsinline></video>
+            <div class="status" id="status-hls1">等待...</div>
+        </div>
+        <div class="video-cell" data-row="HLS" data-col="2">
+            <div class="row-label">HLS-2</div>
+            <h3>HLS Stream 2</h3>
+            <video class="video-player" id="hls2" controls muted playsinline></video>
+            <div class="status" id="status-hls2">等待...</div>
+        </div>
+        <div class="video-cell" data-row="HLS" data-col="3">
+            <div class="row-label">HLS-3</div>
+            <h3>HLS Stream 3</h3>
+            <video class="video-player" id="hls3" controls muted playsinline></video>
+            <div class="status" id="status-hls3">等待...</div>
+        </div>
+        <div class="video-cell" data-row="HLS" data-col="4">
+            <div class="row-label">HLS-4</div>
+            <h3>HLS Stream 4</h3>
+            <video class="video-player" id="hls4" controls muted playsinline></video>
+            <div class="status" id="status-hls4">等待...</div>
+        </div>
+
+        <!-- 第二行：WebRTC (使用iframe简化) -->
+        <div class="video-cell" data-row="WebRTC" data-col="1">
+            <div class="row-label">WRTC-1</div>
+            <h3>WebRTC 1</h3>
+            <div class="video-player" id="webrtc1">加载中...</div>
+            <div class="status" id="status-webrtc1">等待...</div>
+        </div>
+        <div class="video-cell" data-row="WebRTC" data-col="2">
+            <div class="row-label">WRTC-2</div>
+            <h3>WebRTC 2</h3>
+            <div class="video-player" id="webrtc2">加载中...</div>
+            <div class="status" id="status-webrtc2">等待...</div>
+        </div>
+        <div class="video-cell" data-row="WebRTC" data-col="3">
+            <div class="row-label">WRTC-3</div>
+            <h3>WebRTC 3</h3>
+            <div class="video-player" id="webrtc3">加载中...</div>
+            <div class="status" id="status-webrtc3">等待...</div>
+        </div>
+        <div class="video-cell" data-row="WebRTC" data-col="4">
+            <div class="row-label">WRTC-4</div>
+            <h3>WebRTC 4</h3>
+            <div class="video-player" id="webrtc4">加载中...</div>
+            <div class="status" id="status-webrtc4">等待...</div>
+        </div>
+
+        <!-- 第三行：MP4 -->
+        <div class="video-cell" data-row="MP4" data-col="1">
+            <div class="row-label">MP4-1</div>
+            <h3>MP4 Stream 1</h3>
+            <video class="video-player" id="mp41" controls muted playsinline></video>
+            <div class="status" id="status-mp41">等待...</div>
+        </div>
+        <div class="video-cell" data-row="MP4" data-col="2">
+            <div class="row-label">MP4-2</div>
+            <h3>MP4 Stream 2</h3>
+            <video class="video-player" id="mp42" controls muted playsinline></video>
+            <div class="status" id="status-mp42">等待...</div>
+        </div>
+        <div class="video-cell" data-row="MP4" data-col="3">
+            <div class="row-label">MP4-3</div>
+            <h3>MP4 Stream 3</h3>
+            <video class="video-player" id="mp43" controls muted playsinline></video>
+            <div class="status" id="status-mp43">等待...</div>
+        </div>
+        <div class="video-cell" data-row="MP4" data-col="4">
+            <div class="row-label">MP4-4</div>
+            <h3>MP4 Stream 4</h3>
+            <video class="video-player" id="mp44" controls muted playsinline></video>
+            <div class="status" id="status-mp44">等待...</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="reloadAll()">重新加载</button>
+        <button onclick="toggleMute()">静音/恢复</button>
+        <button onclick="clearLog()">清空日志</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        let config = {
+            httpHost: 'http://localhost:1984',
+            wsHost: 'ws://localhost:1984',
+            rtspSource: 'rtsp://admin:Aa147258@192.168.109.213'
+        };
+        let hlsInstances = {};
+
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function updateConfig() {
+            config.httpHost = document.getElementById('go2rtc-http').value;
+            config.wsHost = document.getElementById('go2rtc-ws').value;
+            config.rtspSource = document.getElementById('rtsp-source').value;
+            localStorage.setItem('go2rtcConfig', JSON.stringify(config));
+            log('配置已更新');
+        }
+
+        // 测试连接 - 使用正确的API端点
+        async function testConnection() {
+            updateConfig();
+            log('测试连接到: ' + config.httpHost);
+            
+            try {
+                // 测试 /api/stats (go2rtc正确端点)
+                const response = await fetch(`${config.httpHost}/api/stats`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    log(`✅ 连接成功! go2rtc运行正常`);
+                    log(`📊 流数量: ${Object.keys(stats.streams || {}).length}`);
+                    
+                    // 测试HLS端点
+                    const hlsTest = await fetch(`${config.httpHost}/api/hls?src=${encodeURIComponent(config.rtspSource)}`, {method: 'HEAD'});
+                    log(`HLS端点: ${hlsTest.ok ? '✅ 可访问' : '❌ 不可访问'}`);
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`❌ 连接失败: ${error.message}`);
+                log('💡 请检查:');
+                log('   1. go2rtc服务是否运行');
+                log('   2. CORS是否已配置');
+                log('   3. 端口和IP是否正确');
+                log('   4. 防火墙是否允许访问');
+            }
+        }
+
+        // 初始化HLS
+        function initHLSPlayer(videoId, statusId) {
+            const video = document.getElementById(videoId);
+            const status = document.getElementById(statusId);
+            const hlsUrl = `${config.httpHost}/api/hls?src=${encodeURIComponent(config.rtspSource)}`;
+            
+            status.textContent = '连接中...';
+            status.className = 'status';
+            
+            if (Hls.isSupported()) {
+                if (hlsInstances[videoId]) {
+                    hlsInstances[videoId].destroy();
+                }
+                
+                const hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90
+                });
+                
+                hlsInstances[videoId] = hls;
+                hls.loadSource(hlsUrl);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    status.textContent = 'HLS: 播放中';
+                    video.play().catch(e => log(`自动播放被阻止: ${e.message}`));
+                });
+                
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    let errorMsg = 'HLS错误';
+                    if (data.details) errorMsg += `: ${data.details}`;
+                    status.textContent = errorMsg;
+                    status.className = 'status error';
+                    log(`${videoId}: ${errorMsg}`);
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = hlsUrl;
+                video.addEventListener('loadedmetadata', () => {
+                    status.textContent = 'HLS: 原生播放';
+                    video.play();
+                });
+                video.addEventListener('error', () => {
+                    status.textContent = 'HLS: 加载失败';
+                    status.className = 'status error';
+                });
+            } else {
+                status.textContent = 'HLS: 不支持';
+                status.className = 'status error';
+            }
+        }
+
+        // 简化WebRTC - 使用iframe加载go2rtc内置页面
+        function initWebRTCPlayer(containerId, statusId) {
+            const container = document.getElementById(containerId);
+            const status = document.getElementById(statusId);
+            const webrtcUrl = `${config.httpHost}/api/webrtc?src=${encodeURIComponent(config.rtspSource)}`;
+            
+            container.innerHTML = `<iframe src="${webrtcUrl}" 
+                style="width:100%;height:100%;border:none;" 
+                allowfullscreen 
+                sandbox="allow-same-origin allow-scripts allow-presentation">
+            </iframe>`;
+            
+            status.textContent = 'WebRTC: iframe模式';
+            log(`${containerId}: 使用iframe加载WebRTC`);
+        }
+
+        // 初始化MP4
+        function initMP4Player(videoId, statusId) {
+            const video = document.getElementById(videoId);
+            const status = document.getElementById(statusId);
+            const mp4Url = `${config.httpHost}/api/mp4?src=${encodeURIComponent(config.rtspSource)}`;
+            
+            video.src = mp4Url;
+            video.addEventListener('loadeddata', () => {
+                status.textContent = 'MP4: 播放中';
+                video.play();
+            });
+            video.addEventListener('error', () => {
+                status.textContent = 'MP4: 加载失败';
+                status.className = 'status error';
+            });
+            video.addEventListener('waiting', () => {
+                status.textContent = 'MP4: 缓冲中';
+                status.className = 'status warning';
+            });
+        }
+
+        function initAllPlayers() {
+            log('开始初始化所有播放器');
+            
+            // HLS
+            ['hls1', 'hls2', 'hls3', 'hls4'].forEach(id => {
+                initHLSPlayer(id, `status-${id}`);
+            });
+            
+            // WebRTC
+            ['webrtc1', 'webrtc2', 'webrtc3', 'webrtc4'].forEach(id => {
+                initWebRTCPlayer(id, `status-${id}`);
+            });
+            
+            // MP4
+            ['mp41', 'mp42', 'mp43', 'mp44'].forEach(id => {
+                initMP4Player(id, `status-${id}`);
+            });
+        }
+
+        function reloadAll() {
+            Object.values(hlsInstances).forEach(hls => hls?.destroy());
+            hlsInstances = {};
+            initAllPlayers();
+        }
+
+        function toggleMute() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => video.muted = !video.muted);
+            log('切换静音状态');
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // 页面加载
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('go2rtcConfig');
+            if (saved) {
+                config = { ...config, ...JSON.parse(saved) };
+                document.getElementById('go2rtc-http').value = config.httpHost;
+                document.getElementById('go2rtc-ws').value = config.wsHost;
+                document.getElementById('rtsp-source').value = config.rtspSource;
+            }
+            
+            // 延迟测试连接
+            setTimeout(() => {
+                testConnection();
+            }, 1000);
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                toggleMute();
+            }
+        });
+    </script>
+</body>
+</html>

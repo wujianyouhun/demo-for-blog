@@ -1,0 +1,243 @@
+2025-10-14 09:41:54,764 - WebAPIServer - INFO - 启动Web API服务器
+2025-10-14 09:41:54,767 - WebAPIServer - INFO - Web API服务器启动完成
+2025-10-14 09:41:54,769 - WebAPIServer - INFO - 启动WebSocket服务器: ws://localhost:8081
+2025-10-14 09:41:54,779 - WebAPIServer - INFO - HTTP服务器启动: http://localhost:8080
+2025-10-14 09:41:54,790 - websockets.server - INFO - server listening on [::1]:8081
+2025-10-14 09:41:54,791 - websockets.server - INFO - server listening on 127.0.0.1:8081
+2025-10-14 09:42:15,178 - root - INFO - 127.0.0.1 - "GET / HTTP/1.1" 200 -
+2025-10-14 09:42:15,792 - websockets.server - INFO - connection open
+2025-10-14 09:42:15,792 - root - INFO - 127.0.0.1 - "GET /api/streams HTTP/1.1" 200 -
+2025-10-14 09:42:15,793 - StreamManager - INFO - WebSocket客户端连接
+2025-10-14 09:42:15,907 - root - INFO - 127.0.0.1 - code 404, message Not Found
+2025-10-14 09:42:15,908 - root - INFO - 127.0.0.1 - "GET /favicon.ico HTTP/1.1" 404 -
+2025-10-14 09:42:21,107 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:25,799 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:31,100 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:35,791 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:41,112 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:45,803 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:51,103 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:42:55,791 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:01,110 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:05,802 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:11,110 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:15,792 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:21,105 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:25,797 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:31,111 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:35,799 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:41,093 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:41,750 - StreamManager - INFO - 添加流: stream1
+2025-10-14 09:43:41,751 - root - INFO - 127.0.0.1 - "POST /api/streams HTTP/1.1" 200 -
+2025-10-14 09:43:42,068 - root - INFO - 127.0.0.1 - "GET /api/streams HTTP/1.1" 200 -
+2025-10-14 09:43:45,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:51,097 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:52,517 - root - INFO - 127.0.0.1 - "POST /api/streams HTTP/1.1" 400 -
+2025-10-14 09:43:56,106 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:43:59,025 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:43:59,025 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:43:59,331 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:43:59,332 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:44:00,999 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:01,000 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:44:01,013 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:01,014 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:44:01,105 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:01,798 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:01,798 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:44:02,108 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:02,109 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:44:05,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:11,097 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:11,781 - StreamManager - INFO - 启动流: stream1
+2025-10-14 09:44:11,782 - StreamManager - ERROR - 启动流 stream1 失败: 'global_settings'
+2025-10-14 09:44:11,783 - root - INFO - 127.0.0.1 - "POST /api/streams/stream1/start HTTP/1.1" 500 -
+2025-10-14 09:44:15,343 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:15,345 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:44:15,363 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:15,365 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:44:15,799 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:21,108 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:25,801 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:31,113 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:33,042 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:33,043 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:44:33,359 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:33,359 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:44:35,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:41,104 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:42,220 - StreamManager - INFO - 启动流: stream1
+2025-10-14 09:44:42,221 - StreamManager - ERROR - 启动流 stream1 失败: 'global_settings'
+2025-10-14 09:44:42,221 - root - INFO - 127.0.0.1 - "POST /api/streams/stream1/start HTTP/1.1" 500 -
+2025-10-14 09:44:44,330 - StreamManager - INFO - 添加流: st
+2025-10-14 09:44:44,331 - root - INFO - 127.0.0.1 - "POST /api/streams HTTP/1.1" 200 -
+2025-10-14 09:44:44,594 - root - INFO - 127.0.0.1 - "GET /api/streams HTTP/1.1" 200 -
+2025-10-14 09:44:45,793 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:48,459 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:48,459 - root - INFO - 127.0.0.1 - "GET /hls/st/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:44:48,477 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:44:48,477 - root - INFO - 127.0.0.1 - "GET /dash/st/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:44:50,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:44:54,381 - StreamManager - INFO - 启动流: st
+2025-10-14 09:44:54,381 - StreamManager - ERROR - 启动流 st 失败: 'global_settings'
+2025-10-14 09:44:54,382 - root - INFO - 127.0.0.1 - "POST /api/streams/st/start HTTP/1.1" 500 -
+2025-10-14 09:44:55,802 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:01,106 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:05,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:11,108 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:15,798 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:21,106 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:25,793 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:31,108 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:35,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:41,107 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:45,790 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:51,115 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:45:55,795 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:01,103 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:05,806 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:11,108 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:15,799 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:21,487 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:26,160 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:31,475 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:36,162 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:41,471 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:46,167 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:51,482 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:46:56,167 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:47:01,471 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:47:06,157 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:47:11,471 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:47:16,170 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:47:46,469 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:48:46,160 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:49:35,738 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:49:36,005 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:49:40,792 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:49:46,106 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:49:50,801 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:49:52,741 - WebAPIServer - INFO - 接收到停止信号
+2025-10-14 09:49:52,742 - WebAPIServer - INFO - 停止Web API服务器
+2025-10-14 09:49:52,742 - StreamManager - INFO - 清理资源
+2025-10-14 09:49:52,743 - StreamManager - INFO - 资源清理完成
+2025-10-14 09:49:57,728 - WebAPIServer - INFO - 启动Web API服务器
+2025-10-14 09:49:57,729 - WebAPIServer - INFO - Web API服务器启动完成
+2025-10-14 09:49:57,730 - WebAPIServer - INFO - 启动WebSocket服务器: ws://localhost:8081
+2025-10-14 09:49:57,739 - WebAPIServer - INFO - HTTP服务器启动: http://localhost:8080
+2025-10-14 09:49:57,751 - websockets.server - INFO - server listening on 127.0.0.1:8081
+2025-10-14 09:49:57,751 - websockets.server - INFO - server listening on [::1]:8081
+2025-10-14 09:49:57,791 - websockets.server - INFO - connection open
+2025-10-14 09:49:57,792 - StreamManager - INFO - WebSocket客户端连接
+2025-10-14 09:49:57,896 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:00,795 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:06,113 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:10,798 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:16,100 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:20,265 - root - INFO - 127.0.0.1 - "GET / HTTP/1.1" 200 -
+2025-10-14 09:50:20,570 - root - INFO - 127.0.0.1 - "GET /api/streams HTTP/1.1" 200 -
+2025-10-14 09:50:24,905 - StreamManager - INFO - 添加流: stream1
+2025-10-14 09:50:24,906 - root - INFO - 127.0.0.1 - "POST /api/streams HTTP/1.1" 200 -
+2025-10-14 09:50:25,172 - root - INFO - 127.0.0.1 - "GET /api/streams HTTP/1.1" 200 -
+2025-10-14 09:50:25,435 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:30,744 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:34,249 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:50:34,249 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:50:34,568 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:50:34,569 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:50:35,429 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:40,754 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:43,114 - StreamManager - INFO - 启动流: stream1
+2025-10-14 09:50:43,114 - StreamManager - ERROR - 启动流 stream1 失败: 'video_codec'
+2025-10-14 09:50:43,115 - root - INFO - 127.0.0.1 - "POST /api/streams/stream1/start HTTP/1.1" 500 -
+2025-10-14 09:50:45,753 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:50,444 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:50:55,743 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:00,431 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:05,741 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:10,438 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:15,754 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:20,444 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:25,753 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:26,777 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:51:26,777 - root - INFO - 127.0.0.1 - "GET /hls/stream1/stream.m3u8 HTTP/1.1" 404 -
+2025-10-14 09:51:27,095 - root - INFO - 127.0.0.1 - code 404, message File not found
+2025-10-14 09:51:27,096 - root - INFO - 127.0.0.1 - "GET /dash/stream1/stream.mpd HTTP/1.1" 404 -
+2025-10-14 09:51:31,157 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:36,472 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:41,171 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:46,483 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:51,164 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:51:56,478 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:01,166 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:06,464 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:11,163 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:16,469 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:21,159 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:26,470 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:52:46,162 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:53:46,470 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:54:46,172 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:55:46,477 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:56:46,158 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:57:46,470 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:58:46,174 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 09:59:46,479 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:00:46,478 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:01:46,164 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:02:46,469 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:03:46,170 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:04:46,470 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:05:46,167 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:06:46,463 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:07:46,163 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:08:46,473 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:09:46,172 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:10:46,469 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:10:58,632 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:01,475 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:06,165 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:11,473 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:16,170 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:21,480 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:26,168 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:31,463 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:36,168 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:41,469 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:46,178 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:51,463 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:11:56,168 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:12:46,475 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:13:46,174 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:14:46,472 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:15:46,170 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:16:46,472 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:17:46,164 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:18:46,469 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:19:46,187 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:20:46,465 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:21:46,176 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:22:46,476 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:23:46,170 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:24:46,473 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:25:46,158 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:26:46,474 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:27:46,162 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:28:46,549 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:29:46,173 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:30:46,478 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:31:46,164 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:32:46,492 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:33:46,158 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:34:46,473 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:35:46,165 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:35:51,194 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:35:55,446 - root - INFO - 127.0.0.1 - "GET /api/stats HTTP/1.1" 200 -
+2025-10-14 10:41:24,911 - root - INFO - 127.0.0.1 - code 404, message Not Found
+2025-10-14 10:41:24,911 - root - INFO - 127.0.0.1 - "GET /tsehlv.html HTTP/1.1" 404 -
+2025-10-14 10:43:14,976 - root - INFO - 127.0.0.1 - code 404, message Not Found
+2025-10-14 10:43:14,977 - root - INFO - 127.0.0.1 - "GET /tsehlv.html HTTP/1.1" 404 -
+2025-10-14 10:44:05,703 - WebAPIServer - INFO - 接收到停止信号
+2025-10-14 10:44:05,706 - WebAPIServer - INFO - 停止Web API服务器
+2025-10-14 10:44:05,707 - StreamManager - INFO - 清理资源
+2025-10-14 10:44:05,709 - StreamManager - INFO - 资源清理完成

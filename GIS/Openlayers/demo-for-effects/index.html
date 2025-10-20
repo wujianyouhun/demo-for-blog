@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <!--
+      OpenLayers地图效果演示项目
+      作者：学GIS的小宝同学
+
+      HTML文件说明：
+      1. 设置页面标题和字符编码
+      2. 引入OpenLayers CSS样式文件
+      3. 定义地图容器和图层切换按钮的样式
+      4. 创建地图容器和切换按钮的HTML结构
+    -->
+    <meta charset="UTF-8">
+    <title>OpenLayers地图效果演示 - 作者：学GIS的小宝同学</title>
+
+    <!-- 引入OpenLayers的CSS样式文件 -->
+    <!-- 这个文件包含了OpenLayers控件和地图容器的基础样式 -->
+    <link rel="stylesheet" href="node_modules/ol/ol.css">
+
+    <style>
+      /*
+       * 页面全局样式
+       * 移除默认边距，隐藏滚动条，让地图铺满整个屏幕
+       */
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+
+      /*
+       * 地图容器样式
+       * 使用viewport单位确保地图完全填满浏览器窗口
+       * - width: 100vw = 100% viewport width
+       * - height: 100vh = 100% viewport height
+       */
+      .map {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      /*
+       * 图层切换器样式
+       * 固定定位在地图右上角，z-index确保显示在地图上方
+       */
+      .layer-switcher {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;  /* 确保按钮在地图图层之上 */
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        font-size: 14px;
+      }
+
+      /*
+       * 切换器标题样式
+       */
+      .layer-switcher .title {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 12px;
+      }
+
+      /*
+       * 按钮基础样式
+       * 块级显示，宽度100%，圆角边框
+       */
+      .layer-switcher button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        background: #f9f9f9;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+      }
+
+      /*
+       * 按钮悬停效果
+       * 鼠标悬停时背景色变深，提供视觉反馈
+       */
+      .layer-switcher button:hover {
+        background: #e9e9e9;
+        border-color: #999;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+
+      /*
+       * 激活状态按钮样式
+       * 绿色背景表示当前选中的地图图层
+       */
+      .layer-switcher button.active {
+        background: #4CAF50;
+        color: white;
+        border-color: #45a049;
+        font-weight: bold;
+      }
+
+      /*
+       * 按焦点样式
+       * 键盘导航时的视觉反馈
+       */
+      .layer-switcher button:focus {
+        outline: 2px solid #4CAF50;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      HTML主体结构：
+      1. 地图容器：OpenLayers将在此div中渲染地图
+      2. 图层切换器：包含切换地图图层的按钮
+      3. JavaScript脚本：引入主逻辑文件
+    -->
+
+    <!-- 地图容器 -->
+    <!-- id="map" 供JavaScript代码引用 -->
+    <!-- class="map" 应用CSS样式 -->
+    <div id="map" class="map"></div>
+
+    <!-- 图层切换器 -->
+    <!-- 固定定位在右上角，提供地图图层切换功能 -->
+    <div class="layer-switcher">
+      <div class="title">地图图层</div>
+
+      <!-- OSM地图按钮 -->
+      <!-- class="active" 表示当前选中状态 -->
+      <!-- id="osm-btn" 供JavaScript事件监听使用 -->
+      <button id="osm-btn" class="active">🌍 OSM地图</button>
+
+      <!-- 天地图按钮 -->
+      <!-- 显示中文标签，便于用户理解 -->
+      <button id="tianditu-btn">🛰️ 天地图影像+注记</button>
+
+      <!-- 使用说明（可选择性添加） -->
+      <div class="help-text" style="font-size: 11px; color: #666; margin-top: 8px;">
+        点击按钮切换地图图层<br>
+        红色圆圈为自动生成的动画效果
+      </div>
+    </div>
+
+    <!--
+      引入JavaScript主文件
+      type="module" 表示使用ES6模块系统
+      src="main.js" 指向主逻辑文件
+    -->
+    <script type="module" src="main.js"></script>
+  </body>
+
+  <!--
+    HTML文件结构说明：
+
+    1. DOCTYPE声明：使用HTML5标准
+    2. html标签：设置语言为中文
+    3. head标签：包含页面元数据和样式
+       - meta charset：设置字符编码为UTF-8
+       - title：页面标题
+       - link：引入外部CSS文件
+       - style：内部CSS样式定义
+    4. body标签：页面主体内容
+       - 地图容器div：OpenLayers地图的渲染目标
+       - 图层切换器div：用户交互界面
+       - script标签：JavaScript代码入口
+
+    学习要点：
+    - 使用语义化的HTML结构
+    - 合理的CSS类命名
+    - 响应式设计原则
+    - 无障碍访问考虑
+    - 模块化JavaScript开发
+
+    这个HTML文件为Web GIS开发提供了一个标准的页面模板！
+  -->
+</html>

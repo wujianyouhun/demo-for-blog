@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单 MSE 测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        video { width: 100%; max-width: 640px; height: 360px; background: #000; }
+        .controls { margin: 15px 0; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; font-weight: bold; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-info { background: #d1ecf1; color: #0c5460; }
+        .log { background: #000; color: #0f0; font-family: monospace; padding: 10px; height: 150px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 简单 MSE 测试</h1>
+        <div class="controls">
+            <button class="btn-primary" onclick="loadMSEVideo()">加载 MSE 视频</button>
+            <button class="btn-primary" onclick="stopVideo()">停止视频</button>
+        </div>
+        <div id="status" class="status status-info">准备就绪</div>
+        <video id="videoPlayer" controls muted playsinline></video>
+        <div class="log" id="logPanel"></div>
+    </div>
+
+    <script>
+        const config = {
+            server: 'http://localhost:8081',
+            stream: 'camera1',
+            mseInstance: null
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logPanel = document.getElementById('logPanel');
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logPanel.appendChild(logEntry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status status-${type}`;
+        }
+
+        function loadMSEVideo() {
+            const video = document.getElementById('videoPlayer');
+            const mp4Url = `${config.server}/api/stream.mp4?src=${config.stream}`;
+
+            log('开始加载 MSE 视频...', 'info');
+            updateStatus('正在加载 MSE 视频...', 'info');
+
+            // 浏览器支持检查
+            if (!window.MediaSource) {
+                updateStatus('❌ 浏览器不支持 MediaSource API', 'error');
+                log('MediaSource API 不可用', 'error');
+                return;
+            }
+
+            const codec = 'video/mp4; codecs="avc1.42E01E,mp4a.40.2"';
+            if (!MediaSource.isTypeSupported(codec)) {
+                updateStatus('❌ 浏览器不支持 MP4 编解码器', 'error');
+                log('MP4 编解码器不支持', 'error');
+                return;
+            }
+
+            // 清理现有实例
+            if (config.mseInstance) {
+                cleanupMSE();
+            }
+
+            video.src = '';
+            video.load();
+
+            const mediaSource = new MediaSource();
+            video.src = URL.createObjectURL(mediaSource);
+
+            // 存储完整的 MSE 实例信息
+            config.mseInstance = {
+                mediaSource: mediaSource,
+                sourceBuffer: null,
+                streamController: null,
+                isActive: true,
+                queue: []
+            };
+
+            mediaSource.addEventListener('sourceopen', () => {
+                if (!config.mseInstance || !config.mseInstance.isActive) {
+                    log('MSE 实例已被清理，取消初始化', 'warning');
+                    return;
+                }
+
+                log('MSE 媒体源已打开', 'success');
+
+                try {
+                    const sourceBuffer = mediaSource.addSourceBuffer(codec);
+                    config.mseInstance.sourceBuffer = sourceBuffer;
+
+                    sourceBuffer.addEventListener('updateend', () => {
+                        if (!config.mseInstance || !config.mseInstance.isActive) {
+                            return;
+                        }
+
+                        const instance = config.mseInstance;
+                        if (instance.queue && instance.queue.length > 0 && !sourceBuffer.updating) {
+                            try {
+                                const buffer = instance.queue.shift();
+                                sourceBuffer.appendBuffer(buffer);
+                            } catch (e) {
+                                log(`队列处理错误: ${e.message}`, 'warning');
+                            }
+                        }
+                    });
+
+                    sourceBuffer.addEventListener('error', (e) => {
+                        log(`SourceBuffer 错误: ${e.message}`, 'error');
+                        updateStatus('缓冲区错误', 'error');
+                    });
+
+                    config.mseInstance.streamController = new AbortController();
+                    fetchMSEStream(mp4Url, sourceBuffer, config.mseInstance.queue);
+
+                } catch (e) {
+                    log(`创建 SourceBuffer 失败: ${e.message}`, 'error');
+                    updateStatus('初始化失败', 'error');
+                    cleanupMSE();
+                }
+            });
+
+            video.addEventListener('loadeddata', () => {
+                updateStatus('✅ MSE 视频加载成功', 'success');
+                log('MSE 视频加载成功', 'success');
+                video.play().catch(e => {
+                    log(`自动播放失败: ${e.message}`, 'warning');
+                });
+            });
+
+            video.addEventListener('error', (e) => {
+                updateStatus('❌ MSE 视频加载失败', 'error');
+                log(`MSE 加载失败: ${e.message}`, 'error');
+            });
+        }
+
+        async function fetchMSEStream(url, sourceBuffer, queue) {
+            const instance = config.mseInstance;
+            if (!instance || !instance.isActive || !instance.streamController) {
+                log('MSE 实例不可用，取消流获取', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch(url, { signal: instance.streamController.signal });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const reader = response.body.getReader();
+                let bufferCount = 0;
+
+                while (true) {
+                    if (!instance.isActive || instance.streamController.signal.aborted) {
+                        log('MSE 流获取被中断', 'info');
+                        break;
+                    }
+
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    if (value && value.length > 0) {
+                        bufferCount++;
+
+                        if (!instance.isActive) break;
+
+                        if (!sourceBuffer.updating) {
+                            try {
+                                sourceBuffer.appendBuffer(value);
+
+                                if (bufferCount % 50 === 0) {
+                                    log(`已处理 ${bufferCount} 个数据块`, 'info');
+                                }
+                            } catch (e) {
+                                log(`缓冲区错误: ${e.message}`, 'warning');
+                                if (instance.isActive) {
+                                    if (queue.length < 100) {
+                                        queue.push(value);
+                                    } else {
+                                        log('队列已满，丢弃数据块', 'warning');
+                                    }
+                                }
+                            }
+                        } else {
+                            if (queue.length < 100) {
+                                queue.push(value);
+                            } else {
+                                log('队列已满，丢弃数据块', 'warning');
+                            }
+                        }
+                    }
+                }
+
+                if (instance.isActive) {
+                    log(`MSE 流获取完成，共处理 ${bufferCount} 个数据块`, 'success');
+                }
+
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    log('MSE 流获取被主动中止', 'info');
+                } else {
+                    log(`MSE 流获取失败: ${error.message}`, 'error');
+                    updateStatus('❌ 流获取失败', 'error');
+                }
+            }
+        }
+
+        function cleanupMSE() {
+            const instance = config.mseInstance;
+            if (!instance) return;
+
+            log('清理 MSE 实例', 'info');
+
+            try {
+                // 中止流获取
+                if (instance.streamController) {
+                    instance.streamController.abort();
+                    instance.streamController = null;
+                }
+
+                // 标记为非活跃状态
+                instance.isActive = false;
+
+                // 清理队列
+                if (instance.queue) {
+                    instance.queue = [];
+                }
+
+                // 清理 SourceBuffer
+                if (instance.sourceBuffer) {
+                    if (instance.mediaSource.readyState === 'open') {
+                        try {
+                            if (instance.sourceBuffer.updating) {
+                                instance.sourceBuffer.abort();
+                            }
+                            instance.mediaSource.removeSourceBuffer(instance.sourceBuffer);
+                        } catch (e) {
+                            log(`移除 SourceBuffer 错误: ${e.message}`, 'warning');
+                        }
+                    }
+                    instance.sourceBuffer = null;
+                }
+
+                // 结束媒体源
+                if (instance.mediaSource && instance.mediaSource.readyState === 'open') {
+                    try {
+                        instance.mediaSource.endOfStream();
+                    } catch (e) {
+                        log(`结束 MediaStream 错误: ${e.message}`, 'warning');
+                    }
+                }
+
+            } catch (e) {
+                log(`清理 MSE 实例错误: ${e.message}`, 'warning');
+            } finally {
+                // 删除实例引用
+                config.mseInstance = null;
+            }
+        }
+
+        function stopVideo() {
+            const video = document.getElementById('videoPlayer');
+
+            // 清理 MSE 实例
+            if (config.mseInstance) {
+                cleanupMSE();
+            }
+
+            // 清理视频元素
+            video.src = '';
+            video.load();
+
+            updateStatus('视频已停止', 'info');
+            log('视频已停止', 'info');
+        }
+
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            log('简单 MSE 测试页面已加载', 'success');
+        });
+    </script>
+</body>
+</html>

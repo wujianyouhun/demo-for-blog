@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <title>OpenLayers 轨迹动画教学案例</title>
+    <!-- OpenLayers CSS 样式文件 - 提供地图容器的基础样式 -->
+    <link rel="stylesheet" href="node_modules/ol/ol.css">
+    <style>
+      /* 全局样式重置 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* 页面主体样式 */
+      body {
+        font-family: Arial, sans-serif;
+        overflow: hidden; /* 隐藏滚动条，实现全屏地图效果 */
+      }
+
+      /* 地图容器样式 */
+      .container {
+        position: relative; /* 相对定位，为控制面板提供定位参考 */
+        height: 100vh; /* 100% 视口高度 */
+        width: 100vw; /* 100% 视口宽度 */
+      }
+
+      /* 地图样式 */
+      .map {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* 控制面板样式 */
+      .control-panel {
+        width: 250px;
+        background-color: rgba(255, 255, 255, 0.9); /* 半透明白色背景 */
+        padding: 20px;
+        box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1); /* 左侧阴影，符合右上角位置 */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        position: absolute; /* 绝对定位 */
+        top: 20px;
+        right: 20px; /* 固定在右上角 */
+        border-radius: 8px;
+        z-index: 1000; /* 确保面板在地图上方 */
+      }
+
+      /* 控制组件组样式 */
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      /* 标签样式 */
+      .control-group label {
+        font-weight: bold;
+        color: #333;
+      }
+
+      /* 速度控制容器样式 */
+      .speed-control {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      /* 速度滑块样式 */
+      .speed-input {
+        width: 100%;
+        height: 30px;
+      }
+
+      /* 速度值显示样式 */
+      .speed-value {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+      }
+
+      /* 开始按钮样式 */
+      .start-button {
+        padding: 12px 20px;
+        background-color: #007cba;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s; /* 平滑颜色过渡效果 */
+      }
+
+      /* 按钮悬停效果 */
+      .start-button:hover {
+        background-color: #005a8b;
+      }
+
+      /* 按钮点击效果 */
+      .start-button:active {
+        background-color: #004070;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 地图容器结构 -->
+    <div class="container">
+      <!-- OpenLayers 地图将渲染到这个 div 中 -->
+      <div id="map" class="map"></div>
+
+      <!-- 控制面板 - 包含速度控制和动画按钮 -->
+      <div class="control-panel">
+        <div class="control-group">
+          <label for="speed">速度控制</label>
+          <div class="speed-control">
+            <!-- 速度滑块：范围 10-999，默认值 60 -->
+            <input id="speed" type="range" min="10" max="999" step="10" value="60" class="speed-input">
+            <!-- 速度值实时显示 -->
+            <div class="speed-value">速度: <span id="speed-value">60</span></div>
+          </div>
+        </div>
+        <!-- 动画控制按钮 -->
+        <button id="start-animation" class="start-button">开始动画</button>
+      </div>
+    </div>
+
+    <!-- 导入主要的 JavaScript 模块 -->
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

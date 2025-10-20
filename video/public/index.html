@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTSP流媒体播放器</title>
+    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
+    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .player-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .video-js {
+            width: 100%;
+            height: 450px;
+            border-radius: 8px;
+        }
+
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        .controls h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .status-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-panel h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+        }
+
+        .status-dot.running {
+            background: #27ae60;
+        }
+
+        .status-dot.error {
+            background: #e74c3c;
+        }
+
+        .status-dot.stopped {
+            background: #95a5a6;
+        }
+
+        .stream-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .stream-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stream-item:last-child {
+            border-bottom: none;
+        }
+
+        .stream-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stream-status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .stats-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .stats-panel h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .url-display {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .url-display h4 {
+            margin-bottom: 5px;
+            font-family: inherit;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .notification.info {
+            background: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .video-js {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>RTSP流媒体播放器</h1>
+            <p>将RTSP流实时转换为Web可播放的HLS/DASH格式</p>
+        </div>
+
+        <div class="main-content">
+            <div class="player-section">
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('hls')">HLS播放器</button>
+                        <button class="tab-button" onclick="switchTab('dash')">DASH播放器</button>
+                        <button class="tab-button" onclick="switchTab('grid')">网格视图</button>
+                    </div>
+
+                    <div id="hls-tab" class="tab-content active">
+                        <div class="video-container">
+                            <video
+                                id="hls-player"
+                                class="video-js vjs-default-skin"
+                                controls
+                                preload="auto"
+                                data-setup="{}">
+                                <p class="vjs-no-js">
+                                    To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video
+                                </p>
+                            </video>
+                        </div>
+                    </div>
+
+                    <div id="dash-tab" class="tab-content">
+                        <div class="video-container">
+                            <video
+                                id="dash-player"
+                                class="video-js vjs-default-skin"
+                                controls
+                                preload="auto"
+                                data-setup="{}">
+                                <p class="vjs-no-js">
+                                    To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video
+                                </p>
+                            </video>
+                        </div>
+                    </div>
+
+                    <div id="grid-tab" class="tab-content">
+                        <div id="multi-view">
+                            <div class="loading" id="grid-loading">
+                                <div class="spinner"></div>
+                                <p>正在加载网格视图...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="controls">
+                    <h3>流媒体控制</h3>
+
+                    <div class="control-group">
+                        <label for="stream-name">流名称</label>
+                        <input type="text" id="stream-name" placeholder="输入流名称" value="stream1">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="rtsp-url">RTSP地址</label>
+                        <input type="text" id="rtsp-url" placeholder="rtsp://username:password@ip:port/stream" value="rtsp://admin:Aa147258@192.168.109.213">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="video-quality">视频质量</label>
+                        <select id="video-quality">
+                            <option value="low">低质量 (480p)</option>
+                            <option value="medium" selected>中等质量 (720p)</option>
+                            <option value="high">高质量 (1080p)</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="addStream()">添加流</button>
+                        <button class="btn btn-danger" onclick="removeSelectedStream()">删除流</button>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="startSelectedStream()">启动</button>
+                        <button class="btn btn-danger" onclick="stopSelectedStream()">停止</button>
+                    </div>
+                </div>
+
+                <div class="status-panel">
+                    <h4>流状态</h4>
+                    <div class="status-indicator">
+                        <div class="status-dot" id="status-dot"></div>
+                        <span id="status-text">未连接</span>
+                    </div>
+                    <div class="stream-list" id="stream-list">
+                        <div class="stream-item">
+                            <span class="stream-name">暂无流</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="url-display">
+                    <h4>HLS流地址</h4>
+                    <div id="hls-url">-</div>
+                    <h4>DASH流地址</h4>
+                    <div id="dash-url">-</div>
+                </div>
+
+                <div class="stats-panel">
+                    <h4>系统统计</h4>
+                    <div class="stat-item">
+                        <span class="stat-label">运行时间:</span>
+                        <span class="stat-value" id="uptime">0秒</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">活跃流:</span>
+                        <span class="stat-value" id="active-streams">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">总流量:</span>
+                        <span class="stat-value" id="total-bytes">0MB</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">错误数:</span>
+                        <span class="stat-value" id="error-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // 全局变量
+        let hlsPlayer, dashPlayer;
+        let currentStreams = {};
+        let selectedStreamId = null;
+        let websocket = null;
+        let systemStats = {};
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePlayers();
+            connectWebSocket();
+            loadStreams();
+            startStatsUpdate();
+        });
+
+        // 初始化播放器
+        function initializePlayers() {
+            hlsPlayer = videojs('hls-player');
+            dashPlayer = videojs('dash-player');
+        }
+
+        // 连接WebSocket
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.hostname}:8081`;
+
+            try {
+                websocket = new WebSocket(wsUrl);
+
+                websocket.onopen = function() {
+                    console.log('WebSocket连接已建立');
+                    updateConnectionStatus(true);
+                };
+
+                websocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+
+                websocket.onclose = function() {
+                    console.log('WebSocket连接已关闭');
+                    updateConnectionStatus(false);
+                    // 5秒后尝试重连
+                    setTimeout(connectWebSocket, 5000);
+                };
+
+                websocket.onerror = function(error) {
+                    console.error('WebSocket错误:', error);
+                    updateConnectionStatus(false);
+                };
+            } catch (error) {
+                console.error('无法连接WebSocket:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        // 处理WebSocket消息
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'initial_status':
+                    currentStreams = data.streams;
+                    systemStats = data.system_stats;
+                    updateStreamList();
+                    updateStats();
+                    break;
+                case 'stream_started':
+                    showNotification(`流 ${data.stream_id} 已启动`, 'success');
+                    refreshStreamStatus(data.stream_id);
+                    break;
+                case 'stream_stopped':
+                    showNotification(`流 ${data.stream_id} 已停止`, 'info');
+                    refreshStreamStatus(data.stream_id);
+                    break;
+                case 'heartbeat':
+                    // 心跳消息，忽略
+                    break;
+            }
+        }
+
+        // 更新连接状态
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+
+            if (connected) {
+                statusDot.className = 'status-dot running';
+                statusText.textContent = '已连接';
+            } else {
+                statusDot.className = 'status-dot error';
+                statusText.textContent = '连接断开';
+            }
+        }
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 更新标签按钮状态
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+
+            // 如果切换到网格视图，加载多视图
+            if (tabName === 'grid') {
+                loadGridView();
+            }
+        }
+
+        // 加载流列表
+        function loadStreams() {
+            fetch('/api/streams')
+                .then(response => response.json())
+                .then(data => {
+                    currentStreams = data.streams;
+                    updateStreamList();
+                })
+                .catch(error => {
+                    console.error('加载流列表失败:', error);
+                });
+        }
+
+        // 更新流列表
+        function updateStreamList() {
+            const streamList = document.getElementById('stream-list');
+
+            if (Object.keys(currentStreams).length === 0) {
+                streamList.innerHTML = '<div class="stream-item"><span class="stream-name">暂无流</span></div>';
+                return;
+            }
+
+            streamList.innerHTML = '';
+
+            Object.entries(currentStreams).forEach(([streamId, stream]) => {
+                const item = document.createElement('div');
+                item.className = 'stream-item';
+                item.innerHTML = `
+                    <span class="stream-name">${streamId}</span>
+                    <span class="stream-status">${stream.status}</span>
+                `;
+                item.onclick = () => selectStream(streamId);
+                streamList.appendChild(item);
+            });
+        }
+
+        // 选择流
+        function selectStream(streamId) {
+            selectedStreamId = streamId;
+
+            // 更新选中状态
+            document.querySelectorAll('.stream-item').forEach(item => {
+                item.style.backgroundColor = '';
+            });
+            event.currentTarget.style.backgroundColor = '#f0f0f0';
+
+            // 更新URL显示
+            updateStreamUrls(streamId);
+        }
+
+        // 更新流URL显示
+        function updateStreamUrls(streamId) {
+            if (!currentStreams[streamId]) return;
+
+            const hlsUrl = `http://localhost:8080/hls/${streamId}/stream.m3u8`;
+            const dashUrl = `http://localhost:8080/dash/${streamId}/stream.mpd`;
+
+            document.getElementById('hls-url').textContent = hlsUrl;
+            document.getElementById('dash-url').textContent = dashUrl;
+
+            // 更新播放器源
+            if (hlsPlayer) {
+                hlsPlayer.src({ src: hlsUrl, type: 'application/x-mpegURL' });
+            }
+            if (dashPlayer) {
+                dashPlayer.src({ src: dashUrl, type: 'application/dash+xml' });
+            }
+        }
+
+        // 添加流
+        function addStream() {
+            const streamName = document.getElementById('stream-name').value.trim();
+            const rtspUrl = document.getElementById('rtsp-url').value.trim();
+            const quality = document.getElementById('video-quality').value;
+
+            if (!streamName || !rtspUrl) {
+                showNotification('请填写流名称和RTSP地址', 'error');
+                return;
+            }
+
+            const config = getQualityConfig(quality);
+
+            fetch('/api/streams', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    stream_id: streamName,
+                    rtsp_url: rtspUrl,
+                    config: config
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('流添加成功', 'success');
+                    loadStreams();
+                } else {
+                    showNotification(data.error || '添加流失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('添加流失败:', error);
+                showNotification('添加流失败', 'error');
+            });
+        }
+
+        // 获取质量配置
+        function getQualityConfig(quality) {
+            const configs = {
+                low: {
+                    resolution: '640x480',
+                    bitrate: '1000k',
+                    framerate: 20
+                },
+                medium: {
+                    resolution: '1280x720',
+                    bitrate: '2000k',
+                    framerate: 25
+                },
+                high: {
+                    resolution: '1920x1080',
+                    bitrate: '4000k',
+                    framerate: 30
+                }
+            };
+            return configs[quality] || configs.medium;
+        }
+
+        // 删除选中的流
+        function removeSelectedStream() {
+            if (!selectedStreamId) {
+                showNotification('请先选择要删除的流', 'error');
+                return;
+            }
+
+            if (!confirm(`确定要删除流 "${selectedStreamId}" 吗？`)) {
+                return;
+            }
+
+            fetch(`/api/streams/${selectedStreamId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('流删除成功', 'success');
+                    selectedStreamId = null;
+                    loadStreams();
+                } else {
+                    showNotification(data.error || '删除流失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('删除流失败:', error);
+                showNotification('删除流失败', 'error');
+            });
+        }
+
+        // 启动选中的流
+        function startSelectedStream() {
+            if (!selectedStreamId) {
+                showNotification('请先选择要启动的流', 'error');
+                return;
+            }
+
+            fetch(`/api/streams/${selectedStreamId}/start`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('流启动成功', 'success');
+                    setTimeout(() => {
+                        updateStreamUrls(selectedStreamId);
+                    }, 2000);
+                } else {
+                    showNotification(data.error || '启动流失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('启动流失败:', error);
+                showNotification('启动流失败', 'error');
+            });
+        }
+
+        // 停止选中的流
+        function stopSelectedStream() {
+            if (!selectedStreamId) {
+                showNotification('请先选择要停止的流', 'error');
+                return;
+            }
+
+            fetch(`/api/streams/${selectedStreamId}/stop`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('流停止成功', 'success');
+                } else {
+                    showNotification(data.error || '停止流失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('停止流失败:', error);
+                showNotification('停止流失败', 'error');
+            });
+        }
+
+        // 刷新流状态
+        function refreshStreamStatus(streamId) {
+            fetch(`/api/streams/${streamId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentStreams[streamId] = data.stream;
+                        updateStreamList();
+                        updateStats();
+                    }
+                })
+                .catch(error => {
+                    console.error('刷新流状态失败:', error);
+                });
+        }
+
+        // 加载网格视图
+        function loadGridView() {
+            const multiView = document.getElementById('multi-view');
+            const loading = document.getElementById('grid-loading');
+
+            loading.classList.add('show');
+
+            // 清空现有内容
+            multiView.innerHTML = '';
+            multiView.appendChild(loading);
+
+            // 延迟加载以显示加载动画
+            setTimeout(() => {
+                const streams = Object.entries(currentStreams).filter(([_, stream]) => stream.status === 'running');
+
+                if (streams.length === 0) {
+                    multiView.innerHTML = '<p style="text-align: center; color: #666;">没有正在运行的流</p>';
+                    return;
+                }
+
+                const grid = document.createElement('div');
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
+                grid.style.gap = '20px';
+
+                streams.forEach(([streamId, _]) => {
+                    const videoContainer = document.createElement('div');
+                    videoContainer.style.backgroundColor = 'white';
+                    videoContainer.style.borderRadius = '8px';
+                    videoContainer.style.padding = '10px';
+                    videoContainer.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+
+                    const video = document.createElement('video');
+                    video.className = 'video-js vjs-default-skin';
+                    video.controls = true;
+                    video.preload = 'auto';
+                    video.style.width = '100%';
+                    video.style.height = '200px';
+
+                    const hlsUrl = `http://localhost:8080/hls/${streamId}/stream.m3u8`;
+                    video.innerHTML = `<source src="${hlsUrl}" type="application/x-mpegURL">`;
+
+                    const title = document.createElement('h4');
+                    title.textContent = streamId;
+                    title.style.marginBottom = '10px';
+                    title.style.textAlign = 'center';
+
+                    videoContainer.appendChild(title);
+                    videoContainer.appendChild(video);
+                    grid.appendChild(videoContainer);
+
+                    // 初始化播放器
+                    videojs(video);
+                });
+
+                multiView.innerHTML = '';
+                multiView.appendChild(grid);
+            }, 1000);
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            if (systemStats) {
+                document.getElementById('uptime').textContent = formatUptime(systemStats.uptime);
+                document.getElementById('active-streams').textContent = systemStats.active_streams;
+                document.getElementById('total-bytes').textContent = formatBytes(systemStats.total_bytes_processed);
+                document.getElementById('error-count').textContent = systemStats.total_errors;
+            }
+        }
+
+        // 开始统计更新
+        function startStatsUpdate() {
+            setInterval(() => {
+                fetch('/api/stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        systemStats = data.stats;
+                        updateStats();
+                    })
+                    .catch(error => {
+                        console.error('获取统计信息失败:', error);
+                    });
+            }, 5000);
+        }
+
+        // 格式化运行时间
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+
+            if (hours > 0) {
+                return `${hours}小时${minutes}分钟`;
+            } else if (minutes > 0) {
+                return `${minutes}分钟${secs}秒`;
+            } else {
+                return `${secs}秒`;
+            }
+        }
+
+        // 格式化字节数
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0B';
+
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + sizes[i];
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

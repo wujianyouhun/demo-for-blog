@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作视频页面 - go2rtc</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls {
+            background: #333;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .video-cell {
+            background: #000;
+            border: 2px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .video-cell h3 {
+            margin: 0;
+            padding: 10px;
+            background: #222;
+            font-size: 14px;
+            text-align: center;
+        }
+        .video-player {
+            width: 100%;
+            height: 300px;
+            background: #000;
+        }
+        .status {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 10;
+        }
+        .status.success { color: #00ff00; }
+        .status.error { color: #ff4444; }
+        .status.warning { color: #ffaa00; }
+        button {
+            margin: 0 5px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #666; cursor: not-allowed; }
+        .log {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            height: 120px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .config-panel {
+            background: #222;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        input {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px;
+            margin: 0 5px;
+            border-radius: 3px;
+        }
+        .format-selector {
+            margin: 10px 0;
+        }
+        select {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>工作视频页面 - go2rtc</h1>
+        <p>使用 HLS 和 MP4 格式</p>
+    </div>
+
+    <div class="config-panel">
+        <label>服务器地址:</label>
+        <input type="text" id="server" value="http://localhost:8081" style="width: 200px;">
+        <button onclick="testServer()">测试服务器</button>
+        <button onclick="loadAllVideos()">加载所有视频</button>
+        <button onclick="clearAll()">清空</button>
+
+        <div class="format-selector">
+            <label>视频格式:</label>
+            <select id="videoFormat" onchange="updateFormat()">
+                <option value="hls">HLS (推荐)</option>
+                <option value="mp4">MP4</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="loadVideo('camera1', 0)">Camera 1</button>
+        <button onclick="loadVideo('camera2', 1)">Camera 2</button>
+        <button onclick="loadVideo('camera3', 2)">Camera 3</button>
+        <button onclick="loadVideo('camera4', 3)">Camera 4</button>
+    </div>
+
+    <div class="grid" id="videoGrid">
+        <div class="video-cell">
+            <h3>Camera 1</h3>
+            <video class="video-player" id="video-0" controls muted playsinline></video>
+            <div class="status" id="status-0">等待加载</div>
+        </div>
+        <div class="video-cell">
+            <h3>Camera 2</h3>
+            <video class="video-player" id="video-1" controls muted playsinline></video>
+            <div class="status" id="status-1">等待加载</div>
+        </div>
+        <div class="video-cell">
+            <h3>Camera 3</h3>
+            <video class="video-player" id="video-2" controls muted playsinline></video>
+            <div class="status" id="status-2">等待加载</div>
+        </div>
+        <div class="video-cell">
+            <h3>Camera 4</h3>
+            <video class="video-player" id="video-3" controls muted playsinline></video>
+            <div class="status" id="status-3">等待加载</div>
+        </div>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        let config = {
+            server: 'http://localhost:8081',
+            format: 'hls'
+        };
+        let hlsInstances = {};
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEl = document.getElementById('log');
+            logEl.innerHTML += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function updateServer() {
+            config.server = document.getElementById('server').value;
+        }
+
+        function updateFormat() {
+            config.format = document.getElementById('videoFormat').value;
+            log(`视频格式切换为: ${config.format.toUpperCase()}`);
+        }
+
+        async function testServer() {
+            updateServer();
+            log(`测试服务器连接: ${config.server}`);
+
+            try {
+                const response = await fetch(`${config.server}/api/streams`);
+                if (response.ok) {
+                    const streams = await response.json();
+                    log(`✅ 服务器连接成功!`);
+                    log(`📊 可用流: ${Object.keys(streams).join(', ')}`);
+
+                    // 测试HLS端点
+                    const hlsTest = await fetch(`${config.server}/api/stream.m3u8?src=camera1`, {method: 'HEAD'});
+                    log(`HLS端点: ${hlsTest.ok ? '✅ 可用' : '❌ 不可用'}`);
+
+                    // 测试MP4端点
+                    const mp4Test = await fetch(`${config.server}/api/stream.mp4?src=camera1`, {method: 'HEAD'});
+                    log(`MP4端点: ${mp4Test.ok ? '✅ 可用' : '❌ 不可用'}`);
+
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                log(`❌ 服务器连接失败: ${error.message}`);
+            }
+        }
+
+        function loadVideo(streamName, index) {
+            updateServer();
+
+            const video = document.getElementById(`video-${index}`);
+            const status = document.getElementById(`status-${index}`);
+
+            status.textContent = '加载中...';
+            status.className = 'status';
+
+            // 清理之前的实例
+            if (hlsInstances[index]) {
+                hlsInstances[index].destroy();
+                hlsInstances[index] = null;
+            }
+
+            if (config.format === 'hls') {
+                loadHLSVideo(streamName, index, video, status);
+            } else {
+                loadMP4Video(streamName, index, video, status);
+            }
+        }
+
+        function loadHLSVideo(streamName, index, video, status) {
+            const hlsUrl = `${config.server}/api/stream.m3u8?src=${streamName}`;
+
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    backBufferLength: 90
+                });
+
+                hlsInstances[index] = hls;
+                hls.loadSource(hlsUrl);
+                hls.attachMedia(video);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    status.textContent = 'HLS: 播放中';
+                    status.className = 'status success';
+                    video.play().catch(e => {
+                        log(`自动播放被阻止: ${e.message}`);
+                        status.textContent = 'HLS: 点击播放';
+                        status.className = 'status warning';
+                    });
+                });
+
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    let errorMsg = 'HLS错误';
+                    if (data.details) errorMsg += `: ${data.details}`;
+                    status.textContent = errorMsg;
+                    status.className = 'status error';
+                    log(`${streamName}: ${errorMsg}`);
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = hlsUrl;
+                video.addEventListener('loadedmetadata', () => {
+                    status.textContent = 'HLS: 原生播放';
+                    status.className = 'status success';
+                    video.play();
+                });
+                video.addEventListener('error', () => {
+                    status.textContent = 'HLS: 加载失败';
+                    status.className = 'status error';
+                });
+            } else {
+                status.textContent = 'HLS: 不支持';
+                status.className = 'status error';
+            }
+
+            log(`加载 ${streamName} (HLS): ${hlsUrl}`);
+        }
+
+        function loadMP4Video(streamName, index, video, status) {
+            const mp4Url = `${config.server}/api/stream.mp4?src=${streamName}`;
+
+            video.src = mp4Url;
+            video.addEventListener('loadeddata', () => {
+                status.textContent = 'MP4: 播放中';
+                status.className = 'status success';
+                video.play();
+            });
+            video.addEventListener('error', () => {
+                status.textContent = 'MP4: 加载失败';
+                status.className = 'status error';
+                log(`${streamName}: MP4加载失败`);
+            });
+            video.addEventListener('waiting', () => {
+                status.textContent = 'MP4: 缓冲中';
+                status.className = 'status warning';
+            });
+
+            log(`加载 ${streamName} (MP4): ${mp4Url}`);
+        }
+
+        function loadAllVideos() {
+            log('加载所有视频流...');
+            const streams = ['camera1', 'camera2', 'camera3', 'camera4'];
+
+            streams.forEach((stream, index) => {
+                setTimeout(() => {
+                    loadVideo(stream, index);
+                }, index * 300); // 延迟加载，避免同时请求
+            });
+        }
+
+        function clearAll() {
+            log('清空所有视频');
+
+            // 清理HLS实例
+            Object.values(hlsInstances).forEach(hls => hls?.destroy());
+            hlsInstances = {};
+
+            // 重置视频元素
+            const videos = document.querySelectorAll('.video-player');
+            videos.forEach(video => {
+                video.src = '';
+                video.load();
+            });
+
+            // 重置状态
+            const statusEls = document.querySelectorAll('.status');
+            statusEls.forEach(el => {
+                el.textContent = '等待加载';
+                el.className = 'status';
+            });
+        }
+
+        // 页面加载时自动测试服务器
+        window.addEventListener('load', () => {
+            setTimeout(testServer, 1000);
+        });
+
+        // 页面卸载时清理资源
+        window.addEventListener('beforeunload', () => {
+            Object.values(hlsInstances).forEach(hls => hls?.destroy());
+        });
+    </script>
+</body>
+</html>

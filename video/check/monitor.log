@@ -1,0 +1,1267 @@
+2025-10-14 15:39:29,178 - INFO - 📹 开始完整视频录制: detection_results\videos\full_video_20251014_153929_164.mp4
+2025-10-14 15:39:29,180 - INFO - 预热模型...
+2025-10-14 15:39:30,171 - ERROR - 保存线程错误: 
+2025-10-14 15:39:31,182 - ERROR - 保存线程错误: 
+2025-10-14 15:39:31,416 - INFO - 🚀 开始监控...
+2025-10-14 15:39:32,195 - ERROR - 保存线程错误: 
+2025-10-14 15:39:33,203 - ERROR - 保存线程错误: 
+2025-10-14 15:39:34,208 - ERROR - 保存线程错误: 
+2025-10-14 15:39:35,218 - ERROR - 保存线程错误: 
+2025-10-14 15:39:36,221 - ERROR - 保存线程错误: 
+2025-10-14 15:39:37,228 - ERROR - 保存线程错误: 
+2025-10-14 15:39:38,237 - ERROR - 保存线程错误: 
+2025-10-14 15:39:39,244 - ERROR - 保存线程错误: 
+2025-10-14 15:39:40,257 - ERROR - 保存线程错误: 
+2025-10-14 15:39:41,264 - ERROR - 保存线程错误: 
+2025-10-14 15:39:42,275 - ERROR - 保存线程错误: 
+2025-10-14 15:39:43,284 - ERROR - 保存线程错误: 
+2025-10-14 15:39:44,296 - ERROR - 保存线程错误: 
+2025-10-14 15:39:45,305 - ERROR - 保存线程错误: 
+2025-10-14 15:39:46,307 - ERROR - 保存线程错误: 
+2025-10-14 15:39:47,314 - ERROR - 保存线程错误: 
+2025-10-14 15:39:48,321 - ERROR - 保存线程错误: 
+2025-10-14 15:39:49,329 - ERROR - 保存线程错误: 
+2025-10-14 15:39:50,342 - ERROR - 保存线程错误: 
+2025-10-14 15:39:51,351 - ERROR - 保存线程错误: 
+2025-10-14 15:39:52,360 - ERROR - 保存线程错误: 
+2025-10-14 15:39:53,329 - WARNING - 🚨 事件录制开始: detection_results\events\event_0000_20251014_153953_325.mp4
+2025-10-14 15:39:53,379 - INFO - 💾 保存图像: detection_results\images\frame_114_20251014_153953_330.jpg (1个检测)
+2025-10-14 15:39:53,384 - INFO - 📝 保存检测信息: detection_results\detections\detection_114_20251014_153953_382.json
+2025-10-14 15:39:54,399 - ERROR - 保存线程错误: 
+2025-10-14 15:39:54,881 - WARNING - 🚨 事件录制开始: detection_results\events\event_0001_20251014_153954_879.mp4
+2025-10-14 15:39:54,908 - INFO - 💾 保存图像: detection_results\images\frame_123_20251014_153954_883.jpg (1个检测)
+2025-10-14 15:39:54,912 - INFO - 📝 保存检测信息: detection_results\detections\detection_123_20251014_153954_910.json
+2025-10-14 15:39:55,428 - WARNING - 🚨 事件录制开始: detection_results\events\event_0002_20251014_153955_425.mp4
+2025-10-14 15:39:55,474 - INFO - 💾 保存图像: detection_results\images\frame_126_20251014_153955_431.jpg (1个检测)
+2025-10-14 15:39:55,477 - INFO - 📝 保存检测信息: detection_results\detections\detection_126_20251014_153955_477.json
+2025-10-14 15:39:55,697 - INFO - 💾 保存图像: detection_results\images\frame_127_20251014_153955_651.jpg (2个检测)
+2025-10-14 15:39:55,701 - INFO - 📝 保存检测信息: detection_results\detections\detection_127_20251014_153955_699.json
+2025-10-14 15:39:56,716 - ERROR - 保存线程错误: 
+2025-10-14 15:39:57,175 - WARNING - 🚨 事件录制开始: detection_results\events\event_0003_20251014_153957_171.mp4
+2025-10-14 15:39:57,215 - INFO - 💾 保存图像: detection_results\images\frame_135_20251014_153957_176.jpg (1个检测)
+2025-10-14 15:39:57,218 - INFO - 📝 保存检测信息: detection_results\detections\detection_135_20251014_153957_216.json
+2025-10-14 15:39:57,463 - INFO - 💾 保存图像: detection_results\images\frame_136_20251014_153957_425.jpg (1个检测)
+2025-10-14 15:39:57,467 - INFO - 📝 保存检测信息: detection_results\detections\detection_136_20251014_153957_465.json
+2025-10-14 15:39:58,478 - ERROR - 保存线程错误: 
+2025-10-14 15:39:59,067 - WARNING - 🚨 事件录制开始: detection_results\events\event_0004_20251014_153959_062.mp4
+2025-10-14 15:39:59,093 - INFO - 💾 保存图像: detection_results\images\frame_145_20251014_153959_067.jpg (1个检测)
+2025-10-14 15:39:59,098 - INFO - 📝 保存检测信息: detection_results\detections\detection_145_20251014_153959_097.json
+2025-10-14 15:39:59,541 - WARNING - 🚨 事件录制开始: detection_results\events\event_0005_20251014_153959_538.mp4
+2025-10-14 15:39:59,563 - INFO - 💾 保存图像: detection_results\images\frame_148_20251014_153959_541.jpg (1个检测)
+2025-10-14 15:39:59,566 - INFO - 📝 保存检测信息: detection_results\detections\detection_148_20251014_153959_565.json
+2025-10-14 15:40:00,567 - ERROR - 保存线程错误: 
+2025-10-14 15:40:01,577 - ERROR - 保存线程错误: 
+2025-10-14 15:40:02,593 - ERROR - 保存线程错误: 
+2025-10-14 15:40:03,597 - ERROR - 保存线程错误: 
+2025-10-14 15:40:04,603 - ERROR - 保存线程错误: 
+2025-10-14 15:40:05,617 - ERROR - 保存线程错误: 
+2025-10-14 15:40:06,627 - ERROR - 保存线程错误: 
+2025-10-14 15:40:07,634 - ERROR - 保存线程错误: 
+2025-10-14 15:40:08,644 - ERROR - 保存线程错误: 
+2025-10-14 15:40:09,657 - ERROR - 保存线程错误: 
+2025-10-14 15:40:10,665 - ERROR - 保存线程错误: 
+2025-10-14 15:40:11,666 - ERROR - 保存线程错误: 
+2025-10-14 15:40:12,671 - ERROR - 保存线程错误: 
+2025-10-14 15:40:13,677 - ERROR - 保存线程错误: 
+2025-10-14 15:40:14,688 - ERROR - 保存线程错误: 
+2025-10-14 15:40:15,701 - ERROR - 保存线程错误: 
+2025-10-14 15:40:16,706 - ERROR - 保存线程错误: 
+2025-10-14 15:40:16,947 - WARNING - 🚨 事件录制开始: detection_results\events\event_0006_20251014_154016_944.mp4
+2025-10-14 15:40:16,991 - INFO - 💾 保存图像: detection_results\images\frame_251_20251014_154016_948.jpg (1个检测)
+2025-10-14 15:40:16,994 - INFO - 📝 保存检测信息: detection_results\detections\detection_251_20251014_154016_993.json
+2025-10-14 15:40:17,560 - WARNING - 🚨 事件录制开始: detection_results\events\event_0007_20251014_154017_557.mp4
+2025-10-14 15:40:17,599 - INFO - 💾 保存图像: detection_results\images\frame_254_20251014_154017_562.jpg (1个检测)
+2025-10-14 15:40:17,604 - INFO - 📝 保存检测信息: detection_results\detections\detection_254_20251014_154017_601.json
+2025-10-14 15:40:17,922 - WARNING - 🚨 事件录制开始: detection_results\events\event_0008_20251014_154017_918.mp4
+2025-10-14 15:40:17,966 - INFO - 💾 保存图像: detection_results\images\frame_256_20251014_154017_923.jpg (1个检测)
+2025-10-14 15:40:17,969 - INFO - 📝 保存检测信息: detection_results\detections\detection_256_20251014_154017_968.json
+2025-10-14 15:40:18,975 - ERROR - 保存线程错误: 
+2025-10-14 15:40:19,537 - WARNING - 🚨 事件录制开始: detection_results\events\event_0009_20251014_154019_533.mp4
+2025-10-14 15:40:19,579 - INFO - 💾 保存图像: detection_results\images\frame_266_20251014_154019_537.jpg (1个检测)
+2025-10-14 15:40:19,582 - INFO - 📝 保存检测信息: detection_results\detections\detection_266_20251014_154019_580.json
+2025-10-14 15:40:20,585 - ERROR - 保存线程错误: 
+2025-10-14 15:40:21,140 - WARNING - 🚨 事件录制开始: detection_results\events\event_0010_20251014_154021_138.mp4
+2025-10-14 15:40:21,169 - INFO - 💾 保存图像: detection_results\images\frame_273_20251014_154021_141.jpg (1个检测)
+2025-10-14 15:40:21,172 - INFO - 📝 保存检测信息: detection_results\detections\detection_273_20251014_154021_171.json
+2025-10-14 15:40:21,336 - INFO - 💾 保存图像: detection_results\images\frame_274_20251014_154021_311.jpg (1个检测)
+2025-10-14 15:40:21,337 - INFO - 📝 保存检测信息: detection_results\detections\detection_274_20251014_154021_337.json
+2025-10-14 15:40:21,506 - INFO - 💾 保存图像: detection_results\images\frame_275_20251014_154021_484.jpg (1个检测)
+2025-10-14 15:40:21,508 - INFO - 📝 保存检测信息: detection_results\detections\detection_275_20251014_154021_507.json
+2025-10-14 15:40:21,650 - INFO - 💾 保存图像: detection_results\images\frame_276_20251014_154021_629.jpg (1个检测)
+2025-10-14 15:40:21,653 - INFO - 📝 保存检测信息: detection_results\detections\detection_276_20251014_154021_651.json
+2025-10-14 15:40:21,989 - INFO - 💾 保存图像: detection_results\images\frame_277_20251014_154021_946.jpg (1个检测)
+2025-10-14 15:40:21,991 - INFO - 📝 保存检测信息: detection_results\detections\detection_277_20251014_154021_990.json
+2025-10-14 15:40:22,446 - WARNING - 🚨 事件录制开始: detection_results\events\event_0011_20251014_154022_443.mp4
+2025-10-14 15:40:22,474 - INFO - 💾 保存图像: detection_results\images\frame_279_20251014_154022_448.jpg (1个检测)
+2025-10-14 15:40:22,482 - INFO - 📝 保存检测信息: detection_results\detections\detection_279_20251014_154022_475.json
+2025-10-14 15:40:23,489 - ERROR - 保存线程错误: 
+2025-10-14 15:40:24,495 - ERROR - 保存线程错误: 
+2025-10-14 15:40:25,500 - ERROR - 保存线程错误: 
+2025-10-14 15:40:26,063 - WARNING - 🚨 事件录制开始: detection_results\events\event_0012_20251014_154026_058.mp4
+2025-10-14 15:40:26,102 - INFO - 💾 保存图像: detection_results\images\frame_296_20251014_154026_064.jpg (1个检测)
+2025-10-14 15:40:26,110 - INFO - 📝 保存检测信息: detection_results\detections\detection_296_20251014_154026_104.json
+2025-10-14 15:40:26,521 - INFO - 💾 保存图像: detection_results\images\frame_297_20251014_154026_472.jpg (1个检测)
+2025-10-14 15:40:26,523 - INFO - 📝 保存检测信息: detection_results\detections\detection_297_20251014_154026_522.json
+2025-10-14 15:40:26,893 - INFO - 💾 保存图像: detection_results\images\frame_298_20251014_154026_861.jpg (1个检测)
+2025-10-14 15:40:26,895 - INFO - 📝 保存检测信息: detection_results\detections\detection_298_20251014_154026_894.json
+2025-10-14 15:40:27,182 - INFO - 💾 保存图像: detection_results\images\frame_299_20251014_154027_144.jpg (1个检测)
+2025-10-14 15:40:27,185 - INFO - 📝 保存检测信息: detection_results\detections\detection_299_20251014_154027_184.json
+2025-10-14 15:40:27,590 - INFO - 💾 保存图像: detection_results\images\frame_300_20251014_154027_552.jpg (1个检测)
+2025-10-14 15:40:27,595 - INFO - 📝 保存检测信息: detection_results\detections\detection_300_20251014_154027_593.json
+2025-10-14 15:40:27,931 - INFO - 💾 保存图像: detection_results\images\frame_301_20251014_154027_887.jpg (1个检测)
+2025-10-14 15:40:27,935 - INFO - 📝 保存检测信息: detection_results\detections\detection_301_20251014_154027_933.json
+2025-10-14 15:40:28,244 - INFO - 💾 保存图像: detection_results\images\frame_302_20251014_154028_204.jpg (1个检测)
+2025-10-14 15:40:28,247 - INFO - 📝 保存检测信息: detection_results\detections\detection_302_20251014_154028_245.json
+2025-10-14 15:40:28,547 - INFO - 💾 保存图像: detection_results\images\frame_303_20251014_154028_502.jpg (1个检测)
+2025-10-14 15:40:28,555 - INFO - 📝 保存检测信息: detection_results\detections\detection_303_20251014_154028_551.json
+2025-10-14 15:40:28,818 - INFO - 💾 保存图像: detection_results\images\frame_304_20251014_154028_765.jpg (1个检测)
+2025-10-14 15:40:28,822 - INFO - 📝 保存检测信息: detection_results\detections\detection_304_20251014_154028_820.json
+2025-10-14 15:40:29,043 - INFO - 💾 保存图像: detection_results\images\frame_305_20251014_154029_011.jpg (1个检测)
+2025-10-14 15:40:29,046 - INFO - 📝 保存检测信息: detection_results\detections\detection_305_20251014_154029_045.json
+2025-10-14 15:40:29,353 - INFO - 💾 保存图像: detection_results\images\frame_306_20251014_154029_312.jpg (1个检测)
+2025-10-14 15:40:29,358 - INFO - 📝 保存检测信息: detection_results\detections\detection_306_20251014_154029_356.json
+2025-10-14 15:40:29,684 - INFO - 💾 保存图像: detection_results\images\frame_307_20251014_154029_645.jpg (1个检测)
+2025-10-14 15:40:29,687 - INFO - 📝 保存检测信息: detection_results\detections\detection_307_20251014_154029_685.json
+2025-10-14 15:40:29,939 - INFO - 💾 保存图像: detection_results\images\frame_308_20251014_154029_902.jpg (1个检测)
+2025-10-14 15:40:29,943 - INFO - 📝 保存检测信息: detection_results\detections\detection_308_20251014_154029_941.json
+2025-10-14 15:40:30,213 - INFO - 💾 保存图像: detection_results\images\frame_309_20251014_154030_175.jpg (1个检测)
+2025-10-14 15:40:30,215 - INFO - 📝 保存检测信息: detection_results\detections\detection_309_20251014_154030_214.json
+2025-10-14 15:40:30,468 - INFO - 💾 保存图像: detection_results\images\frame_310_20251014_154030_423.jpg (1个检测)
+2025-10-14 15:40:30,470 - INFO - 📝 保存检测信息: detection_results\detections\detection_310_20251014_154030_469.json
+2025-10-14 15:40:30,750 - INFO - 💾 保存图像: detection_results\images\frame_311_20251014_154030_713.jpg (1个检测)
+2025-10-14 15:40:30,755 - INFO - 📝 保存检测信息: detection_results\detections\detection_311_20251014_154030_752.json
+2025-10-14 15:40:31,010 - INFO - 💾 保存图像: detection_results\images\frame_312_20251014_154030_971.jpg (1个检测)
+2025-10-14 15:40:31,012 - INFO - 📝 保存检测信息: detection_results\detections\detection_312_20251014_154031_011.json
+2025-10-14 15:40:31,290 - INFO - 💾 保存图像: detection_results\images\frame_313_20251014_154031_237.jpg (1个检测)
+2025-10-14 15:40:31,293 - INFO - 📝 保存检测信息: detection_results\detections\detection_313_20251014_154031_291.json
+2025-10-14 15:40:31,546 - INFO - 💾 保存图像: detection_results\images\frame_314_20251014_154031_501.jpg (1个检测)
+2025-10-14 15:40:31,549 - INFO - 📝 保存检测信息: detection_results\detections\detection_314_20251014_154031_547.json
+2025-10-14 15:40:31,784 - INFO - 💾 保存图像: detection_results\images\frame_315_20251014_154031_740.jpg (1个检测)
+2025-10-14 15:40:31,787 - INFO - 📝 保存检测信息: detection_results\detections\detection_315_20251014_154031_786.json
+2025-10-14 15:40:31,980 - INFO - 💾 保存图像: detection_results\images\frame_316_20251014_154031_935.jpg (1个检测)
+2025-10-14 15:40:31,983 - INFO - 📝 保存检测信息: detection_results\detections\detection_316_20251014_154031_981.json
+2025-10-14 15:40:32,192 - INFO - 💾 保存图像: detection_results\images\frame_317_20251014_154032_154.jpg (1个检测)
+2025-10-14 15:40:32,195 - INFO - 📝 保存检测信息: detection_results\detections\detection_317_20251014_154032_194.json
+2025-10-14 15:40:32,400 - INFO - 💾 保存图像: detection_results\images\frame_318_20251014_154032_367.jpg (1个检测)
+2025-10-14 15:40:32,403 - INFO - 📝 保存检测信息: detection_results\detections\detection_318_20251014_154032_401.json
+2025-10-14 15:40:32,592 - INFO - 💾 保存图像: detection_results\images\frame_319_20251014_154032_561.jpg (1个检测)
+2025-10-14 15:40:32,594 - INFO - 📝 保存检测信息: detection_results\detections\detection_319_20251014_154032_593.json
+2025-10-14 15:40:32,791 - INFO - 💾 保存图像: detection_results\images\frame_320_20251014_154032_748.jpg (1个检测)
+2025-10-14 15:40:32,794 - INFO - 📝 保存检测信息: detection_results\detections\detection_320_20251014_154032_792.json
+2025-10-14 15:40:33,026 - INFO - 💾 保存图像: detection_results\images\frame_321_20251014_154032_981.jpg (1个检测)
+2025-10-14 15:40:33,029 - INFO - 📝 保存检测信息: detection_results\detections\detection_321_20251014_154033_028.json
+2025-10-14 15:40:33,277 - INFO - 💾 保存图像: detection_results\images\frame_322_20251014_154033_238.jpg (1个检测)
+2025-10-14 15:40:33,279 - INFO - 📝 保存检测信息: detection_results\detections\detection_322_20251014_154033_278.json
+2025-10-14 15:40:33,493 - INFO - 💾 保存图像: detection_results\images\frame_323_20251014_154033_459.jpg (1个检测)
+2025-10-14 15:40:33,498 - INFO - 📝 保存检测信息: detection_results\detections\detection_323_20251014_154033_496.json
+2025-10-14 15:40:33,698 - INFO - 💾 保存图像: detection_results\images\frame_324_20251014_154033_656.jpg (1个检测)
+2025-10-14 15:40:33,702 - INFO - 📝 保存检测信息: detection_results\detections\detection_324_20251014_154033_700.json
+2025-10-14 15:40:33,941 - INFO - 💾 保存图像: detection_results\images\frame_325_20251014_154033_908.jpg (1个检测)
+2025-10-14 15:40:33,945 - INFO - 📝 保存检测信息: detection_results\detections\detection_325_20251014_154033_943.json
+2025-10-14 15:40:34,247 - INFO - 💾 保存图像: detection_results\images\frame_326_20251014_154034_205.jpg (1个检测)
+2025-10-14 15:40:34,251 - INFO - 📝 保存检测信息: detection_results\detections\detection_326_20251014_154034_249.json
+2025-10-14 15:40:34,519 - INFO - 💾 保存图像: detection_results\images\frame_327_20251014_154034_475.jpg (1个检测)
+2025-10-14 15:40:34,523 - INFO - 📝 保存检测信息: detection_results\detections\detection_327_20251014_154034_521.json
+2025-10-14 15:40:34,726 - INFO - 💾 保存图像: detection_results\images\frame_328_20251014_154034_688.jpg (1个检测)
+2025-10-14 15:40:34,728 - INFO - 📝 保存检测信息: detection_results\detections\detection_328_20251014_154034_727.json
+2025-10-14 15:40:34,965 - INFO - 💾 保存图像: detection_results\images\frame_329_20251014_154034_926.jpg (1个检测)
+2025-10-14 15:40:34,972 - INFO - 📝 保存检测信息: detection_results\detections\detection_329_20251014_154034_969.json
+2025-10-14 15:40:35,238 - INFO - 💾 保存图像: detection_results\images\frame_330_20251014_154035_199.jpg (1个检测)
+2025-10-14 15:40:35,240 - INFO - 📝 保存检测信息: detection_results\detections\detection_330_20251014_154035_239.json
+2025-10-14 15:40:35,498 - INFO - 💾 保存图像: detection_results\images\frame_331_20251014_154035_460.jpg (1个检测)
+2025-10-14 15:40:35,501 - INFO - 📝 保存检测信息: detection_results\detections\detection_331_20251014_154035_500.json
+2025-10-14 15:40:35,753 - INFO - 💾 保存图像: detection_results\images\frame_332_20251014_154035_710.jpg (1个检测)
+2025-10-14 15:40:35,756 - INFO - 📝 保存检测信息: detection_results\detections\detection_332_20251014_154035_755.json
+2025-10-14 15:40:36,087 - INFO - 事件视频结束: detection_results\events\event_0012_20251014_154026_058.mp4
+2025-10-14 15:40:36,096 - INFO - 💾 保存图像: detection_results\images\frame_333_20251014_154036_056.jpg (1个检测)
+2025-10-14 15:40:36,100 - INFO - 📝 保存检测信息: detection_results\detections\detection_333_20251014_154036_098.json
+2025-10-14 15:40:36,333 - WARNING - 🚨 事件录制开始: detection_results\events\event_0013_20251014_154036_327.mp4
+2025-10-14 15:40:36,387 - INFO - 💾 保存图像: detection_results\images\frame_334_20251014_154036_333.jpg (1个检测)
+2025-10-14 15:40:36,392 - INFO - 📝 保存检测信息: detection_results\detections\detection_334_20251014_154036_389.json
+2025-10-14 15:40:36,686 - INFO - 💾 保存图像: detection_results\images\frame_335_20251014_154036_637.jpg (1个检测)
+2025-10-14 15:40:36,690 - INFO - 📝 保存检测信息: detection_results\detections\detection_335_20251014_154036_688.json
+2025-10-14 15:40:37,030 - INFO - 💾 保存图像: detection_results\images\frame_336_20251014_154036_982.jpg (1个检测)
+2025-10-14 15:40:37,032 - INFO - 📝 保存检测信息: detection_results\detections\detection_336_20251014_154037_031.json
+2025-10-14 15:40:37,295 - INFO - 💾 保存图像: detection_results\images\frame_337_20251014_154037_256.jpg (1个检测)
+2025-10-14 15:40:37,300 - INFO - 📝 保存检测信息: detection_results\detections\detection_337_20251014_154037_297.json
+2025-10-14 15:40:37,617 - INFO - 💾 保存图像: detection_results\images\frame_338_20251014_154037_582.jpg (1个检测)
+2025-10-14 15:40:37,621 - INFO - 📝 保存检测信息: detection_results\detections\detection_338_20251014_154037_619.json
+2025-10-14 15:40:37,895 - INFO - 💾 保存图像: detection_results\images\frame_339_20251014_154037_850.jpg (1个检测)
+2025-10-14 15:40:37,901 - INFO - 📝 保存检测信息: detection_results\detections\detection_339_20251014_154037_899.json
+2025-10-14 15:40:38,193 - INFO - 💾 保存图像: detection_results\images\frame_340_20251014_154038_153.jpg (1个检测)
+2025-10-14 15:40:38,198 - INFO - 📝 保存检测信息: detection_results\detections\detection_340_20251014_154038_197.json
+2025-10-14 15:40:38,528 - INFO - 💾 保存图像: detection_results\images\frame_341_20251014_154038_486.jpg (1个检测)
+2025-10-14 15:40:38,532 - INFO - 📝 保存检测信息: detection_results\detections\detection_341_20251014_154038_531.json
+2025-10-14 15:40:38,830 - INFO - 💾 保存图像: detection_results\images\frame_342_20251014_154038_799.jpg (1个检测)
+2025-10-14 15:40:38,840 - INFO - 📝 保存检测信息: detection_results\detections\detection_342_20251014_154038_833.json
+2025-10-14 15:40:39,156 - INFO - 💾 保存图像: detection_results\images\frame_343_20251014_154039_115.jpg (1个检测)
+2025-10-14 15:40:39,160 - INFO - 📝 保存检测信息: detection_results\detections\detection_343_20251014_154039_158.json
+2025-10-14 15:40:39,425 - INFO - 💾 保存图像: detection_results\images\frame_344_20251014_154039_393.jpg (1个检测)
+2025-10-14 15:40:39,428 - INFO - 📝 保存检测信息: detection_results\detections\detection_344_20251014_154039_427.json
+2025-10-14 15:40:39,743 - INFO - 💾 保存图像: detection_results\images\frame_345_20251014_154039_701.jpg (1个检测)
+2025-10-14 15:40:39,745 - INFO - 📝 保存检测信息: detection_results\detections\detection_345_20251014_154039_745.json
+2025-10-14 15:40:40,042 - INFO - 💾 保存图像: detection_results\images\frame_346_20251014_154039_998.jpg (1个检测)
+2025-10-14 15:40:40,045 - INFO - 📝 保存检测信息: detection_results\detections\detection_346_20251014_154040_044.json
+2025-10-14 15:40:40,363 - INFO - 💾 保存图像: detection_results\images\frame_347_20251014_154040_316.jpg (1个检测)
+2025-10-14 15:40:40,368 - INFO - 📝 保存检测信息: detection_results\detections\detection_347_20251014_154040_366.json
+2025-10-14 15:40:40,668 - INFO - 💾 保存图像: detection_results\images\frame_348_20251014_154040_629.jpg (1个检测)
+2025-10-14 15:40:40,671 - INFO - 📝 保存检测信息: detection_results\detections\detection_348_20251014_154040_669.json
+2025-10-14 15:40:40,969 - INFO - 💾 保存图像: detection_results\images\frame_349_20251014_154040_930.jpg (1个检测)
+2025-10-14 15:40:40,973 - INFO - 📝 保存检测信息: detection_results\detections\detection_349_20251014_154040_972.json
+2025-10-14 15:40:41,248 - INFO - 💾 保存图像: detection_results\images\frame_350_20251014_154041_215.jpg (1个检测)
+2025-10-14 15:40:41,252 - INFO - 📝 保存检测信息: detection_results\detections\detection_350_20251014_154041_250.json
+2025-10-14 15:40:41,549 - INFO - 💾 保存图像: detection_results\images\frame_351_20251014_154041_497.jpg (1个检测)
+2025-10-14 15:40:41,553 - INFO - 📝 保存检测信息: detection_results\detections\detection_351_20251014_154041_552.json
+2025-10-14 15:40:41,852 - INFO - 💾 保存图像: detection_results\images\frame_352_20251014_154041_820.jpg (1个检测)
+2025-10-14 15:40:41,856 - INFO - 📝 保存检测信息: detection_results\detections\detection_352_20251014_154041_855.json
+2025-10-14 15:40:42,232 - INFO - 💾 保存图像: detection_results\images\frame_353_20251014_154042_190.jpg (1个检测)
+2025-10-14 15:40:42,235 - INFO - 📝 保存检测信息: detection_results\detections\detection_353_20251014_154042_233.json
+2025-10-14 15:40:42,523 - INFO - 💾 保存图像: detection_results\images\frame_354_20251014_154042_487.jpg (1个检测)
+2025-10-14 15:40:42,529 - INFO - 📝 保存检测信息: detection_results\detections\detection_354_20251014_154042_527.json
+2025-10-14 15:40:42,855 - INFO - 💾 保存图像: detection_results\images\frame_355_20251014_154042_815.jpg (1个检测)
+2025-10-14 15:40:42,858 - INFO - 📝 保存检测信息: detection_results\detections\detection_355_20251014_154042_857.json
+2025-10-14 15:40:43,142 - INFO - 💾 保存图像: detection_results\images\frame_356_20251014_154043_102.jpg (1个检测)
+2025-10-14 15:40:43,146 - INFO - 📝 保存检测信息: detection_results\detections\detection_356_20251014_154043_143.json
+2025-10-14 15:40:43,478 - INFO - 💾 保存图像: detection_results\images\frame_357_20251014_154043_428.jpg (1个检测)
+2025-10-14 15:40:43,482 - INFO - 📝 保存检测信息: detection_results\detections\detection_357_20251014_154043_480.json
+2025-10-14 15:40:43,760 - INFO - 💾 保存图像: detection_results\images\frame_358_20251014_154043_724.jpg (1个检测)
+2025-10-14 15:40:43,764 - INFO - 📝 保存检测信息: detection_results\detections\detection_358_20251014_154043_763.json
+2025-10-14 15:40:44,067 - INFO - 💾 保存图像: detection_results\images\frame_359_20251014_154044_027.jpg (1个检测)
+2025-10-14 15:40:44,070 - INFO - 📝 保存检测信息: detection_results\detections\detection_359_20251014_154044_069.json
+2025-10-14 15:40:44,333 - INFO - 💾 保存图像: detection_results\images\frame_360_20251014_154044_301.jpg (1个检测)
+2025-10-14 15:40:44,338 - INFO - 📝 保存检测信息: detection_results\detections\detection_360_20251014_154044_335.json
+2025-10-14 15:40:44,713 - INFO - 💾 保存图像: detection_results\images\frame_361_20251014_154044_673.jpg (1个检测)
+2025-10-14 15:40:44,718 - INFO - 📝 保存检测信息: detection_results\detections\detection_361_20251014_154044_717.json
+2025-10-14 15:40:45,051 - INFO - 💾 保存图像: detection_results\images\frame_362_20251014_154045_015.jpg (1个检测)
+2025-10-14 15:40:45,057 - INFO - 📝 保存检测信息: detection_results\detections\detection_362_20251014_154045_055.json
+2025-10-14 15:40:45,367 - INFO - 💾 保存图像: detection_results\images\frame_363_20251014_154045_332.jpg (1个检测)
+2025-10-14 15:40:45,371 - INFO - 📝 保存检测信息: detection_results\detections\detection_363_20251014_154045_370.json
+2025-10-14 15:40:45,631 - INFO - 💾 保存图像: detection_results\images\frame_364_20251014_154045_590.jpg (1个检测)
+2025-10-14 15:40:45,637 - INFO - 📝 保存检测信息: detection_results\detections\detection_364_20251014_154045_633.json
+2025-10-14 15:40:45,893 - INFO - 💾 保存图像: detection_results\images\frame_365_20251014_154045_850.jpg (1个检测)
+2025-10-14 15:40:45,896 - INFO - 📝 保存检测信息: detection_results\detections\detection_365_20251014_154045_895.json
+2025-10-14 15:40:46,156 - INFO - 💾 保存图像: detection_results\images\frame_366_20251014_154046_125.jpg (1个检测)
+2025-10-14 15:40:46,159 - INFO - 📝 保存检测信息: detection_results\detections\detection_366_20251014_154046_158.json
+2025-10-14 15:40:46,435 - INFO - 事件视频结束: detection_results\events\event_0013_20251014_154036_327.mp4
+2025-10-14 15:40:46,448 - INFO - 💾 保存图像: detection_results\images\frame_367_20251014_154046_400.jpg (1个检测)
+2025-10-14 15:40:46,451 - INFO - 📝 保存检测信息: detection_results\detections\detection_367_20251014_154046_449.json
+2025-10-14 15:40:46,648 - WARNING - 🚨 事件录制开始: detection_results\events\event_0014_20251014_154046_643.mp4
+2025-10-14 15:40:46,694 - INFO - 💾 保存图像: detection_results\images\frame_368_20251014_154046_648.jpg (1个检测)
+2025-10-14 15:40:46,697 - INFO - 📝 保存检测信息: detection_results\detections\detection_368_20251014_154046_696.json
+2025-10-14 15:40:46,986 - INFO - 💾 保存图像: detection_results\images\frame_369_20251014_154046_946.jpg (1个检测)
+2025-10-14 15:40:46,989 - INFO - 📝 保存检测信息: detection_results\detections\detection_369_20251014_154046_988.json
+2025-10-14 15:40:47,207 - INFO - 💾 保存图像: detection_results\images\frame_370_20251014_154047_172.jpg (1个检测)
+2025-10-14 15:40:47,216 - INFO - 📝 保存检测信息: detection_results\detections\detection_370_20251014_154047_208.json
+2025-10-14 15:40:47,441 - INFO - 💾 保存图像: detection_results\images\frame_371_20251014_154047_407.jpg (1个检测)
+2025-10-14 15:40:47,443 - INFO - 📝 保存检测信息: detection_results\detections\detection_371_20251014_154047_442.json
+2025-10-14 15:40:47,642 - INFO - 💾 保存图像: detection_results\images\frame_372_20251014_154047_612.jpg (1个检测)
+2025-10-14 15:40:47,645 - INFO - 📝 保存检测信息: detection_results\detections\detection_372_20251014_154047_643.json
+2025-10-14 15:40:47,789 - INFO - 💾 保存图像: detection_results\images\frame_373_20251014_154047_769.jpg (1个检测)
+2025-10-14 15:40:47,791 - INFO - 📝 保存检测信息: detection_results\detections\detection_373_20251014_154047_790.json
+2025-10-14 15:40:47,963 - INFO - 💾 保存图像: detection_results\images\frame_374_20251014_154047_924.jpg (1个检测)
+2025-10-14 15:40:47,965 - INFO - 📝 保存检测信息: detection_results\detections\detection_374_20251014_154047_964.json
+2025-10-14 15:40:48,163 - INFO - 💾 保存图像: detection_results\images\frame_375_20251014_154048_132.jpg (1个检测)
+2025-10-14 15:40:48,166 - INFO - 📝 保存检测信息: detection_results\detections\detection_375_20251014_154048_165.json
+2025-10-14 15:40:48,385 - INFO - 💾 保存图像: detection_results\images\frame_376_20251014_154048_341.jpg (1个检测)
+2025-10-14 15:40:48,390 - INFO - 📝 保存检测信息: detection_results\detections\detection_376_20251014_154048_386.json
+2025-10-14 15:40:48,701 - INFO - 💾 保存图像: detection_results\images\frame_377_20251014_154048_659.jpg (1个检测)
+2025-10-14 15:40:48,705 - INFO - 📝 保存检测信息: detection_results\detections\detection_377_20251014_154048_703.json
+2025-10-14 15:40:48,976 - INFO - 💾 保存图像: detection_results\images\frame_378_20251014_154048_951.jpg (1个检测)
+2025-10-14 15:40:48,980 - INFO - 📝 保存检测信息: detection_results\detections\detection_378_20251014_154048_977.json
+2025-10-14 15:40:49,374 - INFO - 💾 保存图像: detection_results\images\frame_379_20251014_154049_333.jpg (1个检测)
+2025-10-14 15:40:49,376 - INFO - 📝 保存检测信息: detection_results\detections\detection_379_20251014_154049_375.json
+2025-10-14 15:40:49,686 - INFO - 💾 保存图像: detection_results\images\frame_380_20251014_154049_639.jpg (1个检测)
+2025-10-14 15:40:49,696 - INFO - 📝 保存检测信息: detection_results\detections\detection_380_20251014_154049_687.json
+2025-10-14 15:40:50,101 - INFO - 💾 保存图像: detection_results\images\frame_381_20251014_154050_068.jpg (1个检测)
+2025-10-14 15:40:50,104 - INFO - 📝 保存检测信息: detection_results\detections\detection_381_20251014_154050_103.json
+2025-10-14 15:40:50,426 - INFO - 💾 保存图像: detection_results\images\frame_382_20251014_154050_376.jpg (1个检测)
+2025-10-14 15:40:50,430 - INFO - 📝 保存检测信息: detection_results\detections\detection_382_20251014_154050_428.json
+2025-10-14 15:40:50,649 - INFO - 💾 保存图像: detection_results\images\frame_383_20251014_154050_607.jpg (1个检测)
+2025-10-14 15:40:50,652 - INFO - 📝 保存检测信息: detection_results\detections\detection_383_20251014_154050_651.json
+2025-10-14 15:40:50,939 - INFO - 💾 保存图像: detection_results\images\frame_384_20251014_154050_896.jpg (1个检测)
+2025-10-14 15:40:50,942 - INFO - 📝 保存检测信息: detection_results\detections\detection_384_20251014_154050_940.json
+2025-10-14 15:40:51,351 - INFO - 💾 保存图像: detection_results\images\frame_385_20251014_154051_309.jpg (1个检测)
+2025-10-14 15:40:51,358 - INFO - 📝 保存检测信息: detection_results\detections\detection_385_20251014_154051_353.json
+2025-10-14 15:40:51,715 - INFO - 💾 保存图像: detection_results\images\frame_386_20251014_154051_668.jpg (1个检测)
+2025-10-14 15:40:51,723 - INFO - 📝 保存检测信息: detection_results\detections\detection_386_20251014_154051_717.json
+2025-10-14 15:40:52,000 - INFO - 💾 保存图像: detection_results\images\frame_387_20251014_154051_967.jpg (1个检测)
+2025-10-14 15:40:52,004 - INFO - 📝 保存检测信息: detection_results\detections\detection_387_20251014_154052_002.json
+2025-10-14 15:40:52,300 - INFO - 💾 保存图像: detection_results\images\frame_388_20251014_154052_256.jpg (1个检测)
+2025-10-14 15:40:52,303 - INFO - 📝 保存检测信息: detection_results\detections\detection_388_20251014_154052_302.json
+2025-10-14 15:40:52,565 - INFO - 💾 保存图像: detection_results\images\frame_389_20251014_154052_532.jpg (1个检测)
+2025-10-14 15:40:52,568 - INFO - 📝 保存检测信息: detection_results\detections\detection_389_20251014_154052_566.json
+2025-10-14 15:40:52,893 - INFO - 💾 保存图像: detection_results\images\frame_390_20251014_154052_858.jpg (1个检测)
+2025-10-14 15:40:52,898 - INFO - 📝 保存检测信息: detection_results\detections\detection_390_20251014_154052_895.json
+2025-10-14 15:40:53,173 - INFO - 💾 保存图像: detection_results\images\frame_391_20251014_154053_132.jpg (1个检测)
+2025-10-14 15:40:53,178 - INFO - 📝 保存检测信息: detection_results\detections\detection_391_20251014_154053_176.json
+2025-10-14 15:40:53,507 - INFO - 💾 保存图像: detection_results\images\frame_392_20251014_154053_475.jpg (1个检测)
+2025-10-14 15:40:53,511 - INFO - 📝 保存检测信息: detection_results\detections\detection_392_20251014_154053_510.json
+2025-10-14 15:40:53,871 - INFO - 💾 保存图像: detection_results\images\frame_393_20251014_154053_816.jpg (1个检测)
+2025-10-14 15:40:53,876 - INFO - 📝 保存检测信息: detection_results\detections\detection_393_20251014_154053_875.json
+2025-10-14 15:40:54,307 - INFO - 💾 保存图像: detection_results\images\frame_394_20251014_154054_270.jpg (1个检测)
+2025-10-14 15:40:54,320 - INFO - 📝 保存检测信息: detection_results\detections\detection_394_20251014_154054_311.json
+2025-10-14 15:40:54,680 - INFO - 💾 保存图像: detection_results\images\frame_395_20251014_154054_646.jpg (1个检测)
+2025-10-14 15:40:54,685 - INFO - 📝 保存检测信息: detection_results\detections\detection_395_20251014_154054_683.json
+2025-10-14 15:40:55,043 - INFO - 💾 保存图像: detection_results\images\frame_396_20251014_154054_995.jpg (1个检测)
+2025-10-14 15:40:55,052 - INFO - 📝 保存检测信息: detection_results\detections\detection_396_20251014_154055_049.json
+2025-10-14 15:40:55,503 - INFO - 💾 保存图像: detection_results\images\frame_397_20251014_154055_460.jpg (1个检测)
+2025-10-14 15:40:55,508 - INFO - 📝 保存检测信息: detection_results\detections\detection_397_20251014_154055_507.json
+2025-10-14 15:40:55,828 - INFO - 💾 保存图像: detection_results\images\frame_398_20251014_154055_781.jpg (1个检测)
+2025-10-14 15:40:55,833 - INFO - 📝 保存检测信息: detection_results\detections\detection_398_20251014_154055_831.json
+2025-10-14 15:40:56,099 - INFO - 💾 保存图像: detection_results\images\frame_399_20251014_154056_068.jpg (1个检测)
+2025-10-14 15:40:56,103 - INFO - 📝 保存检测信息: detection_results\detections\detection_399_20251014_154056_101.json
+2025-10-14 15:40:56,397 - INFO - 💾 保存图像: detection_results\images\frame_400_20251014_154056_362.jpg (1个检测)
+2025-10-14 15:40:56,402 - INFO - 📝 保存检测信息: detection_results\detections\detection_400_20251014_154056_400.json
+2025-10-14 15:40:56,779 - INFO - 事件视频结束: detection_results\events\event_0014_20251014_154046_643.mp4
+2025-10-14 15:40:56,798 - INFO - 💾 保存图像: detection_results\images\frame_401_20251014_154056_751.jpg (1个检测)
+2025-10-14 15:40:56,801 - INFO - 📝 保存检测信息: detection_results\detections\detection_401_20251014_154056_800.json
+2025-10-14 15:40:57,050 - WARNING - 🚨 事件录制开始: detection_results\events\event_0015_20251014_154057_044.mp4
+2025-10-14 15:40:57,100 - INFO - 💾 保存图像: detection_results\images\frame_402_20251014_154057_051.jpg (1个检测)
+2025-10-14 15:40:57,103 - INFO - 📝 保存检测信息: detection_results\detections\detection_402_20251014_154057_102.json
+2025-10-14 15:40:57,514 - INFO - 💾 保存图像: detection_results\images\frame_403_20251014_154057_453.jpg (1个检测)
+2025-10-14 15:40:57,518 - INFO - 📝 保存检测信息: detection_results\detections\detection_403_20251014_154057_516.json
+2025-10-14 15:40:57,854 - INFO - 💾 保存图像: detection_results\images\frame_404_20251014_154057_818.jpg (1个检测)
+2025-10-14 15:40:57,858 - INFO - 📝 保存检测信息: detection_results\detections\detection_404_20251014_154057_856.json
+2025-10-14 15:40:58,188 - INFO - 💾 保存图像: detection_results\images\frame_405_20251014_154058_134.jpg (2个检测)
+2025-10-14 15:40:58,193 - INFO - 📝 保存检测信息: detection_results\detections\detection_405_20251014_154058_190.json
+2025-10-14 15:40:58,471 - INFO - 💾 保存图像: detection_results\images\frame_406_20251014_154058_428.jpg (1个检测)
+2025-10-14 15:40:58,473 - INFO - 📝 保存检测信息: detection_results\detections\detection_406_20251014_154058_473.json
+2025-10-14 15:40:58,743 - INFO - 💾 保存图像: detection_results\images\frame_407_20251014_154058_710.jpg (1个检测)
+2025-10-14 15:40:58,748 - INFO - 📝 保存检测信息: detection_results\detections\detection_407_20251014_154058_746.json
+2025-10-14 15:40:59,750 - ERROR - 保存线程错误: 
+2025-10-14 15:41:00,766 - ERROR - 保存线程错误: 
+2025-10-14 15:41:01,613 - WARNING - 🚨 事件录制开始: detection_results\events\event_0016_20251014_154101_607.mp4
+2025-10-14 15:41:01,657 - INFO - 💾 保存图像: detection_results\images\frame_417_20251014_154101_614.jpg (1个检测)
+2025-10-14 15:41:01,661 - INFO - 📝 保存检测信息: detection_results\detections\detection_417_20251014_154101_659.json
+2025-10-14 15:41:01,885 - INFO - 💾 保存图像: detection_results\images\frame_418_20251014_154101_841.jpg (1个检测)
+2025-10-14 15:41:01,889 - INFO - 📝 保存检测信息: detection_results\detections\detection_418_20251014_154101_888.json
+2025-10-14 15:41:02,164 - INFO - 💾 保存图像: detection_results\images\frame_419_20251014_154102_119.jpg (1个检测)
+2025-10-14 15:41:02,167 - INFO - 📝 保存检测信息: detection_results\detections\detection_419_20251014_154102_166.json
+2025-10-14 15:41:02,363 - INFO - 💾 保存图像: detection_results\images\frame_420_20251014_154102_320.jpg (1个检测)
+2025-10-14 15:41:02,369 - INFO - 📝 保存检测信息: detection_results\detections\detection_420_20251014_154102_368.json
+2025-10-14 15:41:03,371 - ERROR - 保存线程错误: 
+2025-10-14 15:41:03,852 - WARNING - 🚨 事件录制开始: detection_results\events\event_0017_20251014_154103_847.mp4
+2025-10-14 15:41:03,898 - INFO - 💾 保存图像: detection_results\images\frame_428_20251014_154103_853.jpg (1个检测)
+2025-10-14 15:41:03,902 - INFO - 📝 保存检测信息: detection_results\detections\detection_428_20251014_154103_900.json
+2025-10-14 15:41:04,404 - WARNING - 🚨 事件录制开始: detection_results\events\event_0018_20251014_154104_401.mp4
+2025-10-14 15:41:04,446 - INFO - 💾 保存图像: detection_results\images\frame_431_20251014_154104_408.jpg (1个检测)
+2025-10-14 15:41:04,450 - INFO - 📝 保存检测信息: detection_results\detections\detection_431_20251014_154104_449.json
+2025-10-14 15:41:04,712 - INFO - 💾 保存图像: detection_results\images\frame_432_20251014_154104_667.jpg (1个检测)
+2025-10-14 15:41:04,716 - INFO - 📝 保存检测信息: detection_results\detections\detection_432_20251014_154104_715.json
+2025-10-14 15:41:05,732 - ERROR - 保存线程错误: 
+2025-10-14 15:41:06,691 - WARNING - 🚨 事件录制开始: detection_results\events\event_0019_20251014_154106_686.mp4
+2025-10-14 15:41:06,737 - INFO - 💾 保存图像: detection_results\images\frame_443_20251014_154106_693.jpg (1个检测)
+2025-10-14 15:41:06,742 - INFO - 📝 保存检测信息: detection_results\detections\detection_443_20251014_154106_740.json
+2025-10-14 15:41:07,191 - INFO - 💾 保存图像: detection_results\images\frame_444_20251014_154107_162.jpg (1个检测)
+2025-10-14 15:41:07,195 - INFO - 📝 保存检测信息: detection_results\detections\detection_444_20251014_154107_194.json
+2025-10-14 15:41:07,663 - INFO - 💾 保存图像: detection_results\images\frame_445_20251014_154107_616.jpg (1个检测)
+2025-10-14 15:41:07,667 - INFO - 📝 保存检测信息: detection_results\detections\detection_445_20251014_154107_665.json
+2025-10-14 15:41:07,922 - INFO - 💾 保存图像: detection_results\images\frame_446_20251014_154107_892.jpg (1个检测)
+2025-10-14 15:41:07,926 - INFO - 📝 保存检测信息: detection_results\detections\detection_446_20251014_154107_926.json
+2025-10-14 15:41:08,223 - INFO - 💾 保存图像: detection_results\images\frame_447_20251014_154108_179.jpg (1个检测)
+2025-10-14 15:41:08,227 - INFO - 📝 保存检测信息: detection_results\detections\detection_447_20251014_154108_226.json
+2025-10-14 15:41:08,505 - INFO - 💾 保存图像: detection_results\images\frame_448_20251014_154108_460.jpg (1个检测)
+2025-10-14 15:41:08,510 - INFO - 📝 保存检测信息: detection_results\detections\detection_448_20251014_154108_508.json
+2025-10-14 15:41:08,812 - INFO - 💾 保存图像: detection_results\images\frame_449_20251014_154108_772.jpg (1个检测)
+2025-10-14 15:41:08,816 - INFO - 📝 保存检测信息: detection_results\detections\detection_449_20251014_154108_814.json
+2025-10-14 15:41:09,148 - INFO - 💾 保存图像: detection_results\images\frame_450_20251014_154109_099.jpg (1个检测)
+2025-10-14 15:41:09,152 - INFO - 📝 保存检测信息: detection_results\detections\detection_450_20251014_154109_151.json
+2025-10-14 15:41:09,427 - INFO - 💾 保存图像: detection_results\images\frame_451_20251014_154109_381.jpg (1个检测)
+2025-10-14 15:41:09,437 - INFO - 📝 保存检测信息: detection_results\detections\detection_451_20251014_154109_429.json
+2025-10-14 15:41:09,706 - INFO - 💾 保存图像: detection_results\images\frame_452_20251014_154109_677.jpg (1个检测)
+2025-10-14 15:41:09,710 - INFO - 📝 保存检测信息: detection_results\detections\detection_452_20251014_154109_709.json
+2025-10-14 15:41:09,987 - INFO - 💾 保存图像: detection_results\images\frame_453_20251014_154109_941.jpg (1个检测)
+2025-10-14 15:41:09,992 - INFO - 📝 保存检测信息: detection_results\detections\detection_453_20251014_154109_990.json
+2025-10-14 15:41:10,316 - INFO - 💾 保存图像: detection_results\images\frame_454_20251014_154110_271.jpg (1个检测)
+2025-10-14 15:41:10,319 - INFO - 📝 保存检测信息: detection_results\detections\detection_454_20251014_154110_318.json
+2025-10-14 15:41:10,589 - INFO - 💾 保存图像: detection_results\images\frame_455_20251014_154110_568.jpg (1个检测)
+2025-10-14 15:41:10,597 - INFO - 📝 保存检测信息: detection_results\detections\detection_455_20251014_154110_591.json
+2025-10-14 15:41:10,878 - INFO - 💾 保存图像: detection_results\images\frame_456_20251014_154110_835.jpg (1个检测)
+2025-10-14 15:41:10,882 - INFO - 📝 保存检测信息: detection_results\detections\detection_456_20251014_154110_881.json
+2025-10-14 15:41:11,176 - INFO - 💾 保存图像: detection_results\images\frame_457_20251014_154111_126.jpg (1个检测)
+2025-10-14 15:41:11,182 - INFO - 📝 保存检测信息: detection_results\detections\detection_457_20251014_154111_178.json
+2025-10-14 15:41:11,459 - INFO - 💾 保存图像: detection_results\images\frame_458_20251014_154111_412.jpg (1个检测)
+2025-10-14 15:41:11,463 - INFO - 📝 保存检测信息: detection_results\detections\detection_458_20251014_154111_461.json
+2025-10-14 15:41:12,088 - INFO - 💾 保存图像: detection_results\images\frame_459_20251014_154112_048.jpg (1个检测)
+2025-10-14 15:41:12,093 - INFO - 📝 保存检测信息: detection_results\detections\detection_459_20251014_154112_091.json
+2025-10-14 15:41:12,382 - INFO - 💾 保存图像: detection_results\images\frame_460_20251014_154112_350.jpg (1个检测)
+2025-10-14 15:41:12,385 - INFO - 📝 保存检测信息: detection_results\detections\detection_460_20251014_154112_384.json
+2025-10-14 15:41:12,664 - INFO - 💾 保存图像: detection_results\images\frame_461_20251014_154112_621.jpg (1个检测)
+2025-10-14 15:41:12,668 - INFO - 📝 保存检测信息: detection_results\detections\detection_461_20251014_154112_667.json
+2025-10-14 15:41:13,007 - INFO - 💾 保存图像: detection_results\images\frame_462_20251014_154112_959.jpg (1个检测)
+2025-10-14 15:41:13,011 - INFO - 📝 保存检测信息: detection_results\detections\detection_462_20251014_154113_010.json
+2025-10-14 15:41:14,017 - ERROR - 保存线程错误: 
+2025-10-14 15:41:15,033 - ERROR - 保存线程错误: 
+2025-10-14 15:41:16,035 - ERROR - 保存线程错误: 
+2025-10-14 15:41:17,045 - ERROR - 保存线程错误: 
+2025-10-14 15:41:18,059 - ERROR - 保存线程错误: 
+2025-10-14 15:41:19,066 - ERROR - 保存线程错误: 
+2025-10-14 15:41:20,075 - ERROR - 保存线程错误: 
+2025-10-14 15:41:21,087 - ERROR - 保存线程错误: 
+2025-10-14 15:41:22,096 - ERROR - 保存线程错误: 
+2025-10-14 15:41:23,115 - ERROR - 保存线程错误: 
+2025-10-14 15:41:24,132 - ERROR - 保存线程错误: 
+2025-10-14 15:41:25,136 - ERROR - 保存线程错误: 
+2025-10-14 15:41:26,141 - ERROR - 保存线程错误: 
+2025-10-14 15:41:27,146 - ERROR - 保存线程错误: 
+2025-10-14 15:41:28,152 - ERROR - 保存线程错误: 
+2025-10-14 15:41:29,166 - ERROR - 保存线程错误: 
+2025-10-14 15:41:30,173 - ERROR - 保存线程错误: 
+2025-10-14 15:41:31,189 - ERROR - 保存线程错误: 
+2025-10-14 15:41:32,191 - ERROR - 保存线程错误: 
+2025-10-14 15:41:32,862 - WARNING - 🚨 事件录制开始: detection_results\events\event_0020_20251014_154132_857.mp4
+2025-10-14 15:41:32,915 - INFO - 💾 保存图像: detection_results\images\frame_543_20251014_154132_863.jpg (1个检测)
+2025-10-14 15:41:32,918 - INFO - 📝 保存检测信息: detection_results\detections\detection_543_20251014_154132_917.json
+2025-10-14 15:41:33,319 - INFO - 💾 保存图像: detection_results\images\frame_544_20251014_154133_272.jpg (1个检测)
+2025-10-14 15:41:33,323 - INFO - 📝 保存检测信息: detection_results\detections\detection_544_20251014_154133_321.json
+2025-10-14 15:41:34,293 - WARNING - 🚨 事件录制开始: detection_results\events\event_0021_20251014_154134_289.mp4
+2025-10-14 15:41:34,349 - INFO - 💾 保存图像: detection_results\images\frame_547_20251014_154134_297.jpg (1个检测)
+2025-10-14 15:41:34,352 - INFO - 📝 保存检测信息: detection_results\detections\detection_547_20251014_154134_351.json
+2025-10-14 15:41:35,362 - ERROR - 保存线程错误: 
+2025-10-14 15:41:36,370 - ERROR - 保存线程错误: 
+2025-10-14 15:41:37,373 - ERROR - 保存线程错误: 
+2025-10-14 15:41:38,380 - ERROR - 保存线程错误: 
+2025-10-14 15:41:38,433 - INFO - 用户中断
+2025-10-14 15:41:38,521 - INFO - 📈 最终统计:
+2025-10-14 15:41:38,522 - INFO -    总帧数: 567
+2025-10-14 15:41:38,522 - INFO -    总检测: 162
+2025-10-14 15:41:38,522 - INFO -    人员: 158
+2025-10-14 15:41:38,522 - INFO -    车辆: 0
+2025-10-14 15:41:38,523 - INFO -    事件: 22
+2025-10-14 15:41:38,523 - INFO - 结果保存在: detection_results
+2025-10-14 15:45:16,544 - INFO - 📹 开始完整视频录制: detection_results\videos\full_video_20251014_154516_540.mp4
+2025-10-14 15:45:16,544 - INFO - 预热模型...
+2025-10-14 15:45:17,549 - ERROR - 保存线程错误: 
+2025-10-14 15:45:18,276 - INFO - 🚀 开始监控...
+2025-10-14 15:45:18,554 - ERROR - 保存线程错误: 
+2025-10-14 15:45:19,568 - ERROR - 保存线程错误: 
+2025-10-14 15:45:20,591 - ERROR - 保存线程错误: 
+2025-10-14 15:45:21,600 - ERROR - 保存线程错误: 
+2025-10-14 15:45:22,615 - ERROR - 保存线程错误: 
+2025-10-14 15:45:23,621 - ERROR - 保存线程错误: 
+2025-10-14 15:45:24,632 - ERROR - 保存线程错误: 
+2025-10-14 15:45:25,641 - ERROR - 保存线程错误: 
+2025-10-14 15:45:26,645 - ERROR - 保存线程错误: 
+2025-10-14 15:45:27,649 - ERROR - 保存线程错误: 
+2025-10-14 15:45:28,656 - ERROR - 保存线程错误: 
+2025-10-14 15:45:29,657 - ERROR - 保存线程错误: 
+2025-10-14 15:45:30,668 - ERROR - 保存线程错误: 
+2025-10-14 15:45:31,679 - ERROR - 保存线程错误: 
+2025-10-14 15:45:32,691 - ERROR - 保存线程错误: 
+2025-10-14 15:45:33,700 - ERROR - 保存线程错误: 
+2025-10-14 15:45:34,707 - ERROR - 保存线程错误: 
+2025-10-14 15:45:35,722 - ERROR - 保存线程错误: 
+2025-10-14 15:45:36,724 - ERROR - 保存线程错误: 
+2025-10-14 15:45:37,730 - ERROR - 保存线程错误: 
+2025-10-14 15:45:38,733 - ERROR - 保存线程错误: 
+2025-10-14 15:45:39,743 - ERROR - 保存线程错误: 
+2025-10-14 15:45:40,754 - ERROR - 保存线程错误: 
+2025-10-14 15:45:41,762 - ERROR - 保存线程错误: 
+2025-10-14 15:45:42,774 - ERROR - 保存线程错误: 
+2025-10-14 15:45:43,781 - ERROR - 保存线程错误: 
+2025-10-14 15:45:44,789 - ERROR - 保存线程错误: 
+2025-10-14 15:45:45,800 - ERROR - 保存线程错误: 
+2025-10-14 15:45:46,804 - ERROR - 保存线程错误: 
+2025-10-14 15:45:47,818 - ERROR - 保存线程错误: 
+2025-10-14 15:45:48,823 - ERROR - 保存线程错误: 
+2025-10-14 15:45:49,829 - ERROR - 保存线程错误: 
+2025-10-14 15:45:50,844 - ERROR - 保存线程错误: 
+2025-10-14 15:45:51,854 - ERROR - 保存线程错误: 
+2025-10-14 15:45:52,865 - ERROR - 保存线程错误: 
+2025-10-14 15:45:53,868 - ERROR - 保存线程错误: 
+2025-10-14 15:45:54,878 - ERROR - 保存线程错误: 
+2025-10-14 15:45:55,885 - ERROR - 保存线程错误: 
+2025-10-14 15:45:56,889 - ERROR - 保存线程错误: 
+2025-10-14 15:45:57,897 - ERROR - 保存线程错误: 
+2025-10-14 15:45:58,904 - ERROR - 保存线程错误: 
+2025-10-14 15:45:59,912 - ERROR - 保存线程错误: 
+2025-10-14 15:46:00,922 - ERROR - 保存线程错误: 
+2025-10-14 15:46:01,934 - ERROR - 保存线程错误: 
+2025-10-14 15:46:02,945 - ERROR - 保存线程错误: 
+2025-10-14 15:46:03,953 - ERROR - 保存线程错误: 
+2025-10-14 15:46:04,957 - ERROR - 保存线程错误: 
+2025-10-14 15:46:05,972 - ERROR - 保存线程错误: 
+2025-10-14 15:46:06,980 - ERROR - 保存线程错误: 
+2025-10-14 15:46:07,988 - ERROR - 保存线程错误: 
+2025-10-14 15:46:08,996 - ERROR - 保存线程错误: 
+2025-10-14 15:46:10,009 - ERROR - 保存线程错误: 
+2025-10-14 15:46:11,020 - ERROR - 保存线程错误: 
+2025-10-14 15:46:12,028 - ERROR - 保存线程错误: 
+2025-10-14 15:46:13,041 - ERROR - 保存线程错误: 
+2025-10-14 15:46:14,045 - ERROR - 保存线程错误: 
+2025-10-14 15:46:15,057 - ERROR - 保存线程错误: 
+2025-10-14 15:46:16,068 - ERROR - 保存线程错误: 
+2025-10-14 15:46:17,084 - ERROR - 保存线程错误: 
+2025-10-14 15:46:18,099 - ERROR - 保存线程错误: 
+2025-10-14 15:46:19,109 - ERROR - 保存线程错误: 
+2025-10-14 15:46:20,113 - ERROR - 保存线程错误: 
+2025-10-14 15:46:21,119 - ERROR - 保存线程错误: 
+2025-10-14 15:46:22,133 - ERROR - 保存线程错误: 
+2025-10-14 15:46:23,145 - ERROR - 保存线程错误: 
+2025-10-14 15:46:24,160 - ERROR - 保存线程错误: 
+2025-10-14 15:46:25,172 - ERROR - 保存线程错误: 
+2025-10-14 15:46:26,181 - ERROR - 保存线程错误: 
+2025-10-14 15:46:27,183 - ERROR - 保存线程错误: 
+2025-10-14 15:46:28,187 - ERROR - 保存线程错误: 
+2025-10-14 15:46:29,195 - ERROR - 保存线程错误: 
+2025-10-14 15:46:30,205 - ERROR - 保存线程错误: 
+2025-10-14 15:46:31,213 - ERROR - 保存线程错误: 
+2025-10-14 15:46:32,223 - ERROR - 保存线程错误: 
+2025-10-14 15:46:33,237 - ERROR - 保存线程错误: 
+2025-10-14 15:46:34,243 - ERROR - 保存线程错误: 
+2025-10-14 15:46:35,249 - ERROR - 保存线程错误: 
+2025-10-14 15:46:36,251 - ERROR - 保存线程错误: 
+2025-10-14 15:46:37,257 - ERROR - 保存线程错误: 
+2025-10-14 15:46:38,261 - ERROR - 保存线程错误: 
+2025-10-14 15:46:39,273 - ERROR - 保存线程错误: 
+2025-10-14 15:46:40,289 - ERROR - 保存线程错误: 
+2025-10-14 15:46:41,293 - ERROR - 保存线程错误: 
+2025-10-14 15:46:42,299 - ERROR - 保存线程错误: 
+2025-10-14 15:46:43,303 - ERROR - 保存线程错误: 
+2025-10-14 15:46:44,305 - ERROR - 保存线程错误: 
+2025-10-14 15:46:45,313 - ERROR - 保存线程错误: 
+2025-10-14 15:46:46,319 - ERROR - 保存线程错误: 
+2025-10-14 15:46:47,334 - ERROR - 保存线程错误: 
+2025-10-14 15:46:48,342 - ERROR - 保存线程错误: 
+2025-10-14 15:46:49,352 - ERROR - 保存线程错误: 
+2025-10-14 15:46:50,356 - ERROR - 保存线程错误: 
+2025-10-14 15:46:51,364 - ERROR - 保存线程错误: 
+2025-10-14 15:46:52,371 - ERROR - 保存线程错误: 
+2025-10-14 15:46:53,383 - ERROR - 保存线程错误: 
+2025-10-14 15:46:54,390 - ERROR - 保存线程错误: 
+2025-10-14 15:46:55,402 - ERROR - 保存线程错误: 
+2025-10-14 15:46:56,411 - ERROR - 保存线程错误: 
+2025-10-14 15:46:57,416 - ERROR - 保存线程错误: 
+2025-10-14 15:46:58,422 - ERROR - 保存线程错误: 
+2025-10-14 15:46:59,433 - ERROR - 保存线程错误: 
+2025-10-14 15:47:00,446 - ERROR - 保存线程错误: 
+2025-10-14 15:47:01,452 - ERROR - 保存线程错误: 
+2025-10-14 15:47:02,460 - ERROR - 保存线程错误: 
+2025-10-14 15:47:03,464 - ERROR - 保存线程错误: 
+2025-10-14 15:47:04,470 - ERROR - 保存线程错误: 
+2025-10-14 15:47:05,481 - ERROR - 保存线程错误: 
+2025-10-14 15:47:06,491 - ERROR - 保存线程错误: 
+2025-10-14 15:47:07,503 - ERROR - 保存线程错误: 
+2025-10-14 15:47:08,512 - ERROR - 保存线程错误: 
+2025-10-14 15:47:09,517 - ERROR - 保存线程错误: 
+2025-10-14 15:47:10,533 - ERROR - 保存线程错误: 
+2025-10-14 15:47:11,540 - ERROR - 保存线程错误: 
+2025-10-14 15:47:12,542 - ERROR - 保存线程错误: 
+2025-10-14 15:47:13,544 - ERROR - 保存线程错误: 
+2025-10-14 15:47:14,556 - ERROR - 保存线程错误: 
+2025-10-14 15:47:15,557 - ERROR - 保存线程错误: 
+2025-10-14 15:47:16,562 - ERROR - 保存线程错误: 
+2025-10-14 15:47:17,562 - ERROR - 保存线程错误: 
+2025-10-14 15:47:18,566 - ERROR - 保存线程错误: 
+2025-10-14 15:47:19,582 - ERROR - 保存线程错误: 
+2025-10-14 15:47:20,591 - ERROR - 保存线程错误: 
+2025-10-14 15:47:21,605 - ERROR - 保存线程错误: 
+2025-10-14 15:47:22,607 - ERROR - 保存线程错误: 
+2025-10-14 15:47:23,102 - WARNING - 🚨 事件录制开始: detection_results\events\event_0000_20251014_154723_100.mp4
+2025-10-14 15:47:23,124 - INFO - 💾 保存图像: detection_results\images\frame_571_20251014_154723_103.jpg (1个检测)
+2025-10-14 15:47:23,127 - INFO - 📝 保存检测信息: detection_results\detections\detection_571_20251014_154723_125.json
+2025-10-14 15:47:23,460 - WARNING - 🚨 事件录制开始: detection_results\events\event_0001_20251014_154723_455.mp4
+2025-10-14 15:47:23,488 - INFO - 💾 保存图像: detection_results\images\frame_573_20251014_154723_461.jpg (1个检测)
+2025-10-14 15:47:23,493 - INFO - 📝 保存检测信息: detection_results\detections\detection_573_20251014_154723_489.json
+2025-10-14 15:47:23,700 - INFO - 💾 保存图像: detection_results\images\frame_574_20251014_154723_678.jpg (1个检测)
+2025-10-14 15:47:23,702 - INFO - 📝 保存检测信息: detection_results\detections\detection_574_20251014_154723_701.json
+2025-10-14 15:47:24,006 - INFO - 💾 保存图像: detection_results\images\frame_575_20251014_154723_961.jpg (1个检测)
+2025-10-14 15:47:24,009 - INFO - 📝 保存检测信息: detection_results\detections\detection_575_20251014_154724_008.json
+2025-10-14 15:47:24,301 - INFO - 💾 保存图像: detection_results\images\frame_576_20251014_154724_265.jpg (1个检测)
+2025-10-14 15:47:24,305 - INFO - 📝 保存检测信息: detection_results\detections\detection_576_20251014_154724_303.json
+2025-10-14 15:47:25,314 - ERROR - 保存线程错误: 
+2025-10-14 15:47:26,321 - ERROR - 保存线程错误: 
+2025-10-14 15:47:26,407 - WARNING - 🚨 事件录制开始: detection_results\events\event_0002_20251014_154726_403.mp4
+2025-10-14 15:47:26,459 - INFO - 💾 保存图像: detection_results\images\frame_584_20251014_154726_410.jpg (1个检测)
+2025-10-14 15:47:26,464 - INFO - 📝 保存检测信息: detection_results\detections\detection_584_20251014_154726_462.json
+2025-10-14 15:47:27,331 - WARNING - 🚨 事件录制开始: detection_results\events\event_0003_20251014_154727_326.mp4
+2025-10-14 15:47:27,366 - INFO - 💾 保存图像: detection_results\images\frame_587_20251014_154727_333.jpg (1个检测)
+2025-10-14 15:47:27,370 - INFO - 📝 保存检测信息: detection_results\detections\detection_587_20251014_154727_369.json
+2025-10-14 15:47:27,664 - INFO - 💾 保存图像: detection_results\images\frame_588_20251014_154727_629.jpg (1个检测)
+2025-10-14 15:47:27,668 - INFO - 📝 保存检测信息: detection_results\detections\detection_588_20251014_154727_668.json
+2025-10-14 15:47:28,027 - INFO - 💾 保存图像: detection_results\images\frame_589_20251014_154727_982.jpg (1个检测)
+2025-10-14 15:47:28,031 - INFO - 📝 保存检测信息: detection_results\detections\detection_589_20251014_154728_030.json
+2025-10-14 15:47:28,337 - INFO - 💾 保存图像: detection_results\images\frame_590_20251014_154728_295.jpg (1个检测)
+2025-10-14 15:47:28,341 - INFO - 📝 保存检测信息: detection_results\detections\detection_590_20251014_154728_340.json
+2025-10-14 15:47:28,633 - INFO - 💾 保存图像: detection_results\images\frame_591_20251014_154728_599.jpg (1个检测)
+2025-10-14 15:47:28,639 - INFO - 📝 保存检测信息: detection_results\detections\detection_591_20251014_154728_636.json
+2025-10-14 15:47:28,959 - INFO - 💾 保存图像: detection_results\images\frame_592_20251014_154728_907.jpg (1个检测)
+2025-10-14 15:47:28,962 - INFO - 📝 保存检测信息: detection_results\detections\detection_592_20251014_154728_961.json
+2025-10-14 15:47:29,274 - INFO - 💾 保存图像: detection_results\images\frame_593_20251014_154729_232.jpg (1个检测)
+2025-10-14 15:47:29,277 - INFO - 📝 保存检测信息: detection_results\detections\detection_593_20251014_154729_276.json
+2025-10-14 15:47:29,580 - INFO - 💾 保存图像: detection_results\images\frame_594_20251014_154729_540.jpg (1个检测)
+2025-10-14 15:47:29,584 - INFO - 📝 保存检测信息: detection_results\detections\detection_594_20251014_154729_582.json
+2025-10-14 15:47:29,889 - INFO - 💾 保存图像: detection_results\images\frame_595_20251014_154729_842.jpg (1个检测)
+2025-10-14 15:47:29,895 - INFO - 📝 保存检测信息: detection_results\detections\detection_595_20251014_154729_893.json
+2025-10-14 15:47:30,192 - INFO - 💾 保存图像: detection_results\images\frame_596_20251014_154730_151.jpg (1个检测)
+2025-10-14 15:47:30,196 - INFO - 📝 保存检测信息: detection_results\detections\detection_596_20251014_154730_195.json
+2025-10-14 15:47:30,509 - INFO - 💾 保存图像: detection_results\images\frame_597_20251014_154730_454.jpg (1个检测)
+2025-10-14 15:47:30,518 - INFO - 📝 保存检测信息: detection_results\detections\detection_597_20251014_154730_511.json
+2025-10-14 15:47:30,807 - INFO - 💾 保存图像: detection_results\images\frame_598_20251014_154730_770.jpg (1个检测)
+2025-10-14 15:47:30,812 - INFO - 📝 保存检测信息: detection_results\detections\detection_598_20251014_154730_810.json
+2025-10-14 15:47:31,146 - INFO - 💾 保存图像: detection_results\images\frame_599_20251014_154731_105.jpg (1个检测)
+2025-10-14 15:47:31,151 - INFO - 📝 保存检测信息: detection_results\detections\detection_599_20251014_154731_148.json
+2025-10-14 15:47:32,162 - ERROR - 保存线程错误: 
+2025-10-14 15:47:33,169 - ERROR - 保存线程错误: 
+2025-10-14 15:47:34,171 - ERROR - 保存线程错误: 
+2025-10-14 15:47:35,178 - ERROR - 保存线程错误: 
+2025-10-14 15:47:36,187 - ERROR - 保存线程错误: 
+2025-10-14 15:47:37,192 - ERROR - 保存线程错误: 
+2025-10-14 15:47:38,199 - ERROR - 保存线程错误: 
+2025-10-14 15:47:39,211 - ERROR - 保存线程错误: 
+2025-10-14 15:47:40,224 - ERROR - 保存线程错误: 
+2025-10-14 15:47:41,234 - ERROR - 保存线程错误: 
+2025-10-14 15:47:42,244 - ERROR - 保存线程错误: 
+2025-10-14 15:47:43,252 - ERROR - 保存线程错误: 
+2025-10-14 15:47:44,265 - ERROR - 保存线程错误: 
+2025-10-14 15:47:45,274 - ERROR - 保存线程错误: 
+2025-10-14 15:47:46,284 - ERROR - 保存线程错误: 
+2025-10-14 15:47:47,299 - ERROR - 保存线程错误: 
+2025-10-14 15:47:48,303 - ERROR - 保存线程错误: 
+2025-10-14 15:47:49,307 - ERROR - 保存线程错误: 
+2025-10-14 15:47:50,315 - ERROR - 保存线程错误: 
+2025-10-14 15:47:51,323 - ERROR - 保存线程错误: 
+2025-10-14 15:47:52,334 - ERROR - 保存线程错误: 
+2025-10-14 15:47:53,346 - ERROR - 保存线程错误: 
+2025-10-14 15:47:54,351 - ERROR - 保存线程错误: 
+2025-10-14 15:47:55,359 - ERROR - 保存线程错误: 
+2025-10-14 15:47:56,366 - ERROR - 保存线程错误: 
+2025-10-14 15:47:57,371 - ERROR - 保存线程错误: 
+2025-10-14 15:47:57,567 - WARNING - 🚨 事件录制开始: detection_results\events\event_0004_20251014_154757_561.mp4
+2025-10-14 15:47:57,619 - INFO - 💾 保存图像: detection_results\images\frame_693_20251014_154757_565.jpg (1个检测)
+2025-10-14 15:47:57,623 - INFO - 📝 保存检测信息: detection_results\detections\detection_693_20251014_154757_621.json
+2025-10-14 15:47:58,387 - WARNING - 🚨 事件录制开始: detection_results\events\event_0005_20251014_154758_385.mp4
+2025-10-14 15:47:58,429 - INFO - 💾 保存图像: detection_results\images\frame_697_20251014_154758_389.jpg (2个检测)
+2025-10-14 15:47:58,438 - INFO - 📝 保存检测信息: detection_results\detections\detection_697_20251014_154758_430.json
+2025-10-14 15:47:58,673 - INFO - 💾 保存图像: detection_results\images\frame_698_20251014_154758_636.jpg (2个检测)
+2025-10-14 15:47:58,676 - INFO - 📝 保存检测信息: detection_results\detections\detection_698_20251014_154758_674.json
+2025-10-14 15:47:59,032 - INFO - 💾 保存图像: detection_results\images\frame_699_20251014_154758_966.jpg (2个检测)
+2025-10-14 15:47:59,036 - INFO - 📝 保存检测信息: detection_results\detections\detection_699_20251014_154759_033.json
+2025-10-14 15:47:59,693 - WARNING - 🚨 事件录制开始: detection_results\events\event_0006_20251014_154759_688.mp4
+2025-10-14 15:47:59,748 - INFO - 💾 保存图像: detection_results\images\frame_701_20251014_154759_693.jpg (1个检测)
+2025-10-14 15:47:59,751 - INFO - 📝 保存检测信息: detection_results\detections\detection_701_20251014_154759_750.json
+2025-10-14 15:48:00,121 - INFO - 💾 保存图像: detection_results\images\frame_702_20251014_154800_081.jpg (2个检测)
+2025-10-14 15:48:00,125 - INFO - 📝 保存检测信息: detection_results\detections\detection_702_20251014_154800_124.json
+2025-10-14 15:48:00,432 - INFO - 💾 保存图像: detection_results\images\frame_703_20251014_154800_398.jpg (1个检测)
+2025-10-14 15:48:00,434 - INFO - 📝 保存检测信息: detection_results\detections\detection_703_20251014_154800_433.json
+2025-10-14 15:48:01,436 - ERROR - 保存线程错误: 
+2025-10-14 15:48:01,451 - WARNING - 🚨 事件录制开始: detection_results\events\event_0007_20251014_154801_444.mp4
+2025-10-14 15:48:01,490 - INFO - 💾 保存图像: detection_results\images\frame_708_20251014_154801_450.jpg (1个检测)
+2025-10-14 15:48:01,493 - INFO - 📝 保存检测信息: detection_results\detections\detection_708_20251014_154801_492.json
+2025-10-14 15:48:02,035 - WARNING - 🚨 事件录制开始: detection_results\events\event_0008_20251014_154802_033.mp4
+2025-10-14 15:48:02,078 - INFO - 💾 保存图像: detection_results\images\frame_711_20251014_154802_038.jpg (1个检测)
+2025-10-14 15:48:02,080 - INFO - 📝 保存检测信息: detection_results\detections\detection_711_20251014_154802_079.json
+2025-10-14 15:48:02,553 - WARNING - 🚨 事件录制开始: detection_results\events\event_0009_20251014_154802_551.mp4
+2025-10-14 15:48:02,583 - INFO - 💾 保存图像: detection_results\images\frame_714_20251014_154802_555.jpg (1个检测)
+2025-10-14 15:48:02,586 - INFO - 📝 保存检测信息: detection_results\detections\detection_714_20251014_154802_585.json
+2025-10-14 15:48:02,821 - INFO - 💾 保存图像: detection_results\images\frame_715_20251014_154802_783.jpg (1个检测)
+2025-10-14 15:48:02,826 - INFO - 📝 保存检测信息: detection_results\detections\detection_715_20251014_154802_825.json
+2025-10-14 15:48:03,836 - ERROR - 保存线程错误: 
+2025-10-14 15:48:03,887 - WARNING - 🚨 事件录制开始: detection_results\events\event_0010_20251014_154803_885.mp4
+2025-10-14 15:48:03,931 - INFO - 💾 保存图像: detection_results\images\frame_720_20251014_154803_889.jpg (2个检测)
+2025-10-14 15:48:03,934 - INFO - 📝 保存检测信息: detection_results\detections\detection_720_20251014_154803_933.json
+2025-10-14 15:48:04,218 - INFO - 💾 保存图像: detection_results\images\frame_721_20251014_154804_173.jpg (2个检测)
+2025-10-14 15:48:04,221 - INFO - 📝 保存检测信息: detection_results\detections\detection_721_20251014_154804_219.json
+2025-10-14 15:48:04,597 - INFO - 💾 保存图像: detection_results\images\frame_722_20251014_154804_556.jpg (1个检测)
+2025-10-14 15:48:04,600 - INFO - 📝 保存检测信息: detection_results\detections\detection_722_20251014_154804_598.json
+2025-10-14 15:48:04,854 - INFO - 💾 保存图像: detection_results\images\frame_723_20251014_154804_817.jpg (2个检测)
+2025-10-14 15:48:04,858 - INFO - 📝 保存检测信息: detection_results\detections\detection_723_20251014_154804_856.json
+2025-10-14 15:48:05,107 - INFO - 💾 保存图像: detection_results\images\frame_724_20251014_154805_067.jpg (1个检测)
+2025-10-14 15:48:05,112 - INFO - 📝 保存检测信息: detection_results\detections\detection_724_20251014_154805_109.json
+2025-10-14 15:48:05,358 - INFO - 💾 保存图像: detection_results\images\frame_725_20251014_154805_302.jpg (1个检测)
+2025-10-14 15:48:05,361 - INFO - 📝 保存检测信息: detection_results\detections\detection_725_20251014_154805_360.json
+2025-10-14 15:48:05,951 - INFO - 💾 保存图像: detection_results\images\frame_726_20251014_154805_886.jpg (1个检测)
+2025-10-14 15:48:05,955 - INFO - 📝 保存检测信息: detection_results\detections\detection_726_20251014_154805_954.json
+2025-10-14 15:48:06,444 - INFO - 💾 保存图像: detection_results\images\frame_727_20251014_154806_379.jpg (1个检测)
+2025-10-14 15:48:06,446 - INFO - 📝 保存检测信息: detection_results\detections\detection_727_20251014_154806_445.json
+2025-10-14 15:48:06,913 - INFO - 💾 保存图像: detection_results\images\frame_728_20251014_154806_876.jpg (1个检测)
+2025-10-14 15:48:06,915 - INFO - 📝 保存检测信息: detection_results\detections\detection_728_20251014_154806_914.json
+2025-10-14 15:48:07,383 - INFO - 💾 保存图像: detection_results\images\frame_729_20251014_154807_324.jpg (1个检测)
+2025-10-14 15:48:07,387 - INFO - 📝 保存检测信息: detection_results\detections\detection_729_20251014_154807_386.json
+2025-10-14 15:48:07,715 - INFO - 💾 保存图像: detection_results\images\frame_730_20251014_154807_666.jpg (1个检测)
+2025-10-14 15:48:07,719 - INFO - 📝 保存检测信息: detection_results\detections\detection_730_20251014_154807_717.json
+2025-10-14 15:48:08,032 - INFO - 💾 保存图像: detection_results\images\frame_731_20251014_154807_980.jpg (1个检测)
+2025-10-14 15:48:08,035 - INFO - 📝 保存检测信息: detection_results\detections\detection_731_20251014_154808_034.json
+2025-10-14 15:48:08,382 - INFO - 💾 保存图像: detection_results\images\frame_732_20251014_154808_331.jpg (1个检测)
+2025-10-14 15:48:08,385 - INFO - 📝 保存检测信息: detection_results\detections\detection_732_20251014_154808_383.json
+2025-10-14 15:48:08,828 - INFO - 💾 保存图像: detection_results\images\frame_733_20251014_154808_768.jpg (1个检测)
+2025-10-14 15:48:08,834 - INFO - 📝 保存检测信息: detection_results\detections\detection_733_20251014_154808_832.json
+2025-10-14 15:48:09,179 - INFO - 💾 保存图像: detection_results\images\frame_734_20251014_154809_135.jpg (1个检测)
+2025-10-14 15:48:09,182 - INFO - 📝 保存检测信息: detection_results\detections\detection_734_20251014_154809_181.json
+2025-10-14 15:48:09,580 - INFO - 💾 保存图像: detection_results\images\frame_735_20251014_154809_535.jpg (1个检测)
+2025-10-14 15:48:09,585 - INFO - 📝 保存检测信息: detection_results\detections\detection_735_20251014_154809_583.json
+2025-10-14 15:48:09,910 - INFO - 💾 保存图像: detection_results\images\frame_736_20251014_154809_871.jpg (1个检测)
+2025-10-14 15:48:09,915 - INFO - 📝 保存检测信息: detection_results\detections\detection_736_20251014_154809_913.json
+2025-10-14 15:48:10,241 - INFO - 💾 保存图像: detection_results\images\frame_737_20251014_154810_202.jpg (1个检测)
+2025-10-14 15:48:10,246 - INFO - 📝 保存检测信息: detection_results\detections\detection_737_20251014_154810_245.json
+2025-10-14 15:48:11,263 - ERROR - 保存线程错误: 
+2025-10-14 15:48:12,283 - ERROR - 保存线程错误: 
+2025-10-14 15:48:13,292 - ERROR - 保存线程错误: 
+2025-10-14 15:48:14,296 - ERROR - 保存线程错误: 
+2025-10-14 15:48:15,303 - ERROR - 保存线程错误: 
+2025-10-14 15:48:16,304 - ERROR - 保存线程错误: 
+2025-10-14 15:48:17,319 - ERROR - 保存线程错误: 
+2025-10-14 15:48:18,333 - ERROR - 保存线程错误: 
+2025-10-14 15:48:19,338 - ERROR - 保存线程错误: 
+2025-10-14 15:48:20,343 - ERROR - 保存线程错误: 
+2025-10-14 15:48:21,353 - ERROR - 保存线程错误: 
+2025-10-14 15:48:22,359 - ERROR - 保存线程错误: 
+2025-10-14 15:48:23,375 - ERROR - 保存线程错误: 
+2025-10-14 15:48:24,376 - ERROR - 保存线程错误: 
+2025-10-14 15:48:25,392 - ERROR - 保存线程错误: 
+2025-10-14 15:48:26,408 - ERROR - 保存线程错误: 
+2025-10-14 15:48:27,417 - ERROR - 保存线程错误: 
+2025-10-14 15:48:28,422 - ERROR - 保存线程错误: 
+2025-10-14 15:48:29,423 - ERROR - 保存线程错误: 
+2025-10-14 15:48:30,426 - ERROR - 保存线程错误: 
+2025-10-14 15:48:31,440 - ERROR - 保存线程错误: 
+2025-10-14 15:48:32,447 - ERROR - 保存线程错误: 
+2025-10-14 15:48:32,715 - INFO - 用户中断
+2025-10-14 15:48:32,888 - INFO - 📈 最终统计:
+2025-10-14 15:48:32,889 - INFO -    总帧数: 827
+2025-10-14 15:48:32,890 - INFO -    总检测: 55
+2025-10-14 15:48:32,890 - INFO -    人员: 55
+2025-10-14 15:48:32,891 - INFO -    车辆: 0
+2025-10-14 15:48:32,891 - INFO -    事件: 11
+2025-10-14 15:48:32,891 - INFO - 结果保存在: detection_results
+2025-10-14 16:04:37,204 - INFO - 预热模型...
+2025-10-14 16:04:38,219 - ERROR - 保存错误: 
+2025-10-14 16:04:39,227 - ERROR - 保存错误: 
+2025-10-14 16:04:40,239 - ERROR - 保存错误: 
+2025-10-14 16:04:41,164 - INFO - 🚀 开始监控...
+2025-10-14 16:04:41,254 - ERROR - 保存错误: 
+2025-10-14 16:04:41,524 - INFO - 📈 统计: 帧=0, 轨迹=0, 图像=48
+2025-10-14 16:06:08,910 - INFO - 预热模型...
+2025-10-14 16:06:09,918 - ERROR - 保存错误: 
+2025-10-14 16:06:10,936 - ERROR - 保存错误: 
+2025-10-14 16:06:11,950 - ERROR - 保存错误: 
+2025-10-14 16:06:12,956 - ERROR - 保存错误: 
+2025-10-14 16:06:13,968 - ERROR - 保存错误: 
+2025-10-14 16:06:14,984 - ERROR - 保存错误: 
+2025-10-14 16:06:16,001 - ERROR - 保存错误: 
+2025-10-14 16:06:16,955 - INFO - 🚀 开始监控...
+2025-10-14 16:06:17,015 - ERROR - 保存错误: 
+2025-10-14 16:06:17,697 - INFO - 📈 统计: 帧=0, 轨迹=0, 图像=48
+2025-10-14 16:08:46,742 - INFO - 预热模型...
+2025-10-14 16:08:47,753 - ERROR - 保存错误: 
+2025-10-14 16:08:48,760 - ERROR - 保存错误: 
+2025-10-14 16:08:49,771 - ERROR - 保存错误: 
+2025-10-14 16:08:50,772 - ERROR - 保存错误: 
+2025-10-14 16:08:51,624 - INFO - 🚀 开始监控...
+2025-10-14 16:08:51,775 - ERROR - 保存错误: 
+2025-10-14 16:08:52,078 - INFO - 📈 统计: 帧=0, 轨迹=0, 图像=48
+2025-10-14 16:10:25,427 - INFO - 预热模型...
+2025-10-14 16:10:26,429 - ERROR - 保存错误: 
+Traceback (most recent call last):
+  File "F:\study\demo-for-blog\video\check\rtsp_yolo_monitor.py", line 260, in save_worker
+    task = save_queue.get(timeout=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\programdata\anaconda3\Lib\queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+2025-10-14 16:10:27,439 - ERROR - 保存错误: 
+Traceback (most recent call last):
+  File "F:\study\demo-for-blog\video\check\rtsp_yolo_monitor.py", line 260, in save_worker
+    task = save_queue.get(timeout=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\programdata\anaconda3\Lib\queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+2025-10-14 16:10:28,440 - ERROR - 保存错误: 
+Traceback (most recent call last):
+  File "F:\study\demo-for-blog\video\check\rtsp_yolo_monitor.py", line 260, in save_worker
+    task = save_queue.get(timeout=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\programdata\anaconda3\Lib\queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+2025-10-14 16:10:29,443 - ERROR - 保存错误: 
+Traceback (most recent call last):
+  File "F:\study\demo-for-blog\video\check\rtsp_yolo_monitor.py", line 260, in save_worker
+    task = save_queue.get(timeout=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\programdata\anaconda3\Lib\queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+2025-10-14 16:10:30,444 - ERROR - 保存错误: 
+Traceback (most recent call last):
+  File "F:\study\demo-for-blog\video\check\rtsp_yolo_monitor.py", line 260, in save_worker
+    task = save_queue.get(timeout=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\programdata\anaconda3\Lib\queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+2025-10-14 16:10:31,453 - ERROR - 保存错误: 
+Traceback (most recent call last):
+  File "F:\study\demo-for-blog\video\check\rtsp_yolo_monitor.py", line 260, in save_worker
+    task = save_queue.get(timeout=1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\programdata\anaconda3\Lib\queue.py", line 179, in get
+    raise Empty
+_queue.Empty
+2025-10-14 16:10:31,487 - INFO - 🚀 开始监控...
+2025-10-14 16:12:05,305 - INFO - 预热模型...
+2025-10-14 16:12:10,416 - INFO - 🚀 开始监控...
+2025-10-14 16:12:10,830 - WARNING - 🚨 事件录制: detection_results\events\event_0011_20251014_161210_821.mp4
+2025-10-14 16:12:10,855 - INFO - 💾 保存图像: detection_results\images\person_0_20251014_161210_826.jpg
+2025-10-14 16:12:10,857 - INFO - 📝 保存数据: detection_results\detections\detection_0_20251014_161210_856.json
+2025-10-14 16:12:35,183 - INFO - 预热模型...
+2025-10-14 16:13:05,770 - INFO - 预热模型...
+2025-10-14 16:13:10,438 - INFO - 🚀 开始监控...
+2025-10-14 16:13:10,850 - WARNING - 🚨 事件录制: detection_results\events\event_0012_20251014_161310_846.mp4
+2025-10-14 16:13:10,872 - INFO - 💾 保存图像: detection_results\images\person_0_20251014_161310_849.jpg
+2025-10-14 16:13:10,874 - INFO - 📝 保存数据: detection_results\detections\detection_0_20251014_161310_873.json
+2025-10-14 16:13:21,425 - WARNING - 🚨 事件录制: detection_results\events\event_0013_20251014_161321_420.mp4
+2025-10-14 16:13:28,794 - INFO - 💾 保存图像: detection_results\images\person_30_20251014_161328_755.jpg
+2025-10-14 16:13:28,805 - INFO - 📝 保存数据: detection_results\detections\detection_30_20251014_161328_797.json
+2025-10-14 16:13:33,107 - WARNING - 🚨 事件录制: detection_results\events\event_0014_20251014_161333_103.mp4
+2025-10-14 16:13:43,695 - WARNING - 🚨 事件录制: detection_results\events\event_0015_20251014_161343_689.mp4
+2025-10-14 16:13:49,210 - INFO - 💾 保存图像: detection_results\images\person_60_20251014_161349_162.jpg
+2025-10-14 16:13:49,214 - INFO - 📝 保存数据: detection_results\detections\detection_60_20251014_161349_212.json
+2025-10-14 16:13:53,632 - INFO - 💾 保存图像: detection_results\images\person_65_20251014_161353_589.jpg
+2025-10-14 16:13:53,637 - INFO - 📝 保存数据: detection_results\detections\detection_65_20251014_161353_634.json
+2025-10-14 16:13:55,574 - WARNING - 🚨 事件录制: detection_results\events\event_0016_20251014_161355_563.mp4
+2025-10-14 16:14:03,377 - WARNING - RTSP重连...
+2025-10-14 16:14:42,524 - WARNING - 🚨 事件录制: detection_results\events\event_0017_20251014_161442_519.mp4
+2025-10-14 16:14:42,546 - INFO - 💾 保存图像: detection_results\images\person_144_20251014_161442_523.jpg
+2025-10-14 16:14:42,548 - INFO - 📝 保存数据: detection_results\detections\detection_144_20251014_161442_547.json
+2025-10-14 16:14:43,126 - INFO - 💾 保存图像: detection_results\images\person_145_20251014_161443_083.jpg
+2025-10-14 16:14:43,130 - INFO - 📝 保存数据: detection_results\detections\detection_145_20251014_161443_128.json
+2025-10-14 16:14:44,649 - WARNING - 🚨 事件录制: detection_results\events\event_0018_20251014_161444_639.mp4
+2025-10-14 16:14:49,554 - WARNING - 🚨 事件录制: detection_results\events\event_0019_20251014_161449_550.mp4
+2025-10-14 16:15:00,549 - WARNING - 🚨 事件录制: detection_results\events\event_0020_20251014_161500_544.mp4
+2025-10-14 16:15:00,619 - INFO - 💾 保存图像: detection_results\images\person_173_20251014_161500_552.jpg
+2025-10-14 16:15:00,622 - INFO - 📝 保存数据: detection_results\detections\detection_173_20251014_161500_621.json
+2025-10-14 16:15:03,736 - WARNING - 🚨 事件录制: detection_results\events\event_0021_20251014_161503_731.mp4
+2025-10-14 16:15:05,031 - WARNING - RTSP重连...
+2025-10-14 16:15:06,990 - INFO - 💾 保存图像: detection_results\images\person_180_20251014_161506_953.jpg
+2025-10-14 16:15:06,994 - INFO - 📝 保存数据: detection_results\detections\detection_180_20251014_161506_992.json
+2025-10-14 16:15:07,717 - INFO - 💾 保存图像: detection_results\images\person_181_20251014_161507_677.jpg
+2025-10-14 16:15:07,720 - INFO - 📝 保存数据: detection_results\detections\detection_181_20251014_161507_719.json
+2025-10-14 16:15:15,394 - WARNING - 🚨 事件录制: detection_results\events\event_0022_20251014_161515_387.mp4
+2025-10-14 16:15:17,769 - INFO - 💾 保存图像: detection_results\images\person_191_20251014_161517_730.jpg
+2025-10-14 16:15:17,774 - INFO - 📝 保存数据: detection_results\detections\detection_191_20251014_161517_773.json
+2025-10-14 16:15:26,245 - WARNING - 🚨 事件录制: detection_results\events\event_0023_20251014_161526_241.mp4
+2025-10-14 16:15:36,773 - WARNING - 🚨 事件录制: detection_results\events\event_0024_20251014_161536_770.mp4
+2025-10-14 16:15:38,171 - INFO - 💾 保存图像: detection_results\images\person_221_20251014_161538_128.jpg
+2025-10-14 16:15:38,175 - INFO - 📝 保存数据: detection_results\detections\detection_221_20251014_161538_172.json
+2025-10-14 16:15:47,905 - WARNING - 🚨 事件录制: detection_results\events\event_0025_20251014_161547_900.mp4
+2025-10-14 16:15:58,898 - WARNING - 🚨 事件录制: detection_results\events\event_0026_20251014_161558_891.mp4
+2025-10-14 16:16:01,369 - WARNING - RTSP重连...
+2025-10-14 16:16:03,552 - INFO - 💾 保存图像: detection_results\images\person_251_20251014_161603_509.jpg
+2025-10-14 16:16:03,555 - INFO - 📝 保存数据: detection_results\detections\detection_251_20251014_161603_554.json
+2025-10-14 16:16:04,708 - INFO - 💾 保存图像: detection_results\images\person_252_20251014_161604_602.jpg
+2025-10-14 16:16:04,710 - INFO - 📝 保存数据: detection_results\detections\detection_252_20251014_161604_709.json
+2025-10-14 16:16:12,716 - WARNING - 🚨 事件录制: detection_results\events\event_0027_20251014_161612_711.mp4
+2025-10-14 16:16:14,923 - WARNING - 🚨 事件录制: detection_results\events\event_0028_20251014_161614_918.mp4
+2025-10-14 16:16:22,888 - WARNING - 🚨 事件录制: detection_results\events\event_0029_20251014_161622_882.mp4
+2025-10-14 16:16:31,260 - WARNING - 🚨 事件录制: detection_results\events\event_0030_20251014_161631_254.mp4
+2025-10-14 16:16:32,225 - INFO - 💾 保存图像: detection_results\images\person_282_20251014_161632_173.jpg
+2025-10-14 16:16:32,227 - INFO - 📝 保存数据: detection_results\detections\detection_282_20251014_161632_227.json
+2025-10-14 16:16:41,516 - WARNING - 🚨 事件录制: detection_results\events\event_0031_20251014_161641_511.mp4
+2025-10-14 16:16:43,042 - INFO - 📈 统计: 帧=299, 轨迹=8, 图像=63
+2025-10-14 16:17:48,287 - INFO - 预热模型...
+2025-10-14 16:17:54,609 - INFO - 🚀 开始监控...
+2025-10-14 16:17:55,203 - WARNING - 🚨 事件录制: detection_results\events\event_0000_20251014_161755_197.mp4
+2025-10-14 16:17:55,228 - INFO - 💾 保存图像: detection_results\images\person_0_20251014_161755_200.jpg
+2025-10-14 16:17:55,230 - INFO - 📝 保存数据: detection_results\detections\detection_0_20251014_161755_229.json
+2025-10-14 16:18:00,908 - INFO - 💾 保存图像: detection_results\images\person_11_20251014_161800_886.jpg
+2025-10-14 16:18:00,910 - INFO - 📝 保存数据: detection_results\detections\detection_11_20251014_161800_909.json
+2025-10-14 16:18:05,335 - INFO - 💾 保存图像: detection_results\images\person_22_20251014_161805_313.jpg
+2025-10-14 16:18:05,338 - INFO - 📝 保存数据: detection_results\detections\detection_22_20251014_161805_337.json
+2025-10-14 16:18:05,722 - WARNING - 🚨 事件录制: detection_results\events\event_0001_20251014_161805_719.mp4
+2025-10-14 16:18:08,864 - INFO - 💾 保存图像: detection_results\images\person_30_20251014_161808_839.jpg
+2025-10-14 16:18:08,868 - INFO - 📝 保存数据: detection_results\detections\detection_30_20251014_161808_866.json
+2025-10-14 16:18:16,861 - WARNING - 🚨 事件录制: detection_results\events\event_0002_20251014_161816_854.mp4
+2025-10-14 16:18:17,647 - INFO - 💾 保存图像: detection_results\images\person_41_20251014_161817_611.jpg
+2025-10-14 16:18:17,650 - INFO - 📝 保存数据: detection_results\detections\detection_41_20251014_161817_648.json
+2025-10-14 16:18:24,342 - INFO - 💾 保存图像: detection_results\images\person_52_20251014_161824_295.jpg
+2025-10-14 16:18:24,344 - INFO - 📝 保存数据: detection_results\detections\detection_52_20251014_161824_343.json
+2025-10-14 16:18:25,563 - INFO - 💾 保存图像: detection_results\images\person_54_20251014_161825_529.jpg
+2025-10-14 16:18:25,566 - INFO - 📝 保存数据: detection_results\detections\detection_54_20251014_161825_564.json
+2025-10-14 16:18:27,845 - WARNING - 🚨 事件录制: detection_results\events\event_0003_20251014_161827_840.mp4
+2025-10-14 16:18:30,227 - INFO - 💾 保存图像: detection_results\images\person_60_20251014_161830_182.jpg
+2025-10-14 16:18:30,237 - INFO - 📝 保存数据: detection_results\detections\detection_60_20251014_161830_229.json
+2025-10-14 16:18:37,442 - INFO - 💾 保存图像: detection_results\images\person_71_20251014_161837_394.jpg
+2025-10-14 16:18:37,447 - INFO - 📝 保存数据: detection_results\detections\detection_71_20251014_161837_445.json
+2025-10-14 16:18:39,245 - WARNING - 🚨 事件录制: detection_results\events\event_0004_20251014_161839_240.mp4
+2025-10-14 16:18:42,992 - INFO - 💾 保存图像: detection_results\images\person_78_20251014_161842_918.jpg
+2025-10-14 16:18:42,996 - INFO - 📝 保存数据: detection_results\detections\detection_78_20251014_161842_994.json
+2025-10-14 16:18:44,821 - WARNING - RTSP重连...
+2025-10-14 16:18:47,199 - INFO - 💾 保存图像: detection_results\images\person_81_20251014_161847_155.jpg
+2025-10-14 16:18:47,204 - INFO - 📝 保存数据: detection_results\detections\detection_81_20251014_161847_201.json
+2025-10-14 16:18:48,180 - INFO - 💾 保存图像: detection_results\images\person_82_20251014_161848_148.jpg
+2025-10-14 16:18:48,187 - INFO - 📝 保存数据: detection_results\detections\detection_82_20251014_161848_183.json
+2025-10-14 16:18:50,369 - WARNING - 🚨 事件录制: detection_results\events\event_0005_20251014_161850_364.mp4
+2025-10-14 16:19:01,352 - WARNING - 🚨 事件录制: detection_results\events\event_0006_20251014_161901_347.mp4
+2025-10-14 16:19:10,015 - INFO - 💾 保存图像: detection_results\images\person_112_20251014_161909_979.jpg
+2025-10-14 16:19:10,018 - INFO - 📝 保存数据: detection_results\detections\detection_112_20251014_161910_017.json
+2025-10-14 16:19:12,551 - WARNING - 🚨 事件录制: detection_results\events\event_0007_20251014_161912_544.mp4
+2025-10-14 16:19:12,589 - INFO - 💾 保存图像: detection_results\images\person_115_20251014_161912_551.jpg
+2025-10-14 16:19:12,593 - INFO - 📝 保存数据: detection_results\detections\detection_115_20251014_161912_591.json
+2025-10-14 16:19:23,477 - WARNING - 🚨 事件录制: detection_results\events\event_0008_20251014_161923_472.mp4
+2025-10-14 16:19:34,573 - WARNING - 🚨 事件录制: detection_results\events\event_0009_20251014_161934_566.mp4
+2025-10-14 16:19:34,614 - INFO - 💾 保存图像: detection_results\images\person_142_20251014_161934_573.jpg
+2025-10-14 16:19:34,623 - INFO - 📝 保存数据: detection_results\detections\detection_142_20251014_161934_616.json
+2025-10-14 16:19:44,160 - WARNING - RTSP重连...
+2025-10-14 16:19:46,802 - WARNING - 🚨 事件录制: detection_results\events\event_0010_20251014_161946_800.mp4
+2025-10-14 16:19:46,824 - INFO - 💾 保存图像: detection_results\images\person_158_20251014_161946_802.jpg
+2025-10-14 16:19:46,828 - INFO - 📝 保存数据: detection_results\detections\detection_158_20251014_161946_825.json
+2025-10-14 16:20:15,259 - WARNING - 🚨 事件录制: detection_results\events\event_0011_20251014_162015_256.mp4
+2025-10-14 16:20:15,283 - INFO - 💾 保存图像: detection_results\images\person_215_20251014_162015_259.jpg
+2025-10-14 16:20:15,287 - INFO - 📝 保存数据: detection_results\detections\detection_215_20251014_162015_284.json
+2025-10-14 16:20:16,707 - WARNING - 🚨 事件录制: detection_results\events\event_0012_20251014_162016_704.mp4
+2025-10-14 16:20:20,676 - WARNING - RTSP重连...
+2025-10-14 16:20:25,682 - WARNING - 🚨 事件录制: detection_results\events\event_0013_20251014_162025_677.mp4
+2025-10-14 16:20:36,969 - WARNING - 🚨 事件录制: detection_results\events\event_0014_20251014_162036_961.mp4
+2025-10-14 16:20:46,882 - WARNING - 🚨 事件录制: detection_results\events\event_0015_20251014_162046_877.mp4
+2025-10-14 16:20:57,901 - WARNING - 🚨 事件录制: detection_results\events\event_0016_20251014_162057_895.mp4
+2025-10-14 16:21:15,945 - WARNING - RTSP重连...
+2025-10-14 16:21:17,820 - WARNING - 🚨 事件录制: detection_results\events\event_0017_20251014_162117_816.mp4
+2025-10-14 16:21:17,849 - INFO - 💾 保存图像: detection_results\images\person_306_20251014_162117_819.jpg
+2025-10-14 16:21:17,852 - INFO - 📝 保存数据: detection_results\detections\detection_306_20251014_162117_850.json
+2025-10-14 16:21:18,460 - INFO - 💾 保存图像: detection_results\images\person_307_20251014_162118_417.jpg
+2025-10-14 16:21:18,463 - INFO - 📝 保存数据: detection_results\detections\detection_307_20251014_162118_462.json
+2025-10-14 16:21:29,089 - WARNING - 🚨 事件录制: detection_results\events\event_0018_20251014_162129_085.mp4
+2025-10-14 16:21:31,284 - INFO - 💾 保存图像: detection_results\images\person_326_20251014_162131_242.jpg
+2025-10-14 16:21:31,289 - INFO - 📝 保存数据: detection_results\detections\detection_326_20251014_162131_286.json
+2025-10-14 16:21:40,017 - WARNING - 🚨 事件录制: detection_results\events\event_0019_20251014_162140_012.mp4
+2025-10-14 16:21:41,767 - INFO - 💾 保存图像: detection_results\images\person_337_20251014_162141_727.jpg
+2025-10-14 16:21:41,771 - INFO - 📝 保存数据: detection_results\detections\detection_337_20251014_162141_769.json
+2025-10-14 16:21:51,131 - WARNING - 🚨 事件录制: detection_results\events\event_0020_20251014_162151_125.mp4
+2025-10-14 16:22:02,666 - WARNING - 🚨 事件录制: detection_results\events\event_0021_20251014_162202_660.mp4
+2025-10-14 16:22:07,784 - INFO - 💾 保存图像: detection_results\images\person_367_20251014_162207_742.jpg
+2025-10-14 16:22:07,787 - INFO - 📝 保存数据: detection_results\detections\detection_367_20251014_162207_786.json
+2025-10-14 16:22:13,632 - WARNING - 🚨 事件录制: detection_results\events\event_0022_20251014_162213_626.mp4
+2025-10-14 16:22:18,217 - WARNING - 🚨 事件录制: detection_results\events\event_0023_20251014_162218_210.mp4
+2025-10-14 16:22:19,752 - WARNING - 🚨 事件录制: detection_results\events\event_0024_20251014_162219_748.mp4
+2025-10-14 16:22:20,248 - INFO - 💾 保存图像: detection_results\images\person_382_20251014_162220_210.jpg
+2025-10-14 16:22:20,251 - INFO - 📝 保存数据: detection_results\detections\detection_382_20251014_162220_250.json
+2025-10-14 16:22:29,492 - INFO - 💾 保存图像: detection_results\images\person_397_20251014_162229_444.jpg
+2025-10-14 16:22:29,495 - INFO - 📝 保存数据: detection_results\detections\detection_397_20251014_162229_493.json
+2025-10-14 16:22:30,652 - WARNING - 🚨 事件录制: detection_results\events\event_0025_20251014_162230_647.mp4
+2025-10-14 16:22:36,384 - WARNING - RTSP重连...
+2025-10-14 16:22:39,071 - INFO - 💾 保存图像: detection_results\images\person_409_20251014_162239_013.jpg
+2025-10-14 16:22:39,074 - INFO - 📝 保存数据: detection_results\detections\detection_409_20251014_162239_073.json
+2025-10-14 16:22:40,085 - INFO - 💾 保存图像: detection_results\images\person_410_20251014_162240_046.jpg
+2025-10-14 16:22:40,094 - INFO - 📝 保存数据: detection_results\detections\detection_410_20251014_162240_087.json
+2025-10-14 16:22:42,253 - WARNING - 🚨 事件录制: detection_results\events\event_0026_20251014_162242_245.mp4
+2025-10-14 16:22:49,579 - WARNING - 🚨 事件录制: detection_results\events\event_0027_20251014_162249_574.mp4
+2025-10-14 16:22:51,985 - WARNING - 🚨 事件录制: detection_results\events\event_0028_20251014_162251_980.mp4
+2025-10-14 16:23:37,921 - WARNING - 🚨 事件录制: detection_results\events\event_0029_20251014_162337_915.mp4
+2025-10-14 16:23:40,566 - WARNING - RTSP重连...
+2025-10-14 16:24:41,426 - WARNING - 🚨 事件录制: detection_results\events\event_0030_20251014_162441_421.mp4
+2025-10-14 16:24:45,581 - WARNING - RTSP重连...
+2025-10-14 16:25:24,701 - WARNING - 🚨 事件录制: detection_results\events\event_0031_20251014_162524_694.mp4
+2025-10-14 16:25:36,365 - WARNING - 🚨 事件录制: detection_results\events\event_0032_20251014_162536_359.mp4
+2025-10-14 16:25:47,060 - WARNING - RTSP重连...
+2025-10-14 16:25:50,418 - WARNING - 🚨 事件录制: detection_results\events\event_0033_20251014_162550_413.mp4
+2025-10-14 16:25:50,455 - INFO - 💾 保存图像: detection_results\images\person_628_20251014_162550_419.jpg
+2025-10-14 16:25:50,458 - INFO - 📝 保存数据: detection_results\detections\detection_628_20251014_162550_456.json
+2025-10-14 16:25:51,326 - INFO - 💾 保存图像: detection_results\images\person_629_20251014_162551_291.jpg
+2025-10-14 16:25:51,332 - INFO - 📝 保存数据: detection_results\detections\detection_629_20251014_162551_329.json
+2025-10-14 16:25:58,184 - WARNING - 🚨 事件录制: detection_results\events\event_0034_20251014_162558_178.mp4
+2025-10-14 16:26:08,777 - WARNING - 🚨 事件录制: detection_results\events\event_0035_20251014_162608_771.mp4
+2025-10-14 16:26:23,230 - WARNING - 🚨 事件录制: detection_results\events\event_0036_20251014_162623_225.mp4
+2025-10-14 16:26:23,264 - INFO - 💾 保存图像: detection_results\images\person_666_20251014_162623_230.jpg
+2025-10-14 16:26:23,267 - INFO - 📝 保存数据: detection_results\detections\detection_666_20251014_162623_265.json
+2025-10-14 16:26:29,158 - WARNING - 🚨 事件录制: detection_results\events\event_0037_20251014_162629_150.mp4
+2025-10-14 16:26:40,323 - WARNING - 🚨 事件录制: detection_results\events\event_0038_20251014_162640_317.mp4
+2025-10-14 16:26:46,582 - WARNING - 🚨 事件录制: detection_results\events\event_0039_20251014_162646_577.mp4
+2025-10-14 16:26:48,427 - WARNING - 🚨 事件录制: detection_results\events\event_0040_20251014_162648_420.mp4
+2025-10-14 16:26:51,676 - WARNING - 🚨 事件录制: detection_results\events\event_0041_20251014_162651_669.mp4
+2025-10-14 16:26:51,721 - INFO - 💾 保存图像: detection_results\images\person_698_20251014_162651_676.jpg
+2025-10-14 16:26:51,724 - INFO - 📝 保存数据: detection_results\detections\detection_698_20251014_162651_722.json
+2025-10-14 16:26:59,374 - WARNING - RTSP重连...
+2025-10-14 16:27:01,803 - INFO - 💾 保存图像: detection_results\images\person_708_20251014_162701_755.jpg
+2025-10-14 16:27:01,811 - INFO - 📝 保存数据: detection_results\detections\detection_708_20251014_162701_805.json
+2025-10-14 16:27:04,269 - WARNING - 🚨 事件录制: detection_results\events\event_0042_20251014_162704_263.mp4
+2025-10-14 16:27:06,085 - WARNING - 🚨 事件录制: detection_results\events\event_0043_20251014_162706_081.mp4
+2025-10-14 16:27:06,997 - INFO - 💾 保存图像: detection_results\images\person_714_20251014_162706_950.jpg
+2025-10-14 16:27:07,002 - INFO - 📝 保存数据: detection_results\detections\detection_714_20251014_162706_999.json
+2025-10-14 16:27:16,800 - WARNING - 🚨 事件录制: detection_results\events\event_0044_20251014_162716_796.mp4
+2025-10-14 16:27:18,719 - INFO - 💾 保存图像: detection_results\images\person_727_20251014_162718_652.jpg
+2025-10-14 16:27:18,732 - INFO - 📝 保存数据: detection_results\detections\detection_727_20251014_162718_726.json
+2025-10-14 16:27:28,574 - WARNING - 🚨 事件录制: detection_results\events\event_0045_20251014_162728_561.mp4
+2025-10-14 16:27:30,241 - WARNING - 🚨 事件录制: detection_results\events\event_0046_20251014_162730_237.mp4
+2025-10-14 16:27:33,923 - INFO - 💾 保存图像: detection_results\images\person_744_20251014_162733_881.jpg
+2025-10-14 16:27:33,927 - INFO - 📝 保存数据: detection_results\detections\detection_744_20251014_162733_925.json
+2025-10-14 16:27:41,187 - WARNING - 🚨 事件录制: detection_results\events\event_0047_20251014_162741_180.mp4
+2025-10-14 16:27:45,683 - INFO - 💾 保存图像: detection_results\images\person_757_20251014_162745_639.jpg
+2025-10-14 16:27:45,686 - INFO - 📝 保存数据: detection_results\detections\detection_757_20251014_162745_685.json
+2025-10-14 16:27:52,270 - WARNING - 🚨 事件录制: detection_results\events\event_0048_20251014_162752_264.mp4
+2025-10-14 16:28:01,530 - WARNING - RTSP重连...
+2025-10-14 16:28:01,544 - INFO - 💾 保存图像: detection_results\images\person_774_20251014_162801_484.jpg
+2025-10-14 16:28:01,553 - INFO - 📝 保存数据: detection_results\detections\detection_774_20251014_162801_549.json
+2025-10-14 16:28:06,454 - WARNING - 🚨 事件录制: detection_results\events\event_0049_20251014_162806_448.mp4
+2025-10-14 16:28:06,502 - INFO - 💾 保存图像: detection_results\images\person_778_20251014_162806_453.jpg
+2025-10-14 16:28:06,505 - INFO - 📝 保存数据: detection_results\detections\detection_778_20251014_162806_504.json
+2025-10-14 16:28:07,428 - INFO - 💾 保存图像: detection_results\images\person_779_20251014_162807_369.jpg
+2025-10-14 16:28:07,431 - INFO - 📝 保存数据: detection_results\detections\detection_779_20251014_162807_429.json
+2025-10-14 16:28:17,323 - WARNING - 🚨 事件录制: detection_results\events\event_0050_20251014_162817_319.mp4
+2025-10-14 16:28:28,183 - WARNING - 🚨 事件录制: detection_results\events\event_0051_20251014_162828_177.mp4
+2025-10-14 16:28:33,306 - WARNING - 🚨 事件录制: detection_results\events\event_0052_20251014_162833_301.mp4
+2025-10-14 16:28:34,397 - INFO - 💾 保存图像: detection_results\images\person_809_20251014_162834_344.jpg
+2025-10-14 16:28:34,407 - INFO - 📝 保存数据: detection_results\detections\detection_809_20251014_162834_399.json
+2025-10-14 16:28:43,870 - WARNING - 🚨 事件录制: detection_results\events\event_0053_20251014_162843_860.mp4
+2025-10-14 16:28:54,332 - WARNING - 🚨 事件录制: detection_results\events\event_0054_20251014_162854_327.mp4
+2025-10-14 16:29:00,575 - WARNING - 🚨 事件录制: detection_results\events\event_0055_20251014_162900_571.mp4
+2025-10-14 16:29:00,624 - INFO - 💾 保存图像: detection_results\images\person_839_20251014_162900_576.jpg
+2025-10-14 16:29:00,627 - INFO - 📝 保存数据: detection_results\detections\detection_839_20251014_162900_625.json
+2025-10-14 16:29:04,772 - WARNING - RTSP重连...
+2025-10-14 16:29:07,752 - WARNING - 🚨 事件录制: detection_results\events\event_0056_20251014_162907_747.mp4
+2025-10-14 16:29:07,813 - INFO - 💾 保存图像: detection_results\images\person_846_20251014_162907_752.jpg
+2025-10-14 16:29:07,816 - INFO - 📝 保存数据: detection_results\detections\detection_846_20251014_162907_814.json
+2025-10-14 16:29:15,617 - WARNING - 🚨 事件录制: detection_results\events\event_0057_20251014_162915_607.mp4
+2025-10-14 16:29:15,683 - INFO - 💾 保存图像: detection_results\images\person_856_20251014_162915_624.jpg
+2025-10-14 16:29:15,685 - INFO - 📝 保存数据: detection_results\detections\detection_856_20251014_162915_684.json
+2025-10-14 16:29:17,429 - WARNING - 🚨 事件录制: detection_results\events\event_0058_20251014_162917_422.mp4
+2025-10-14 16:29:17,516 - INFO - 💾 保存图像: detection_results\images\person_858_20251014_162917_428.jpg
+2025-10-14 16:29:17,523 - INFO - 📝 保存数据: detection_results\detections\detection_858_20251014_162917_519.json
+2025-10-14 16:29:18,422 - INFO - 💾 保存图像: detection_results\images\person_859_20251014_162918_376.jpg
+2025-10-14 16:29:18,425 - INFO - 📝 保存数据: detection_results\detections\detection_859_20251014_162918_423.json
+2025-10-14 16:29:28,369 - WARNING - 🚨 事件录制: detection_results\events\event_0059_20251014_162928_357.mp4
+2025-10-14 16:29:30,127 - INFO - 💾 保存图像: detection_results\images\person_872_20251014_162930_078.jpg
+2025-10-14 16:29:30,132 - INFO - 📝 保存数据: detection_results\detections\detection_872_20251014_162930_129.json
+2025-10-14 16:29:39,748 - WARNING - 🚨 事件录制: detection_results\events\event_0060_20251014_162939_742.mp4
+2025-10-14 16:29:45,803 - INFO - 💾 保存图像: detection_results\images\person_889_20251014_162945_754.jpg
+2025-10-14 16:29:45,806 - INFO - 📝 保存数据: detection_results\detections\detection_889_20251014_162945_804.json
+2025-10-14 16:29:47,682 - INFO - 💾 保存图像: detection_results\images\person_891_20251014_162947_619.jpg
+2025-10-14 16:29:47,686 - INFO - 📝 保存数据: detection_results\detections\detection_891_20251014_162947_684.json
+2025-10-14 16:29:51,147 - WARNING - 🚨 事件录制: detection_results\events\event_0061_20251014_162951_136.mp4
+2025-10-14 16:29:57,592 - INFO - 💾 保存图像: detection_results\images\person_902_20251014_162957_536.jpg
+2025-10-14 16:29:57,596 - INFO - 📝 保存数据: detection_results\detections\detection_902_20251014_162957_594.json
+2025-10-14 16:29:59,353 - WARNING - RTSP重连...
+2025-10-14 16:30:01,707 - INFO - 💾 保存图像: detection_results\images\person_905_20251014_163001_654.jpg
+2025-10-14 16:30:01,711 - INFO - 📝 保存数据: detection_results\detections\detection_905_20251014_163001_708.json
+2025-10-14 16:30:02,516 - WARNING - 🚨 事件录制: detection_results\events\event_0062_20251014_163002_512.mp4
+2025-10-14 16:30:02,603 - INFO - 💾 保存图像: detection_results\images\person_906_20251014_163002_518.jpg
+2025-10-14 16:30:02,606 - INFO - 📝 保存数据: detection_results\detections\detection_906_20251014_163002_604.json
+2025-10-14 16:30:14,124 - WARNING - 🚨 事件录制: detection_results\events\event_0063_20251014_163014_117.mp4
+2025-10-14 16:30:25,809 - WARNING - 🚨 事件录制: detection_results\events\event_0064_20251014_163025_803.mp4
+2025-10-14 16:30:30,068 - INFO - 💾 保存图像: detection_results\images\person_936_20251014_163029_966.jpg
+2025-10-14 16:30:30,078 - INFO - 📝 保存数据: detection_results\detections\detection_936_20251014_163030_074.json
+2025-10-14 16:30:36,861 - WARNING - 🚨 事件录制: detection_results\events\event_0065_20251014_163036_854.mp4
+2025-10-14 16:30:48,163 - WARNING - 🚨 事件录制: detection_results\events\event_0066_20251014_163048_157.mp4
+2025-10-14 16:30:56,161 - INFO - 💾 保存图像: detection_results\images\person_966_20251014_163056_110.jpg
+2025-10-14 16:30:56,168 - INFO - 📝 保存数据: detection_results\detections\detection_966_20251014_163056_162.json
+2025-10-14 16:30:59,896 - WARNING - 🚨 事件录制: detection_results\events\event_0067_20251014_163059_891.mp4
+2025-10-14 16:31:00,835 - WARNING - RTSP重连...
+2025-10-14 16:31:03,119 - INFO - 💾 保存图像: detection_results\images\person_972_20251014_163103_063.jpg
+2025-10-14 16:31:03,123 - INFO - 📝 保存数据: detection_results\detections\detection_972_20251014_163103_122.json
+2025-10-14 16:31:04,042 - INFO - 💾 保存图像: detection_results\images\person_973_20251014_163103_993.jpg
+2025-10-14 16:31:04,047 - INFO - 📝 保存数据: detection_results\detections\detection_973_20251014_163104_044.json
+2025-10-14 16:31:10,960 - WARNING - 🚨 事件录制: detection_results\events\event_0068_20251014_163110_955.mp4
+2025-10-14 16:31:57,667 - WARNING - RTSP重连...
+2025-10-14 16:32:10,120 - WARNING - 🚨 事件录制: detection_results\events\event_0069_20251014_163210_114.mp4
+2025-10-14 16:32:31,187 - WARNING - RTSP重连...
+2025-10-14 16:32:57,746 - WARNING - 🚨 事件录制: detection_results\events\event_0070_20251014_163257_742.mp4
+2025-10-14 16:32:57,769 - INFO - 💾 保存图像: detection_results\images\person_1189_20251014_163257_745.jpg
+2025-10-14 16:32:57,771 - INFO - 📝 保存数据: detection_results\detections\detection_1189_20251014_163257_770.json
+2025-10-14 16:32:58,720 - WARNING - 🚨 事件录制: detection_results\events\event_0071_20251014_163258_716.mp4
+2025-10-14 16:33:07,742 - WARNING - 🚨 事件录制: detection_results\events\event_0072_20251014_163307_739.mp4
+2025-10-14 16:33:08,310 - INFO - 💾 保存图像: detection_results\images\person_1210_20251014_163308_289.jpg
+2025-10-14 16:33:08,312 - INFO - 📝 保存数据: detection_results\detections\detection_1210_20251014_163308_311.json
+2025-10-14 16:33:09,343 - WARNING - 🚨 事件录制: detection_results\events\event_0073_20251014_163309_341.mp4
+2025-10-14 16:33:15,942 - WARNING - 🚨 事件录制: detection_results\events\event_0074_20251014_163315_937.mp4
+2025-10-14 16:33:15,966 - INFO - 💾 保存图像: detection_results\images\person_1225_20251014_163315_941.jpg
+2025-10-14 16:33:15,968 - INFO - 📝 保存数据: detection_results\detections\detection_1225_20251014_163315_967.json
+2025-10-14 16:33:17,924 - WARNING - 🚨 事件录制: detection_results\events\event_0075_20251014_163317_920.mp4
+2025-10-14 16:33:18,500 - INFO - 💾 保存图像: detection_results\images\person_1230_20251014_163318_475.jpg
+2025-10-14 16:33:18,504 - INFO - 📝 保存数据: detection_results\detections\detection_1230_20251014_163318_502.json
+2025-10-14 16:33:38,129 - WARNING - RTSP重连...
+2025-10-14 16:33:40,088 - WARNING - 🚨 事件录制: detection_results\events\event_0076_20251014_163340_081.mp4
+2025-10-14 16:33:40,151 - INFO - 💾 保存图像: detection_results\images\person_1269_20251014_163340_087.jpg
+2025-10-14 16:33:40,154 - INFO - 📝 保存数据: detection_results\detections\detection_1269_20251014_163340_153.json
+2025-10-14 16:33:40,771 - INFO - 💾 保存图像: detection_results\images\person_1270_20251014_163340_750.jpg
+2025-10-14 16:33:40,773 - INFO - 📝 保存数据: detection_results\detections\detection_1270_20251014_163340_772.json
+2025-10-14 16:33:50,901 - WARNING - 🚨 事件录制: detection_results\events\event_0077_20251014_163350_896.mp4
+2025-10-14 16:33:52,311 - WARNING - 🚨 事件录制: detection_results\events\event_0078_20251014_163352_308.mp4
+2025-10-14 16:33:53,336 - WARNING - 🚨 事件录制: detection_results\events\event_0079_20251014_163353_331.mp4
+2025-10-14 16:33:55,990 - INFO - 💾 保存图像: detection_results\images\person_1300_20251014_163355_964.jpg
+2025-10-14 16:33:55,992 - INFO - 📝 保存数据: detection_results\detections\detection_1300_20251014_163355_991.json
+2025-10-14 16:33:57,514 - WARNING - 🚨 事件录制: detection_results\events\event_0080_20251014_163357_510.mp4
+2025-10-14 16:34:00,620 - WARNING - 🚨 事件录制: detection_results\events\event_0081_20251014_163400_615.mp4
+2025-10-14 16:34:05,612 - WARNING - 🚨 事件录制: detection_results\events\event_0082_20251014_163405_604.mp4
+2025-10-14 16:34:16,408 - WARNING - 🚨 事件录制: detection_results\events\event_0083_20251014_163416_403.mp4
+2025-10-14 16:34:19,586 - WARNING - 🚨 事件录制: detection_results\events\event_0084_20251014_163419_583.mp4
+2025-10-14 16:34:29,174 - INFO - 💾 保存图像: detection_results\images\person_1364_20251014_163429_147.jpg
+2025-10-14 16:34:29,176 - INFO - 📝 保存数据: detection_results\detections\detection_1364_20251014_163429_176.json
+2025-10-14 16:34:30,232 - WARNING - 🚨 事件录制: detection_results\events\event_0085_20251014_163430_225.mp4
+2025-10-14 16:34:30,276 - WARNING - RTSP重连...
+2025-10-14 16:35:04,713 - WARNING - 🚨 事件录制: detection_results\events\event_0086_20251014_163504_708.mp4
+2025-10-14 16:35:08,479 - WARNING - 🚨 事件录制: detection_results\events\event_0087_20251014_163508_474.mp4
+2025-10-14 16:35:26,959 - WARNING - RTSP重连...
+2025-10-14 16:35:28,929 - WARNING - 🚨 事件录制: detection_results\events\event_0088_20251014_163528_924.mp4
+2025-10-14 16:35:28,967 - INFO - 💾 保存图像: detection_results\images\person_1467_20251014_163528_929.jpg
+2025-10-14 16:35:28,971 - INFO - 📝 保存数据: detection_results\detections\detection_1467_20251014_163528_969.json
+2025-10-14 16:35:29,523 - INFO - 💾 保存图像: detection_results\images\person_1468_20251014_163529_498.jpg
+2025-10-14 16:35:29,525 - INFO - 📝 保存数据: detection_results\detections\detection_1468_20251014_163529_524.json
+2025-10-14 16:35:35,789 - INFO - 💾 保存图像: detection_results\images\person_1476_20251014_163535_734.jpg
+2025-10-14 16:35:35,796 - INFO - 📝 保存数据: detection_results\detections\detection_1476_20251014_163535_794.json
+2025-10-14 16:35:39,814 - WARNING - 🚨 事件录制: detection_results\events\event_0089_20251014_163539_809.mp4
+2025-10-14 16:35:50,430 - WARNING - 🚨 事件录制: detection_results\events\event_0090_20251014_163550_425.mp4
+2025-10-14 16:35:53,683 - WARNING - 🚨 事件录制: detection_results\events\event_0091_20251014_163553_677.mp4
+2025-10-14 16:35:53,718 - INFO - 💾 保存图像: detection_results\images\person_1498_20251014_163553_683.jpg
+2025-10-14 16:35:53,721 - INFO - 📝 保存数据: detection_results\detections\detection_1498_20251014_163553_720.json
+2025-10-14 16:35:54,930 - INFO - 💾 保存图像: detection_results\images\person_1500_20251014_163554_899.jpg
+2025-10-14 16:35:54,934 - INFO - 📝 保存数据: detection_results\detections\detection_1500_20251014_163554_932.json
+2025-10-14 16:35:56,517 - WARNING - 🚨 事件录制: detection_results\events\event_0092_20251014_163556_513.mp4
+2025-10-14 16:35:59,147 - WARNING - 🚨 事件录制: detection_results\events\event_0093_20251014_163559_141.mp4
+2025-10-14 16:35:59,184 - INFO - 💾 保存图像: detection_results\images\person_1508_20251014_163559_145.jpg
+2025-10-14 16:35:59,188 - INFO - 📝 保存数据: detection_results\detections\detection_1508_20251014_163559_186.json
+2025-10-14 16:35:59,767 - INFO - 💾 保存图像: detection_results\images\person_1509_20251014_163559_737.jpg
+2025-10-14 16:35:59,770 - INFO - 📝 保存数据: detection_results\detections\detection_1509_20251014_163559_769.json
+2025-10-14 16:36:02,507 - WARNING - 🚨 事件录制: detection_results\events\event_0094_20251014_163602_503.mp4
+2025-10-14 16:36:12,842 - INFO - 💾 保存图像: detection_results\images\person_1529_20251014_163612_803.jpg
+2025-10-14 16:36:12,847 - INFO - 📝 保存数据: detection_results\detections\detection_1529_20251014_163612_844.json
+2025-10-14 16:36:13,388 - WARNING - 🚨 事件录制: detection_results\events\event_0095_20251014_163613_383.mp4
+2025-10-14 16:36:23,269 - WARNING - 🚨 事件录制: detection_results\events\event_0096_20251014_163623_260.mp4
+2025-10-14 16:36:23,285 - INFO - 💾 保存图像: detection_results\images\person_1545_20251014_163623_264.jpg
+2025-10-14 16:36:23,287 - INFO - 📝 保存数据: detection_results\detections\detection_1545_20251014_163623_285.json
+2025-10-14 16:36:23,838 - WARNING - RTSP重连...
+2025-10-14 16:36:25,636 - INFO - 💾 保存图像: detection_results\images\person_1547_20251014_163625_613.jpg
+2025-10-14 16:36:25,637 - INFO - 📝 保存数据: detection_results\detections\detection_1547_20251014_163625_637.json
+2025-10-14 16:36:26,234 - INFO - 💾 保存图像: detection_results\images\person_1548_20251014_163626_194.jpg
+2025-10-14 16:36:26,239 - INFO - 📝 保存数据: detection_results\detections\detection_1548_20251014_163626_236.json
+2025-10-14 16:36:32,083 - WARNING - 🚨 事件录制: detection_results\events\event_0097_20251014_163632_079.mp4
+2025-10-14 16:36:38,235 - WARNING - 🚨 事件录制: detection_results\events\event_0098_20251014_163638_231.mp4
+2025-10-14 16:36:44,703 - WARNING - 🚨 事件录制: detection_results\events\event_0099_20251014_163644_699.mp4
+2025-10-14 16:36:44,744 - INFO - 💾 保存图像: detection_results\images\person_1580_20251014_163644_703.jpg
+2025-10-14 16:36:44,748 - INFO - 📝 保存数据: detection_results\detections\detection_1580_20251014_163644_747.json
+2025-10-14 16:36:45,743 - WARNING - 🚨 事件录制: detection_results\events\event_0100_20251014_163645_732.mp4
+2025-10-14 16:36:55,890 - WARNING - 🚨 事件录制: detection_results\events\event_0101_20251014_163655_884.mp4
+2025-10-14 16:36:56,905 - WARNING - 🚨 事件录制: detection_results\events\event_0102_20251014_163656_895.mp4
+2025-10-14 16:36:59,059 - WARNING - 🚨 事件录制: detection_results\events\event_0103_20251014_163659_053.mp4
+2025-10-14 16:37:00,394 - INFO - 💾 保存图像: detection_results\images\person_1610_20251014_163700_358.jpg
+2025-10-14 16:37:00,399 - INFO - 📝 保存数据: detection_results\detections\detection_1610_20251014_163700_395.json
+2025-10-14 16:37:03,539 - WARNING - 🚨 事件录制: detection_results\events\event_0104_20251014_163703_535.mp4
+2025-10-14 16:37:14,248 - WARNING - 🚨 事件录制: detection_results\events\event_0105_20251014_163714_243.mp4
+2025-10-14 16:37:20,876 - WARNING - 🚨 事件录制: detection_results\events\event_0106_20251014_163720_871.mp4
+2025-10-14 16:37:20,910 - INFO - 💾 保存图像: detection_results\images\person_1640_20251014_163720_878.jpg
+2025-10-14 16:37:20,912 - INFO - 📝 保存数据: detection_results\detections\detection_1640_20251014_163720_912.json
+2025-10-14 16:37:31,796 - WARNING - 🚨 事件录制: detection_results\events\event_0107_20251014_163731_792.mp4
+2025-10-14 16:37:38,835 - INFO - 💾 保存图像: detection_results\images\person_1670_20251014_163738_799.jpg
+2025-10-14 16:37:38,839 - INFO - 📝 保存数据: detection_results\detections\detection_1670_20251014_163738_837.json
+2025-10-14 16:37:42,689 - WARNING - 🚨 事件录制: detection_results\events\event_0108_20251014_163742_685.mp4
+2025-10-14 16:37:43,973 - WARNING - RTSP重连...
+2025-10-14 16:37:46,162 - INFO - 💾 保存图像: detection_results\images\person_1680_20251014_163746_131.jpg
+2025-10-14 16:37:46,165 - INFO - 📝 保存数据: detection_results\detections\detection_1680_20251014_163746_163.json
+2025-10-14 16:37:46,977 - INFO - 💾 保存图像: detection_results\images\person_1681_20251014_163746_939.jpg
+2025-10-14 16:37:46,981 - INFO - 📝 保存数据: detection_results\detections\detection_1681_20251014_163746_980.json
+2025-10-14 16:37:54,478 - WARNING - 🚨 事件录制: detection_results\events\event_0109_20251014_163754_473.mp4
+2025-10-14 16:38:05,303 - WARNING - 🚨 事件录制: detection_results\events\event_0110_20251014_163805_292.mp4
+2025-10-14 16:38:10,930 - INFO - 💾 保存图像: detection_results\images\person_1711_20251014_163810_887.jpg
+2025-10-14 16:38:10,933 - INFO - 📝 保存数据: detection_results\detections\detection_1711_20251014_163810_933.json
+2025-10-14 16:38:16,355 - WARNING - 🚨 事件录制: detection_results\events\event_0111_20251014_163816_350.mp4
+2025-10-14 16:38:27,009 - WARNING - 🚨 事件录制: detection_results\events\event_0112_20251014_163827_003.mp4
+2025-10-14 16:38:28,429 - INFO - 💾 保存图像: detection_results\images\person_1736_20251014_163828_383.jpg
+2025-10-14 16:38:28,432 - INFO - 📝 保存数据: detection_results\detections\detection_1736_20251014_163828_431.json
+2025-10-14 16:38:31,565 - INFO - 💾 保存图像: detection_results\images\person_1740_20251014_163831_525.jpg
+2025-10-14 16:38:31,568 - INFO - 📝 保存数据: detection_results\detections\detection_1740_20251014_163831_566.json
+2025-10-14 16:38:32,092 - INFO - 💾 保存图像: detection_results\images\person_1741_20251014_163832_033.jpg
+2025-10-14 16:38:32,095 - INFO - 📝 保存数据: detection_results\detections\detection_1741_20251014_163832_093.json
+2025-10-14 16:38:34,144 - INFO - 💾 保存图像: detection_results\images\person_1744_20251014_163834_105.jpg
+2025-10-14 16:38:34,148 - INFO - 📝 保存数据: detection_results\detections\detection_1744_20251014_163834_146.json
+2025-10-14 16:38:38,669 - WARNING - 🚨 事件录制: detection_results\events\event_0113_20251014_163838_664.mp4
+2025-10-14 16:38:43,209 - WARNING - RTSP重连...
+2025-10-14 16:38:50,045 - WARNING - 🚨 事件录制: detection_results\events\event_0114_20251014_163850_037.mp4
+2025-10-14 16:39:01,214 - WARNING - 🚨 事件录制: detection_results\events\event_0115_20251014_163901_203.mp4
+2025-10-14 16:39:12,713 - WARNING - 🚨 事件录制: detection_results\events\event_0116_20251014_163912_709.mp4
+2025-10-14 16:39:23,572 - WARNING - 🚨 事件录制: detection_results\events\event_0117_20251014_163923_567.mp4
+2025-10-14 16:39:34,977 - WARNING - 🚨 事件录制: detection_results\events\event_0118_20251014_163934_971.mp4
+2025-10-14 16:39:44,559 - WARNING - 🚨 事件录制: detection_results\events\event_0119_20251014_163944_550.mp4
+2025-10-14 16:39:44,604 - WARNING - RTSP重连...
+2025-10-14 16:39:46,583 - INFO - 💾 保存图像: detection_results\images\person_1836_20251014_163946_546.jpg
+2025-10-14 16:39:46,586 - INFO - 📝 保存数据: detection_results\detections\detection_1836_20251014_163946_585.json
+2025-10-14 16:39:47,540 - INFO - 💾 保存图像: detection_results\images\person_1837_20251014_163947_496.jpg
+2025-10-14 16:39:47,543 - INFO - 📝 保存数据: detection_results\detections\detection_1837_20251014_163947_542.json
+2025-10-14 16:39:55,374 - WARNING - 🚨 事件录制: detection_results\events\event_0120_20251014_163955_370.mp4
+2025-10-14 16:40:06,830 - WARNING - 🚨 事件录制: detection_results\events\event_0121_20251014_164006_824.mp4
+2025-10-14 16:40:13,079 - INFO - 💾 保存图像: detection_results\images\person_1867_20251014_164013_050.jpg
+2025-10-14 16:40:13,089 - INFO - 📝 保存数据: detection_results\detections\detection_1867_20251014_164013_082.json
+2025-10-14 16:40:17,541 - WARNING - 🚨 事件录制: detection_results\events\event_0122_20251014_164017_535.mp4
+2025-10-14 16:40:28,545 - WARNING - 🚨 事件录制: detection_results\events\event_0123_20251014_164028_538.mp4
+2025-10-14 16:40:33,682 - INFO - 💾 保存图像: detection_results\images\person_1897_20251014_164033_644.jpg
+2025-10-14 16:40:33,688 - INFO - 📝 保存数据: detection_results\detections\detection_1897_20251014_164033_686.json
+2025-10-14 16:40:39,912 - WARNING - 🚨 事件录制: detection_results\events\event_0124_20251014_164039_904.mp4
+2025-10-14 16:40:45,693 - WARNING - RTSP重连...
+2025-10-14 16:40:47,761 - INFO - 💾 保存图像: detection_results\images\person_1912_20251014_164047_717.jpg
+2025-10-14 16:40:47,764 - INFO - 📝 保存数据: detection_results\detections\detection_1912_20251014_164047_763.json
+2025-10-14 16:40:48,494 - INFO - 💾 保存图像: detection_results\images\person_1913_20251014_164048_443.jpg
+2025-10-14 16:40:48,504 - INFO - 📝 保存数据: detection_results\detections\detection_1913_20251014_164048_497.json
+2025-10-14 16:40:50,443 - WARNING - 🚨 事件录制: detection_results\events\event_0125_20251014_164050_438.mp4
+2025-10-14 16:41:01,088 - WARNING - 🚨 事件录制: detection_results\events\event_0126_20251014_164101_082.mp4
+2025-10-14 16:41:04,914 - INFO - 💾 保存图像: detection_results\images\person_1943_20251014_164104_892.jpg
+2025-10-14 16:41:04,917 - INFO - 📝 保存数据: detection_results\detections\detection_1943_20251014_164104_915.json
+2025-10-14 16:41:12,261 - WARNING - 🚨 事件录制: detection_results\events\event_0127_20251014_164112_255.mp4
+2025-10-14 16:41:23,411 - WARNING - 🚨 事件录制: detection_results\events\event_0128_20251014_164123_404.mp4
+2025-10-14 16:41:26,942 - INFO - 💾 保存图像: detection_results\images\person_1971_20251014_164126_900.jpg
+2025-10-14 16:41:26,948 - INFO - 📝 保存数据: detection_results\detections\detection_1971_20251014_164126_945.json
+2025-10-14 16:41:28,282 - INFO - 💾 保存图像: detection_results\images\person_1973_20251014_164128_237.jpg
+2025-10-14 16:41:28,286 - INFO - 📝 保存数据: detection_results\detections\detection_1973_20251014_164128_284.json
+2025-10-14 16:41:35,150 - WARNING - 🚨 事件录制: detection_results\events\event_0129_20251014_164135_143.mp4
+2025-10-14 16:41:37,621 - WARNING - 🚨 事件录制: detection_results\events\event_0130_20251014_164137_614.mp4
+2025-10-14 16:41:42,883 - WARNING - 🚨 事件录制: detection_results\events\event_0131_20251014_164142_876.mp4
+2025-10-14 16:41:43,664 - INFO - 💾 保存图像: detection_results\images\person_1995_20251014_164143_623.jpg
+2025-10-14 16:41:43,671 - INFO - 📝 保存数据: detection_results\detections\detection_1995_20251014_164143_669.json
+2025-10-14 16:41:51,787 - WARNING - 🚨 事件录制: detection_results\events\event_0132_20251014_164151_782.mp4
+2025-10-14 16:41:53,540 - WARNING - 🚨 事件录制: detection_results\events\event_0133_20251014_164153_536.mp4
+2025-10-14 16:41:55,506 - WARNING - RTSP重连...
+2025-10-14 16:42:02,540 - INFO - 📈 统计: 帧=2021, 轨迹=43, 图像=94
+2025-10-14 16:49:06,683 - INFO - 预热模型...
+2025-10-14 16:49:10,714 - INFO - 🚀 开始监控...
+2025-10-14 16:49:11,155 - WARNING - 🚨 事件录制: detection_results\events\event_0134_20251014_164911_150.mp4
+2025-10-14 16:49:11,175 - INFO - 💾 保存图像: detection_results\images\person_0_20251014_164911_154.jpg
+2025-10-14 16:49:11,178 - INFO - 📝 保存数据: detection_results\detections\detection_0_20251014_164911_177.json
+2025-10-14 16:49:19,731 - INFO - 💾 保存图像: detection_results\images\person_15_20251014_164919_688.jpg
+2025-10-14 16:49:19,734 - INFO - 📝 保存数据: detection_results\detections\detection_15_20251014_164919_733.json
+2025-10-14 16:49:21,866 - WARNING - 🚨 事件录制: detection_results\events\event_0135_20251014_164921_856.mp4
+2025-10-14 16:49:29,252 - INFO - 💾 保存图像: detection_results\images\person_30_20251014_164929_217.jpg
+2025-10-14 16:49:29,256 - INFO - 📝 保存数据: detection_results\detections\detection_30_20251014_164929_254.json
+2025-10-14 16:49:32,629 - WARNING - 🚨 事件录制: detection_results\events\event_0136_20251014_164932_623.mp4
+2025-10-14 16:49:39,208 - INFO - 💾 保存图像: detection_results\images\person_45_20251014_164939_165.jpg
+2025-10-14 16:49:39,211 - INFO - 📝 保存数据: detection_results\detections\detection_45_20251014_164939_209.json
+2025-10-14 16:49:43,658 - WARNING - 🚨 事件录制: detection_results\events\event_0137_20251014_164943_652.mp4
+2025-10-14 16:49:47,146 - INFO - 💾 保存图像: detection_results\images\person_60_20251014_164947_104.jpg
+2025-10-14 16:49:47,150 - INFO - 📝 保存数据: detection_results\detections\detection_60_20251014_164947_149.json
+2025-10-14 16:49:55,062 - WARNING - 🚨 事件录制: detection_results\events\event_0138_20251014_164955_054.mp4
+2025-10-14 16:50:00,933 - WARNING - RTSP重连...
+2025-10-14 16:50:02,805 - WARNING - 🚨 事件录制: detection_results\events\event_0139_20251014_165002_799.mp4
+2025-10-14 16:50:07,735 - WARNING - 🚨 事件录制: detection_results\events\event_0140_20251014_165007_728.mp4
+2025-10-14 16:50:10,220 - WARNING - 🚨 事件录制: detection_results\events\event_0141_20251014_165010_214.mp4
+2025-10-14 16:50:18,953 - WARNING - 🚨 事件录制: detection_results\events\event_0142_20251014_165018_948.mp4
+2025-10-14 16:50:30,349 - WARNING - 🚨 事件录制: detection_results\events\event_0143_20251014_165030_342.mp4
+2025-10-14 16:50:34,701 - WARNING - 🚨 事件录制: detection_results\events\event_0144_20251014_165034_694.mp4
+2025-10-14 16:50:34,739 - INFO - 💾 保存图像: detection_results\images\person_129_20251014_165034_701.jpg
+2025-10-14 16:50:34,743 - INFO - 📝 保存数据: detection_results\detections\detection_129_20251014_165034_741.json
+2025-10-14 16:50:42,061 - WARNING - 🚨 事件录制: detection_results\events\event_0145_20251014_165042_055.mp4
+2025-10-14 16:50:45,813 - WARNING - RTSP重连...
+2025-10-14 16:51:27,023 - WARNING - 🚨 事件录制: detection_results\events\event_0146_20251014_165127_018.mp4
+2025-10-14 16:51:27,048 - INFO - 💾 保存图像: detection_results\images\person_226_20251014_165127_022.jpg
+2025-10-14 16:51:27,050 - INFO - 📝 保存数据: detection_results\detections\detection_226_20251014_165127_050.json
+2025-10-14 16:51:28,004 - WARNING - 🚨 事件录制: detection_results\events\event_0147_20251014_165128_000.mp4
+2025-10-14 16:51:29,929 - WARNING - 🚨 事件录制: detection_results\events\event_0148_20251014_165129_925.mp4
+2025-10-14 16:51:30,903 - WARNING - 🚨 事件录制: detection_results\events\event_0149_20251014_165130_897.mp4
+2025-10-14 16:51:34,085 - WARNING - 🚨 事件录制: detection_results\events\event_0150_20251014_165134_081.mp4
+2025-10-14 16:51:35,564 - WARNING - 🚨 事件录制: detection_results\events\event_0151_20251014_165135_561.mp4
+2025-10-14 16:51:37,017 - WARNING - 🚨 事件录制: detection_results\events\event_0152_20251014_165137_015.mp4
+2025-10-14 16:51:37,552 - WARNING - RTSP重连...
+2025-10-14 16:52:26,896 - WARNING - RTSP重连...
+2025-10-14 16:52:28,772 - WARNING - 🚨 事件录制: detection_results\events\event_0153_20251014_165228_768.mp4
+2025-10-14 16:52:28,796 - INFO - 💾 保存图像: detection_results\images\person_351_20251014_165228_771.jpg
+2025-10-14 16:52:28,798 - INFO - 📝 保存数据: detection_results\detections\detection_351_20251014_165228_797.json
+2025-10-14 16:52:29,243 - INFO - 💾 保存图像: detection_results\images\person_352_20251014_165229_219.jpg
+2025-10-14 16:52:29,252 - INFO - 📝 保存数据: detection_results\detections\detection_352_20251014_165229_244.json
+2025-10-14 16:52:39,233 - WARNING - 🚨 事件录制: detection_results\events\event_0154_20251014_165239_228.mp4
+2025-10-14 16:52:43,534 - WARNING - 🚨 事件录制: detection_results\events\event_0155_20251014_165243_528.mp4
+2025-10-14 16:52:44,041 - INFO - 💾 保存图像: detection_results\images\person_380_20251014_165244_011.jpg
+2025-10-14 16:52:44,045 - INFO - 📝 保存数据: detection_results\detections\detection_380_20251014_165244_043.json
+2025-10-14 16:52:45,653 - WARNING - 🚨 事件录制: detection_results\events\event_0156_20251014_165245_649.mp4
+2025-10-14 16:52:54,129 - WARNING - 🚨 事件录制: detection_results\events\event_0157_20251014_165254_125.mp4
+2025-10-14 16:52:55,062 - WARNING - 🚨 事件录制: detection_results\events\event_0158_20251014_165255_058.mp4
+2025-10-14 16:52:55,108 - INFO - 💾 保存图像: detection_results\images\person_402_20251014_165255_062.jpg
+2025-10-14 16:52:55,115 - INFO - 📝 保存数据: detection_results\detections\detection_402_20251014_165255_112.json
+2025-10-14 16:53:03,940 - WARNING - 🚨 事件录制: detection_results\events\event_0159_20251014_165303_934.mp4
+2025-10-14 16:53:17,063 - WARNING - 🚨 事件录制: detection_results\events\event_0160_20251014_165317_060.mp4
+2025-10-14 16:53:17,672 - INFO - 📈 统计: 帧=449, 轨迹=5, 图像=105
