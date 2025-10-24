@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//f/study/demo-for-blog/python/yolo/**)",
+      "Read(//f/study/demo-for-blog/**)",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(set:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

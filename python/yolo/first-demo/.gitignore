@@ -1,0 +1,241 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# YOLO / 深度学习相关
+# ====================
+# 模型文件（很大，应该忽略或使用 LFS）
+*.pt
+*.pth
+*.weights
+*.cfg
+*.names
+*.data
+
+# 数据集文件
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# 训练过程中的临时文件
+*.bak
+*.tmp
+*.temp
+events.out.tfevents.*
+*.tfevents.*
+
+# TensorBoard
+tensorboard/
+*/tensorboard/*
+
+# 检测结果（可选 - 如果想上传检测结果请注释掉）
+result/
+detection_results/
+
+# OpenCV 临时文件
+*.dat
+*.xml
+
+# IDE / 编辑器文件
+# =================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# 项目特定文件
+# =================
+# 示例输出文件
+*_output.*
+*_result.*
+
+# 调试文件
+debug/
+logs/
+log/
+*.log
+
+# 临时测试文件
+test_*.jpg
+test_*.png
+temp_*
+
+# 备份文件
+backup/
+bak/
+
+# 缓存文件
+.cache/
+*.cache
+
+# 系统文件
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 模型下载缓存
+ultralytics/
+*.ultralytics
+
+# Hugging Face 缓存
+~/.cache/huggingface/
+
+# 注意事项：
+# ========
+# 1. 如果要将模型文件纳入版本控制，请使用 Git LFS
+#    git lfs track "*.pt"
+#    git lfs track "*.pth"
+#
+# 2. result/ 目录包含检测结果图片，通常不需要上传
+#    如果需要展示检测结果，可以手动选择重要图片上传
+#
+# 3. 已存在的模型文件（如 yolov8n.pt）会在首次运行时自动下载
