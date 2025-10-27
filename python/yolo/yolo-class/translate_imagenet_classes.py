@@ -3,7 +3,7 @@ import time
 from openai import OpenAI
 
 # 初始化 OpenAI 客户端（请替换成你自己的 API Key）
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="you api key")
 
 # 输入的类别英文名文件（每行一个英文类别）
 input_file = "yolov8n-cls.txt"
