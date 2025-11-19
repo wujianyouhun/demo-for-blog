@@ -59,7 +59,7 @@ def classification_demo():
     print("=" * 60)
 
     # 加载分类模型
-    model = YOLO('yolov8n-cls.pt')
+    model = YOLO('yolov8m-worldv2.pt')
     print("✓ 分类模型加载成功")
 
     # 检测图片
