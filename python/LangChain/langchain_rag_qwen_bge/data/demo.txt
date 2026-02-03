@@ -1,0 +1,3 @@
+Qwen2.5 is a powerful open-source LLM.
+BGE provides strong Chinese embedding vectors.
+RAG combines retrieval with generation for knowledge QA.

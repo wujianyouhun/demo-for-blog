@@ -1,0 +1,51 @@
+# YOLO-World 数据集配置示例
+# 将此文件重命名为 data.yaml 并根据你的数据集修改
+
+# 数据集路径（相对于此文件的路径）
+path: ../datasets/custom  # 或者使用绝对路径
+
+# 训练/验证/测试集的相对路径
+train: images/train
+val: images/val
+test: images/test  # 可选
+
+# 类别数量
+nc: 4
+
+# 类别名称（与你的 videoCollect.py 中的 CLASSES 保持一致）
+names:
+  0: person
+  1: car
+  2: truck
+  3: bus
+
+# ============================================
+# 数据集目录结构示例:
+#
+# datasets/custom/
+# ├── images/
+# │   ├── train/
+# │   │   ├── img1.jpg
+# │   │   ├── img2.jpg
+# │   │   └── ...
+# │   ├── val/
+# │   │   ├── img1.jpg
+# │   │   └── ...
+# │   └── test/
+# │       └── ...
+# └── labels/
+#     ├── train/
+#     │   ├── img1.txt
+#     │   ├── img2.txt
+#     │   └── ...
+#     └── val/
+#         └── ...
+#
+# 标注文件格式 (img1.txt):
+#   class_id x_center y_center width height
+#   （所有值都是归一化的 0-1 之间的值）
+#
+# 示例:
+#   0 0.5 0.5 0.3 0.8  # person, 中心在(0.5, 0.5), 宽0.3, 高0.8
+#   1 0.2 0.3 0.15 0.2 # car
+# ============================================

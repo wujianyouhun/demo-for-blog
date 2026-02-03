@@ -1,0 +1,14 @@
+# YOLO-World 视频监控项目依赖
+
+# 核心依赖
+ultralytics>=8.0.0
+torch>=2.0.0
+torchvision>=0.15.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+requests>=2.28.0
+
+# 可选：GPU 加速（如果使用 CUDA）
+# torch>=2.0.0+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
+# torchvision>=0.15.0+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
+
