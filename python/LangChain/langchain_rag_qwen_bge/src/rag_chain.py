@@ -10,7 +10,7 @@ from .config import VECTOR_DB_DIR, EMBEDDING_MODEL_NAME, LLM_MODEL_NAME
 
 
 def build_local_llm():
-    print("🔥 Loading Qwen2.5 model...")
+    print("🔥 正在加载 Qwen2.5 模型...")
     tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_NAME)
     model = AutoModelForCausalLM.from_pretrained(
         LLM_MODEL_NAME,
@@ -31,7 +31,7 @@ def build_local_llm():
 
 
 def build_rag_chain():
-    print("📂 Loading vector database...")
+    print("📂 正在加载向量数据库...")
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
     vectordb = Chroma(

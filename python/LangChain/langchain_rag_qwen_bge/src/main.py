@@ -3,17 +3,17 @@ from .rag_chain import build_rag_chain
 
 def main():
     qa = build_rag_chain()
-    print("\n🌙 Local RAG QA started. Type 'exit' to quit.\n")
+    print("\n🌙 本地 RAG 问答系统已启动。输入 'exit' 退出。\n")
 
     while True:
-        query = input("You: ")
+        query = input("您: ")
         if query.strip().lower() == "exit":
             break
 
         result = qa(query)
 
-        print("\nAnswer:", result["result"])
-        print("\nSources:")
+        print("\n回答:", result["result"])
+        print("\n来源:")
         for doc in result["source_documents"]:
             print("-", doc.page_content[:100], "...")
         print()

@@ -1,0 +1,13 @@
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+CREATE TABLE parks (
+ id SERIAL PRIMARY KEY,
+ name TEXT,
+ geom GEOMETRY(Polygon,4326)
+);
+
+CREATE TABLE schools (
+ id SERIAL PRIMARY KEY,
+ name TEXT,
+ geom GEOMETRY(Point,4326)
+);

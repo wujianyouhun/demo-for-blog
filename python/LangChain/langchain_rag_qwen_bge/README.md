@@ -1,15 +1,15 @@
-# LangChain RAG Template (Qwen2.5 + BGE Local)
+# LangChain RAG 模板 (Qwen2.5 + BGE 本地部署)
 
-This is a GitHub-ready minimal but complete RAG project supporting:
+这是一个可用于 GitHub 的最小化但完整的 RAG 项目，支持：
 
-- Local LLM: **Qwen2.5-Instruct**
-- Local Embeddings: **BGE (BAAI)**
-- Vector Store: **Chroma**
-- Fully offline capable after model download
+- 本地大语言模型：**Qwen2.5-Instruct**
+- 本地嵌入模型：**BGE (BAAI)**
+- 向量数据库：**Chroma**
+- 下载模型后可完全离线运行
 
 ---
 
-## Project Structure
+## 项目结构
 
 ```
 rag_qwen_bge_template/
@@ -31,7 +31,7 @@ rag_qwen_bge_template/
 
 ---
 
-## 1. Install Dependencies
+## 1. 安装依赖
 
 ```bash
 pip install -r requirements.txt
@@ -39,15 +39,15 @@ pip install -r requirements.txt
 
 ---
 
-## 2. Download Models
+## 2. 下载模型
 
-### Embedding model (BGE)
+### 嵌入模型 (BGE)
 
 ```bash
 huggingface-cli download BAAI/bge-base-zh-v1.5
 ```
 
-### LLM (Qwen2.5)
+### 大语言模型 (Qwen2.5)
 
 ```bash
 huggingface-cli download Qwen/Qwen2.5-3B-Instruct
@@ -55,7 +55,7 @@ huggingface-cli download Qwen/Qwen2.5-3B-Instruct
 
 ---
 
-## 3. Ingest Documents
+## 3. 导入文档
 
 ```bash
 python -m src.ingest
@@ -63,7 +63,7 @@ python -m src.ingest
 
 ---
 
-## 4. Run QA
+## 4. 运行问答系统
 
 ```bash
 python -m src.main
@@ -71,7 +71,7 @@ python -m src.main
 
 ---
 
-## Notes
+## 注意事项
 
-- This template uses HuggingFace Transformers pipeline.
-- Runs locally without OpenAI API.
+- 此模板使用 HuggingFace Transformers pipeline
+- 可在本地运行，无需 OpenAI API
