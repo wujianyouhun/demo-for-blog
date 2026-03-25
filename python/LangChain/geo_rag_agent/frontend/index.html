@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Geo RAG Agent</title></head>
+<body>
+<h2>Geo RAG Agent</h2>
+<input id="q"/><button onclick="ask()">Ask</button>
+<input type="file" id="file"/><button onclick="upload()">Upload</button>
+
+<script>
+async function ask(){
+  let q=document.getElementById("q").value;
+  let res=await fetch("http://localhost:8000/chat?query="+q,{method:"POST"});
+  let d=await res.json();
+  alert(d.answer);
+}
+async function upload(){
+  let f=document.getElementById("file").files[0];
+  let form=new FormData();
+  form.append("file",f);
+  await fetch("http://localhost:8000/upload",{method:"POST",body:form});
+  alert("uploaded");
+}
+</script>
+</body>
+</html>
