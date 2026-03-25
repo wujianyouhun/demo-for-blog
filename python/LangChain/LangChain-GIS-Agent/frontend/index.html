@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GIS Chat</title>
+  <meta charset="utf-8" />
+  <style>
+    #map { height: 90vh; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<input id="input" placeholder="输入问题"/>
+<button onclick="send()">发送</button>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<script>
+var map = L.map('map').setView([35.68, 139.76], 10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+async function send(){
+  const val = document.getElementById("input").value;
+  const res = await fetch("http://localhost:8000/chat", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({question: val})
+  });
+  const data = await res.json();
+  alert(data.answer);
+}
+</script>
+</body>
+</html>
