@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>LangGraph + Llama3 对话</title>
+    <style>
+        body{max-width:800px;margin:20px auto;padding:20px;font-family:Arial}
+        .chat{border:1px solid #ddd;padding:20px;border-radius:8px;height:500px;overflow-y:auto;margin-bottom:15px}
+        .msg{margin:10px 0;padding:10px;border-radius:6px}
+        .user{background:#e3f2fd;text-align:right}
+        .bot{background:#f5f5f5;text-align:left}
+        input{width:70%;padding:10px;font-size:16px}
+        button{padding:10px 20px;font-size:16px;background:#0d6efd;color:white;border:none;border-radius:6px}
+    </style>
+</head>
+<body>
+    <h2>LangGraph + Llama3 本地智能体</h2>
+    <div class="chat" id="chat"></div>
+    <input type="text" id="query" placeholder="输入问题..." autocomplete="off">
+    <button onclick="send()">发送</button>
+
+    <script>
+        async function send() {
+            const q = document.getElementById("query").value.trim()
+            if (!q) return
+            const chat = document.getElementById("chat")
+            chat.innerHTML += `<div class="msg user">${q}</div>`
+            document.getElementById("query").value = ""
+
+            const res = await fetch("/run?query=" + encodeURIComponent(q))
+            const data = await res.json()
+
+            chat.innerHTML += `<div class="msg bot"><strong>回答：</strong>${data.response}<br><br><small>步骤：${data.history.join(' → ')}</small></div>`
+            chat.scrollTop = chat.scrollHeight
+        }
+    </script>
+</body>
+</html>

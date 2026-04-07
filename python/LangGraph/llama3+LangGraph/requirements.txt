@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+langgraph
+langchain-ollama
+python-multipart
+jinja2
+pydantic
