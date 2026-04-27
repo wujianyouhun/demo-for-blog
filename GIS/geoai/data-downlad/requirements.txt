@@ -1,0 +1,10 @@
+pystac-client>=0.8.0
+pystac>=1.10.0
+rioxarray>=0.15.0
+xarray>=2024.0.0
+geopandas>=1.0.0
+shapely>=2.0.0
+planetary-computer>=1.0.0
+requests>=2.32.0
+tqdm>=4.66.0
+overturemaps>=0.0.1

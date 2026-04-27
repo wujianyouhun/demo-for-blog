@@ -3,7 +3,7 @@
 ## 启动后端
 cd backend
 pip install -r requirements.txt
-uvicorn main:app --reload
+python main.py
 
 ## 打开前端
 打开 frontend/index.html

@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 langchain
+langchain-openai
 openai
 geopandas
 shapely
