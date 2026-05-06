@@ -122,7 +122,7 @@ def download_naip(
 def download_overture_buildings(
     bbox: Tuple[float, float, float, float],
     output: str,
-    overture_type: str = "building",
+    overture_type: str = "segment",
     **kwargs: Any,
 ) -> str:
     """从 Overture Maps 下载建筑物数据
@@ -441,11 +441,13 @@ def main():
         # 下载 Overture 建筑物数据
         print("\n正在下载 Overture 建筑物数据...")
         # 纽约曼哈顿区域边界框
-        bbox = (-74.01, 40.70, -73.99, 40.72)
+        # bbox = (-74.01, 40.70, -73.99, 40.72)
+        bbox = (107.6, 33.7, 109.8, 34.8)
+
         try:
             output_file = download_overture_buildings(
                 bbox=bbox,
-                output="overture_buildings/manhattan_buildings.geojson"  # 输出文件
+                output="overture_buildings/xian_segment.geojson"  # 输出文件
             )
             print(f"\n下载完成！文件保存至: {output_file}")
         except ImportError as e:
