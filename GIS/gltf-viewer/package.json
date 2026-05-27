@@ -1,0 +1,28 @@
+{
+  "name": "gltf-viewer",
+  "version": "1.0.0",
+  "description": "GLTF 3D Model Viewer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.example.gltfviewer",
+    "win": {
+      "target": "portable"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      "libs/**/*",
+      "scene_3d.glb",
+      "fengche.gltf"
+    ]
+  }
+}

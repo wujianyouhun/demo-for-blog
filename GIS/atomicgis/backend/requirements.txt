@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+geopandas
+rasterio
+shapely
+networkx
+pydantic
+numpy

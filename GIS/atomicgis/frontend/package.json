@@ -1,0 +1,14 @@
+{
+  "name": "atomicgis-ui",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "maplibre-gl": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
