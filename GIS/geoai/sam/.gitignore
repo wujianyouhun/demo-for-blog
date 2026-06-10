@@ -1,0 +1,36 @@
+# GeoAI SAM 项目
+# Python 编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 模型权重文件
+models/
+*.pth
+*.pt
+*.bin
+
+# 输出结果
+output/
+results/
+
+# 环境配置
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.bak
