@@ -24,6 +24,15 @@ from typing import Optional, List, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# 导入 geoai_sam 包会自动配置 matplotlib 中文字体
+from geoai_sam import (  # noqa: E402
+    SAMWrapper,
+    GroundedSAMWrapper,
+    MaskPostProcessor,
+    MaskVectorizer,
+    QualityMetrics,
+)
+
 
 # ──────────────────────────────────────────────
 # 主类

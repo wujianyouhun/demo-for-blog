@@ -23,6 +23,33 @@ os.environ.setdefault("HF_HUB_CACHE", os.path.join(_default_model_dir, "huggingf
 os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", os.path.join(_default_model_dir, "sentence_transformers"))
 os.environ.setdefault("CLIP_CACHE", os.path.join(_default_model_dir, "clip"))
 
+# matplotlib 中文字体配置（解决 Windows 中文乱码）
+# 在所有模块导入前配置，确保后续所有绘图自动生效
+def _setup_chinese_font():
+    try:
+        import matplotlib.pyplot as plt
+        import matplotlib.font_manager as fm
+        preferred = [
+            "Microsoft YaHei", "SimHei", "DengXian",
+            "KaiTi", "FangSong", "Source Han Serif SC",
+        ]
+        available = {f.name for f in fm.fontManager.ttflist}
+        for name in preferred:
+            if name in available:
+                plt.rcParams["font.sans-serif"] = [name, "DejaVu Sans"]
+                break
+        else:
+            cjk = [f.name for f in fm.fontManager.ttflist
+                   if any(k in f.name.lower()
+                          for k in ("cjk", "hei", "song", "ming", "gothic"))]
+            if cjk:
+                plt.rcParams["font.sans-serif"] = [cjk[0], "DejaVu Sans"]
+        plt.rcParams["axes.unicode_minus"] = False
+    except ImportError:
+        pass
+
+_setup_chinese_font()
+
 from .core import SAMWrapper
 from .grounded_sam import GroundedSAMWrapper
 from .postprocess import MaskPostProcessor
