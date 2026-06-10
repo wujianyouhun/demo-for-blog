@@ -522,9 +522,6 @@ class SAMWrapper:
         self._masks = self._sam.masks
         return self._masks
 
-        self._masks = self._sam.masks
-        return self._masks
-
     def generate_masks_auto(
         self,
         points_per_side: int = 32,
