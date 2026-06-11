@@ -17,14 +17,7 @@ export function loadImage(imagePath, modelType = 'vit_l', samVersion = 'sam1') {
 }
 
 /**
- * 获取显示图片 URL
- */
-export function getDisplayImageUrl(sessionId) {
-  return `/api/image/display?session_id=${sessionId}`
-}
-
-/**
- * 获取影像元数据
+ * 获取影像元数据（含 EPSG:3857 extent）
  */
 export function getImageInfo(sessionId) {
   return api.get('/image/info', { params: { session_id: sessionId } })

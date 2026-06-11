@@ -2,6 +2,7 @@
 SAM 模型服务 + 影像服务
 
 封装 SAM 推理、影像加载/降采样、Mask 后处理等核心业务逻辑。
+影像显示由 TiTiler 动态瓦片负责，ImageService 仅提供元数据和坐标转换。
 """
 
 import os
@@ -19,105 +20,99 @@ if _project_root not in sys.path:
 
 
 class ImageService:
-    """影像加载与降采样服务。"""
+    """影像元数据与坐标转换服务。
 
-    MAX_DISPLAY = 4096  # 显示用图片最大边长
+    不再加载全图到内存（显示由 TiTiler 瓦片处理），
+    仅读取元数据并提供 地理坐标 ↔ 像素坐标 的转换。
+    """
 
     def __init__(self, image_path: str):
         self.image_path = os.path.abspath(image_path)
         self._orig_w = 0
         self._orig_h = 0
-        self._crs = None
-        self._display_img: Optional[np.ndarray] = None
-        self._scale_x = 1.0
-        self._scale_y = 1.0
+        self._crs: Optional[str] = None
+        self._bounds: Optional[Tuple[float, float, float, float]] = None  # (left, bottom, right, top)
+        self._transform = None  # rasterio Affine
+        self._band_count = 0
         self._loaded = False
 
     def load(self) -> Dict[str, Any]:
-        """加载影像元数据并生成降采样显示版本。"""
+        """读取影像元数据（不加载像素）。"""
         if self._loaded:
             return self.get_info()
 
-        try:
-            import rasterio
-            from rasterio.enums import Resampling
+        import rasterio
+        with rasterio.open(self.image_path) as src:
+            self._orig_w = src.width
+            self._orig_h = src.height
+            self._crs = str(src.crs) if src.crs else None
+            self._band_count = src.count
+            self._transform = src.transform
+            if src.bounds:
+                self._bounds = (src.bounds.left, src.bounds.bottom,
+                                src.bounds.right, src.bounds.top)
+            else:
+                self._bounds = None
 
-            with rasterio.open(self.image_path) as src:
-                self._orig_w = src.width
-                self._orig_h = src.height
-                self._crs = str(src.crs) if src.crs else None
-                bands = min(src.count, 3)
-
-                # 计算降采样尺寸
-                scale = min(self.MAX_DISPLAY / max(self._orig_h, self._orig_w), 1.0)
-                dh = max(1, int(self._orig_h * scale))
-                dw = max(1, int(self._orig_w * scale))
-
-                # 使用 rasterio 内置降采样读取
-                img = src.read(
-                    list(range(1, bands + 1)),
-                    out_shape=(bands, dh, dw),
-                    resampling=Resampling.average,
-                )
-                img = np.transpose(img, (1, 2, 0))
-        except ImportError:
-            import cv2
-            raw = cv2.imread(self.image_path)
-            raw = cv2.cvtColor(raw, cv2.COLOR_BGR2RGB)
-            self._orig_h, self._orig_w = raw.shape[:2]
-
-            scale = min(self.MAX_DISPLAY / max(self._orig_h, self._orig_w), 1.0)
-            dh = max(1, int(self._orig_h * scale))
-            dw = max(1, int(self._orig_w * scale))
-            img = cv2.resize(raw, (dw, dh), interpolation=cv2.INTER_AREA)
-
-        # 归一化到 0-255 uint8
-        img = img.astype(np.float32)
-        lo, hi = img.min(), img.max()
-        if hi > lo:
-            img = ((img - lo) / (hi - lo) * 255).astype(np.uint8)
-        else:
-            img = np.zeros_like(img, dtype=np.uint8)
-
-        self._display_img = img
-        self._scale_x = self._orig_w / img.shape[1]
-        self._scale_y = self._orig_h / img.shape[0]
         self._loaded = True
-
         return self.get_info()
 
     def get_info(self) -> Dict[str, Any]:
-        return {
+        """返回前端所需的全部影像元数据。"""
+        info: Dict[str, Any] = {
             "width": self._orig_w,
             "height": self._orig_h,
-            "display_width": self._display_img.shape[1] if self._display_img is not None else 0,
-            "display_height": self._display_img.shape[0] if self._display_img is not None else 0,
-            "scale_x": self._scale_x,
-            "scale_y": self._scale_y,
             "crs": self._crs,
+            "band_count": self._band_count,
             "filename": os.path.basename(self.image_path),
+            "has_georef": self._crs is not None and self._bounds is not None,
         }
+        if self._bounds:
+            info["bounds"] = list(self._bounds)  # [left, bottom, right, top]
+        return info
 
-    def get_display_image_png(self) -> bytes:
-        """返回降采样显示版本的 PNG 字节。"""
-        if self._display_img is None:
-            raise RuntimeError("影像未加载，请先调用 load()")
-        img = self._display_img
-        if img.shape[2] == 1:
-            pil_img = Image.fromarray(img[:, :, 0], mode="L")
-        else:
-            pil_img = Image.fromarray(img[:, :, :3])
-        buf = io.BytesIO()
-        pil_img.save(buf, format="PNG")
-        return buf.getvalue()
+    def geo_to_pixel(self, lon: float, lat: float) -> Tuple[float, float]:
+        """地理坐标 (lon/lat in image CRS) → 像素坐标 (col, row)。
+
+        前端发送 EPSG:4326 坐标；若影像 CRS 不同则先做投影转换。
+        """
+        import rasterio
+        from rasterio.warp import transform as warp_transform
+
+        if self._transform is None:
+            raise RuntimeError("影像未加载或无仿射变换")
+
+        # 如果前端坐标 (WGS84) 与影像 CRS 不同，先转投影
+        src_lon, src_lat = lon, lat
+        if self._crs and self._crs.upper() not in ("EPSG:4326",):
+            xs, ys = warp_transform("EPSG:4326", self._crs, [lon], [lat])
+            src_lon, src_lat = xs[0], ys[0]
+
+        # 仿射逆变换: (lon, lat) → (col, row)
+        inv = ~self._transform
+        col, row = inv * (src_lon, src_lat)
+
+        # 裁剪到有效范围
+        col = max(0.0, min(float(col), self._orig_w - 1))
+        row = max(0.0, min(float(row), self._orig_h - 1))
+        return col, row
 
     def display_to_orig(self, dx: float, dy: float) -> Tuple[float, float]:
-        """显示坐标 → 原图像素坐标。"""
-        ox = dx * self._scale_x
-        oy = dy * self._scale_y
-        ox = max(0, min(ox, self._orig_w - 1))
-        oy = max(0, min(oy, self._orig_h - 1))
-        return ox, oy
+        """保留向后兼容（不再使用，由 geo_to_pixel 替代）。"""
+        return dx, dy
+
+    def get_mask_extent(self) -> Optional[List[float]]:
+        """返回 mask 叠加层所需的 EPSG:3857 范围 [minX, minY, maxX, maxY]。"""
+        if not self._bounds:
+            return None
+        from pyproj import Transformer
+        transformer = Transformer.from_crs(
+            self._crs or "EPSG:4326", "EPSG:3857", always_xy=True
+        )
+        left, bottom, right, top = self._bounds
+        x_min, y_min = transformer.transform(left, bottom)
+        x_max, y_max = transformer.transform(right, top)
+        return [x_min, y_min, x_max, y_max]
 
 
 class SAMService:

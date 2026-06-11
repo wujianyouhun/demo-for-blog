@@ -1,6 +1,8 @@
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 pydantic>=2.0
-numpy
+numpy<2.0
 Pillow
 rasterio
+pyproj
+titiler.core>=0.18

@@ -6,7 +6,8 @@
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import Map from 'ol/Map'
 import View from 'ol/View'
-import Projection from 'ol/proj/Projection'
+import TileLayer from 'ol/layer/Tile'
+import XYZ from 'ol/source/XYZ'
 import ImageLayer from 'ol/layer/Image'
 import ImageStatic from 'ol/source/ImageStatic'
 import VectorLayer from 'ol/layer/Vector'
@@ -16,9 +17,10 @@ import Point from 'ol/geom/Point'
 import { fromExtent } from 'ol/geom/Polygon'
 import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style'
 import { defaults as defaultInteractions, DoubleClickZoom, DragPan } from 'ol/interaction'
+import { fromLonLat, toLonLat } from 'ol/proj'
+import { getCenter } from 'ol/extent'
 
 import {
-  getDisplayImageUrl,
   predictByPoint,
   predictByBox,
   predictByText,
@@ -36,35 +38,28 @@ export default {
   setup(props, { emit, expose }) {
     const mapEl = ref(null)
     let map = null
-    let imageLayer = null
+    let tileLayer = null
     let maskLayer = null
     let pointsLayer = null
     let boxLayer = null
     let dblClickZoomInteraction = null
     let dragPanInteraction = null
 
-    // 影像显示尺寸（用于坐标映射）
-    let displayWidth = 0
-    let displayHeight = 0
-    let imageExtent = [0, 0, 1, 1]  // [minX, minY, maxX, maxY]
+    // 影像地理范围 (EPSG:3857)
+    let imageExtent3857 = null  // [minX, minY, maxX, maxY]
 
     // 点标注状态
-    let fgPoints = []   // [[x, y], ...] 像素坐标
-    let bgPoints = []   // [[x, y], ...]
+    let fgPoints = []   // [[lon, lat], ...]
+    let bgPoints = []
+    let fgMarkers = []  // OL features for display
+    let bgMarkers = []
 
     // 框标注状态
     let isDrawingBox = false
     let boxStart = null
 
-    // ── 初始化地图 ──
+    // ── 初始化地图（标准 Web Mercator） ──
     function initMap() {
-      // 自定义投影，像素坐标（左上角 0,0）
-      const projection = new Projection({
-        code: 'pixel',
-        units: 'pixels',
-        extent: [0, 0, 1, 1],  // 会在加载影像时更新
-      })
-
       pointsLayer = new VectorLayer({
         source: new VectorSource(),
         style: (feature) => {
@@ -72,9 +67,7 @@ export default {
           return new Style({
             image: new CircleStyle({
               radius: 6,
-              fill: new Fill({
-                color: type === 'fg' ? '#2ecc71' : '#e74c3c',
-              }),
+              fill: new Fill({ color: type === 'fg' ? '#2ecc71' : '#e74c3c' }),
               stroke: new Stroke({ color: '#fff', width: 2 }),
             }),
           })
@@ -91,7 +84,6 @@ export default {
         zIndex: 20,
       })
 
-      // 创建可控制的双击缩放和拖拽平移
       dblClickZoomInteraction = new DoubleClickZoom()
       dragPanInteraction = new DragPan()
 
@@ -99,11 +91,10 @@ export default {
         target: mapEl.value,
         layers: [pointsLayer, boxLayer],
         view: new View({
-          projection,
           center: [0, 0],
-          zoom: 1,
-          maxZoom: 10,
-          minZoom: 0.1,
+          zoom: 2,
+          maxZoom: 22,
+          minZoom: 1,
         }),
         controls: [],
         interactions: defaultInteractions({
@@ -112,100 +103,79 @@ export default {
         }),
       })
 
-      // 手动添加可控的交互
       map.addInteraction(dblClickZoomInteraction)
       map.addInteraction(dragPanInteraction)
-
-      // 初始禁用双击缩放（标注模式需要双击）
       dblClickZoomInteraction.setActive(false)
       dragPanInteraction.setActive(true)
 
-      // 鼠标移动 → 报告像素坐标
+      // 鼠标移动 → 报告 WGS84 坐标
       map.on('pointermove', (evt) => {
-        if (!displayWidth) return
-        const [x, y] = evt.coordinate
-        // 转换到图像像素坐标（注意 Y 轴翻转）
-        const px = Math.round(x)
-        const py = Math.round(displayHeight - y)
-        if (px >= 0 && px < displayWidth && py >= 0 && py < displayHeight) {
-          emit('cursor-move', { x: px, y: py })
-        }
+        const [lon, lat] = toLonLat(evt.coordinate)
+        emit('cursor-move', { x: lon.toFixed(6), y: lat.toFixed(6), lon, lat })
       })
 
-      // 点击事件
       map.on('singleclick', handleClick)
       map.on('dblclick', handleDoubleClick)
-
-      // 框绘制事件
       map.on('pointerdown', handlePointerDown)
       map.on('pointerdrag', handlePointerDrag)
       map.on('pointerup', handlePointerUp)
     }
 
-    // ── 加载影像到地图 ──
+    // ── 加载 TiTiler 瓦片图层 ──
     function loadDisplayImage(sessionId, info) {
-      displayWidth = info.display_width
-      displayHeight = info.display_height
+      // 移除旧图层
+      if (tileLayer) map.removeLayer(tileLayer)
+      if (maskLayer) { map.removeLayer(maskLayer); maskLayer = null }
 
-      // OpenLayers 使用左下角为原点的坐标系
-      // 图像像素坐标 (0,0) 在左上角 → 映射到 OL 坐标 (0, displayHeight)
-      imageExtent = [0, 0, displayWidth, displayHeight]
-
-      // 更新投影范围
-      const proj = map.getView().getProjection()
-      proj.setExtent(imageExtent)
-
-      // 添加影像图层
-      const imgUrl = getDisplayImageUrl(sessionId)
-      const imgSource = new ImageStatic({
-        url: imgUrl,
-        imageExtent: imageExtent,
-        projection: proj,
+      // 创建 XYZ 瓦片源 (指向 TiTiler)
+      const tileSource = new XYZ({
+        url: info.tile_url,
+        crossOrigin: 'anonymous',
+        maxZoom: 22,
       })
 
-      if (imageLayer) {
-        map.removeLayer(imageLayer)
-      }
-      imageLayer = new ImageLayer({
-        source: imgSource,
+      tileLayer = new TileLayer({
+        source: tileSource,
         zIndex: 1,
       })
-      map.addLayer(imageLayer)
+      map.addLayer(tileLayer)
 
-      // 适配视图
-      map.getView().fit(imageExtent, {
-        size: map.getSize(),
-        padding: [20, 20, 20, 20],
-      })
+      // 计算 EPSG:3857 范围用于 fit 视图和 mask 定位
+      if (info.bounds) {
+        const [left, bottom, right, top] = info.bounds
+        const bl = fromLonLat([left, bottom])
+        const tr = fromLonLat([right, top])
+        imageExtent3857 = [bl[0], bl[1], tr[0], tr[1]]
+
+        map.getView().fit(imageExtent3857, {
+          size: map.getSize(),
+          padding: [30, 30, 30, 30],
+        })
+      }
     }
 
-    // ── 获取点击的像素坐标 ──
-    function getPixelCoord(evt) {
-      const [x, y] = evt.coordinate
-      const px = Math.round(x)
-      const py = Math.round(displayHeight - y)
-      return { px, py, ox: x, oy: y }
+    // ── 获取点击处的 WGS84 坐标 ──
+    function getGeoCoord(evt) {
+      const [lon, lat] = toLonLat(evt.coordinate)
+      return { lon, lat, coord3857: evt.coordinate }
     }
 
     // ── 点击处理 ──
     function handleClick(evt) {
       if (!props.sessionId || props.mode === 'pan') return
 
-      const { px, py } = getPixelCoord(evt)
+      const { lon, lat, coord3857 } = getGeoCoord(evt)
 
       if (props.mode === 'point') {
         if (evt.originalEvent.shiftKey) {
-          // Shift+Click = 背景点
-          bgPoints.push([px, py])
-          addPointMarker(px, py, 'bg')
+          bgPoints.push([lon, lat])
+          addPointMarker(coord3857, 'bg')
         } else {
-          // 普通点击 = 前景点
-          fgPoints.push([px, py])
-          addPointMarker(px, py, 'fg')
+          fgPoints.push([lon, lat])
+          addPointMarker(coord3857, 'fg')
         }
       } else if (props.mode === 'text') {
-        // 文本模式：直接调用文本分割
-        doTextPredict(px, py)
+        doTextPredict()
       }
     }
 
@@ -213,10 +183,7 @@ export default {
     function handleDoubleClick(evt) {
       if (props.mode !== 'point') return
       if (fgPoints.length === 0) return
-
-      // 阻止双击缩放
       evt.preventDefault?.()
-
       doPointPredict()
     }
 
@@ -224,21 +191,19 @@ export default {
     function handlePointerDown(evt) {
       if (props.mode !== 'box' || !props.sessionId) return
       isDrawingBox = true
-      boxStart = getPixelCoord(evt)
+      boxStart = evt.coordinate
       boxLayer.getSource().clear()
     }
 
     function handlePointerDrag(evt) {
       if (!isDrawingBox || props.mode !== 'box') return
-      const end = getPixelCoord(evt)
       const source = boxLayer.getSource()
       source.clear()
 
-      // 在 OL 坐标系中绘制矩形
-      const x1 = Math.min(boxStart.px, end.px)
-      const x2 = Math.max(boxStart.px, end.px)
-      const y1 = displayHeight - Math.max(boxStart.py, end.py) // 翻转 Y
-      const y2 = displayHeight - Math.min(boxStart.py, end.py)
+      const x1 = Math.min(boxStart[0], evt.coordinate[0])
+      const y1 = Math.min(boxStart[1], evt.coordinate[1])
+      const x2 = Math.max(boxStart[0], evt.coordinate[0])
+      const y2 = Math.max(boxStart[1], evt.coordinate[1])
 
       const boxFeature = new Feature({
         geometry: fromExtent([x1, y1, x2, y2]),
@@ -250,23 +215,25 @@ export default {
       if (!isDrawingBox || props.mode !== 'box') return
       isDrawingBox = false
 
-      const end = getPixelCoord(evt)
-      const x1 = Math.min(boxStart.px, end.px)
-      const y1 = Math.min(boxStart.py, end.py)
-      const x2 = Math.max(boxStart.px, end.px)
-      const y2 = Math.max(boxStart.py, end.py)
+      const end = evt.coordinate
+      const x1 = Math.min(boxStart[0], end[0])
+      const y1 = Math.min(boxStart[1], end[1])
+      const x2 = Math.max(boxStart[0], end[0])
+      const y2 = Math.max(boxStart[1], end[1])
 
-      // 忽略太小的框
-      if (x2 - x1 < 3 || y2 - y1 < 3) return
+      // 忽略太小的框 (EPSG:3857 米)
+      if (x2 - x1 < 1 || y2 - y1 < 1) return
 
-      doBoxPredict([x1, y1, x2, y2])
+      // 转为 WGS84
+      const [lon1, lat1] = toLonLat([x1, y1])
+      const [lon2, lat2] = toLonLat([x2, y2])
+      doBoxPredict([lon1, lat1, lon2, lat2])
     }
 
     // ── 添加点标记 ──
-    function addPointMarker(px, py, type) {
-      const olY = displayHeight - py  // 翻转 Y 轴
+    function addPointMarker(coord3857, type) {
       const feature = new Feature({
-        geometry: new Point([px, olY]),
+        geometry: new Point(coord3857),
         type,
       })
       pointsLayer.getSource().addFeature(feature)
@@ -287,7 +254,6 @@ export default {
         updateMaskOverlay(url)
         emit('mask-updated', true)
         emit('toast', '点分割完成', 'success')
-        // 清除点标记
         clearPointMarkers()
       } catch (e) {
         emit('toast', '分割失败: ' + (e.response?.data?.detail || e.message), 'error')
@@ -312,7 +278,7 @@ export default {
       }
     }
 
-    async function doTextPredict(px, py) {
+    async function doTextPredict() {
       if (!props.promptText?.trim()) {
         emit('toast', '请输入目标文本', 'error')
         return
@@ -331,15 +297,18 @@ export default {
       }
     }
 
-    // ── Mask 叠加层 ──
+    // ── Mask 叠加层（使用 EPSG:3857 范围定位） ──
     function updateMaskOverlay(pngUrl) {
-      if (maskLayer) {
-        map.removeLayer(maskLayer)
+      if (maskLayer) map.removeLayer(maskLayer)
+
+      if (!imageExtent3857) {
+        emit('toast', '缺少影像地理范围，无法叠加 Mask', 'error')
+        return
       }
+
       const maskSource = new ImageStatic({
         url: pngUrl,
-        imageExtent: imageExtent,
-        projection: map.getView().getProjection(),
+        imageExtent: imageExtent3857,
       })
       maskLayer = new ImageLayer({
         source: maskSource,
@@ -363,7 +332,7 @@ export default {
       pointsLayer.getSource().clear()
     }
 
-    // ── 监听 mode 变化 → 更新光标与交互 ──
+    // ── 监听 mode 变化 ──
     watch(
       () => props.mode,
       (newMode) => {
@@ -377,24 +346,22 @@ export default {
         } else if (newMode === 'point') {
           el.style.cursor = 'crosshair'
           dblClickZoomInteraction?.setActive(false)
-          dragPanInteraction?.setActive(true)  // 允许平移+点击标注
+          dragPanInteraction?.setActive(true)
         } else if (newMode === 'box') {
           el.style.cursor = 'crosshair'
           dblClickZoomInteraction?.setActive(false)
-          dragPanInteraction?.setActive(false)  // 禁用平移以绘制框
+          dragPanInteraction?.setActive(false)
         } else if (newMode === 'text') {
           el.style.cursor = 'text'
           dblClickZoomInteraction?.setActive(false)
           dragPanInteraction?.setActive(true)
         }
 
-        // 模式切换时清除临时标记
         clearPointMarkers()
         boxLayer?.getSource()?.clear()
       }
     )
 
-    // ── 暴露给父组件的方法 ──
     expose({
       updateMaskOverlay,
       clearMask,
@@ -405,7 +372,6 @@ export default {
       nextTick(() => {
         initMap()
 
-        // 键盘事件监听
         const handleKeyDown = (e) => {
           if (!props.sessionId) return
           if (e.key === 'Enter' && props.mode === 'point' && fgPoints.length > 0) {
@@ -417,7 +383,6 @@ export default {
           }
         }
         window.addEventListener('keydown', handleKeyDown)
-        // 保存引用以便清理
         mapEl.value._keyHandler = handleKeyDown
       })
     })

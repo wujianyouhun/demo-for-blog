@@ -44,9 +44,12 @@
           </div>
           <div v-else style="font-size:12px; color:var(--text-secondary)">
             <p>{{ imageInfo?.filename || '已加载' }}</p>
-            <p>{{ imageInfo?.display_width }} x {{ imageInfo?.display_height }} (显示)</p>
-            <p>{{ imageInfo?.width }} x {{ imageInfo?.height }} (原始)</p>
+            <p>{{ imageInfo?.width }} x {{ imageInfo?.height }} 像素</p>
             <p v-if="imageInfo?.crs">CRS: {{ imageInfo.crs }}</p>
+            <p v-if="imageInfo?.bounds">
+              范围: {{ imageInfo.bounds[0].toFixed(4) }}, {{ imageInfo.bounds[1].toFixed(4) }}
+              ~ {{ imageInfo.bounds[2].toFixed(4) }}, {{ imageInfo.bounds[3].toFixed(4) }}
+            </p>
           </div>
         </div>
 
@@ -185,8 +188,9 @@
 
     <!-- 底部状态栏 -->
     <footer class="app-statusbar">
-      <span v-if="cursorPos">像素: ({{ cursorPos.x }}, {{ cursorPos.y }})</span>
+      <span v-if="cursorPos">经纬度: {{ cursorPos.lon }}, {{ cursorPos.lat }}</span>
       <span v-if="imageInfo">原图: {{ imageInfo.width }} x {{ imageInfo.height }}</span>
+      <span v-if="imageInfo?.crs">CRS: {{ imageInfo.crs }}</span>
       <span v-if="hasMask">Mask 已生成</span>
       <span style="flex:1"></span>
       <span v-if="loading">{{ loadingText }}</span>
@@ -252,10 +256,10 @@ export default {
 
     const modeHint = computed(() => {
       switch (mode.value) {
-        case 'point': return '左键标记前景点，Shift+左键标记背景点，双击执行分割'
+        case 'point': return '左键标记前景，Shift+左键标记背景，双击或 Enter 执行分割'
         case 'box': return '拖拽绘制矩形框，松开后自动分割'
         case 'text': return '点击影像任意位置，使用文本提示进行分割'
-        case 'pan': return '拖拽平移，滚轮缩放'
+        case 'pan': return '拖拽平移，滚轮缩放（支持无级缩放到像素级）'
         default: return ''
       }
     })
