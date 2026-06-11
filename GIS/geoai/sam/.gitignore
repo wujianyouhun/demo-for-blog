@@ -18,6 +18,16 @@ results/
 # 环境配置
 .env
 
+# 前端构建
+frontend/node_modules/
+frontend/dist/
+*.log
+npm-debug.log*
+
+# 大型数据文件（按需取消注释以跟踪）
+*.tif
+*.tiff
+
 # IDE
 .vscode/
 .idea/
