@@ -1,0 +1,23 @@
+html, body, #app { height: 100%; margin: 0; font-family: 'Helvetica Neue', 'PingFang SC', sans-serif; }
+.ol-map { height: 100%; width: 100%; }
+.side-panel { background: #fff; overflow-y: auto; }
+.panel-section { padding: 16px; border-bottom: 1px solid #f0f0f0; }
+.panel-title { font-size: 15px; font-weight: 600; color: #303133; margin-bottom: 12px; }
+.status-running { color: #e6a23c; }
+.status-success { color: #67c23a; }
+.status-error { color: #f56c6c; }
+.swipe-handle {
+  position: absolute; top: 0; bottom: 0; width: 4px;
+  background: #409eff; cursor: ew-resize; z-index: 100;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+.swipe-handle::after {
+  content: '⇔'; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #409eff; color: #fff; border-radius: 50%;
+  width: 28px; height: 28px; display: flex; align-items: center;
+  justify-content: center; font-size: 14px;
+}
+.stat-card { text-align: center; padding: 12px 8px; }
+.stat-value { font-size: 22px; font-weight: 700; color: #409eff; }
+.stat-label { font-size: 12px; color: #909399; margin-top: 4px; }

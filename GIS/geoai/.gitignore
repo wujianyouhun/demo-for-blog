@@ -1,0 +1,106 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.eggs/
+
+# 虚拟环境
+venv/
+.venv/
+env/
+.env/
+
+# ========================
+# 数据与模型（体积大，不入库）
+# ========================
+data/
+*.tif
+*.tiff
+*.geotiff
+*.img
+*.vrt
+*.gpkg
+*.geojson
+*.geoparquet
+*.shp
+*.dbf
+*.shx
+*.prj
+*.fgb
+*.npy
+*.npz
+*.pth
+*.pt
+*.onnx
+*.safetensors
+*.weights
+*.ckpt
+*.mlmodel
+
+# ========================
+# Node / 前端
+# ========================
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ========================
+# IDE / 编辑器
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ========================
+# 系统
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# 测试 / CI
+# ========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# ========================
+# 日志与临时文件
+# ========================
+*.log
+*.tmp
+*.bak
+*.cache
+output/
+
+# ========================
+# 环境变量 / 密钥
+# ========================
+.env
+.env.local
+.env.*.local
+secrets/
+credentials/
+
+# ========================
+# Jupyter
+# ========================
+.ipynb_checkpoints/
+*.ipynb_checkpoints

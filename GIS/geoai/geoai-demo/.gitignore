@@ -1,0 +1,121 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+.env/
+
+# ========================
+# Data & Models (large files)
+# ========================
+data/raw/
+data/samples/
+data/models/
+data/output/
+output/
+logs/
+
+# Geospatial raster
+*.tif
+*.tiff
+*.geotiff
+*.img
+*.vrt
+
+# Geospatial vector
+*.gpkg
+*.geojson
+*.geoparquet
+*.shp
+*.dbf
+*.shx
+*.prj
+*.fgb
+
+# NumPy arrays
+*.npy
+*.npz
+
+# Model weights
+*.pth
+*.pt
+*.onnx
+*.safetensors
+*.weights
+*.ckpt
+*.mlmodel
+
+# ========================
+# Node / Frontend
+# ========================
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+.npm
+.eslintcache
+
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.local
+.env.*.local
+secrets/
+credentials/
+
+# ========================
+# IDE / Editor
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# Testing / CI
+# ========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# ========================
+# Jupyter
+# ========================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ========================
+# Logs & temp
+# ========================
+*.log
+*.tmp
+*.bak
+*.cache
