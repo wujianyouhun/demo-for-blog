@@ -15,6 +15,13 @@ OUTPUT_DIR = DATA_DIR / "output"
 for d in [TIME_A_DIR, TIME_B_DIR, SAMPLES_DIR, MODELS_DIR, OUTPUT_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
+# ── 预训练模型缓存目录（避免下载到 C 盘） ──
+PRETRAINED_DIR = DATA_DIR / "pretrained"
+PRETRAINED_DIR.mkdir(parents=True, exist_ok=True)
+
+import os as _os
+_os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
+
 STAC_API_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
 PRESET_REGIONS = {

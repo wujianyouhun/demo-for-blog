@@ -113,6 +113,8 @@ def start_backend():
     ]
     env = os.environ.copy()
     env["PYTHONPATH"] = str(PROJECT_ROOT) + os.pathsep + env.get("PYTHONPATH", "")
+    # 预训练模型缓存到项目目录，避免下载到 C 盘
+    env["TORCH_HOME"] = str(PROJECT_ROOT / "data" / "pretrained")
 
     info(f"启动后端  →  http://127.0.0.1:{BACKEND_PORT}  (API 文档: /docs)")
     proc = subprocess.Popen(

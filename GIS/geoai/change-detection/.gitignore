@@ -25,6 +25,7 @@ data/raw/
 data/samples/
 data/models/
 data/output/
+data/pretrained/
 *.tif
 *.tiff
 *.gpkg

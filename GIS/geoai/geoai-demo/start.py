@@ -219,12 +219,18 @@ def start_backend(project_root):
         "--reload",
     ]
 
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(project_root) + os.pathsep + env.get("PYTHONPATH", "")
+    # 预训练模型缓存到项目目录，避免下载到 C 盘
+    env["TORCH_HOME"] = str(project_root / "data" / "pretrained")
+
     proc = subprocess.Popen(
         cmd,
         cwd=str(project_root),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        env=env,
     )
 
     time.sleep(1)

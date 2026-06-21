@@ -26,6 +26,7 @@ data/raw/
 data/samples/
 data/models/
 data/output/
+data/pretrained/
 output/
 logs/
 
