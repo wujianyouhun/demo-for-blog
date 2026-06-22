@@ -1,4 +1,9 @@
-"""双时相数据下载器"""
+"""双时相数据下载器.
+
+The search step intentionally uses geoai.pc_stac_search so this demo follows
+the GeoAI data workflow, while the read step keeps local window cropping to
+avoid downloading full Sentinel-2 scenes.
+"""
 import logging
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -41,20 +46,25 @@ class BiTemporalDownloader:
                 "meta": {"date_a": date_a, "date_b": date_b, "bbox": bbox}}
 
     def _download_single(self, bbox, date, max_cloud, bands, output_dir, prefix):
-        from pystac_client import Client
+        import geoai
         import planetary_computer as pc
         from rasterio.warp import transform_bounds
         from rasterio.windows import from_bounds
 
-        client = Client.open(self.STAC_API_URL)
         parts = date.split("-")
         year, month = int(parts[0]), int(parts[1])
         date_end = f"{year + (1 if month == 12 else 0)}-{(month % 12) + 1:02d}-01"
 
-        search = client.search(collections=["sentinel-2-l2a"], bbox=bbox,
-                                datetime=f"{date}/{date_end}",
-                                query={"eo:cloud_cover": {"lt": max_cloud}}, max_items=10)
-        items = sorted(search.items(), key=lambda it: it.properties.get("eo:cloud_cover", 100))
+        items = geoai.pc_stac_search(
+            collection="sentinel-2-l2a",
+            bbox=bbox,
+            time_range=f"{date}/{date_end}",
+            query={"eo:cloud_cover": {"lt": max_cloud}},
+            max_items=10,
+            quiet=True,
+            endpoint=self.STAC_API_URL,
+        )
+        items = sorted(items, key=lambda it: it.properties.get("eo:cloud_cover", 100))
         if not items:
             logger.warning(f"未找到 {date} 附近影像")
             return None

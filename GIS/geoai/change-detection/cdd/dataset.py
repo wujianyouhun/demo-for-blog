@@ -82,11 +82,19 @@ def create_dataloaders(dir_a, dir_b, label_dir, batch_size=8, val_split=0.15,
     transform = get_augmentation() if augment else None
     full = BiTemporalDataset(dir_a, dir_b, label_dir, transform)
     total = len(full)
+    if total < 2:
+        raise ValueError(
+            f"训练至少需要 2 对样本，当前只有 {total} 对。"
+            "请先运行 scripts/generate_sample.py --mode synthetic 或制作真实/弱标签样本。"
+        )
     val_size = max(1, int(total * val_split))
+    if val_size >= total:
+        val_size = 1
+    train_size = total - val_size
     train_ds, val_ds = random_split(full, [total - val_size, val_size],
                                      generator=torch.Generator().manual_seed(42))
     return (
         DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers,
-                   pin_memory=True, drop_last=True),
+                   pin_memory=True, drop_last=train_size >= batch_size),
         DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True),
     )

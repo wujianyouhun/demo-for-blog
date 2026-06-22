@@ -1,92 +1,99 @@
 #!/usr/bin/env python3
-"""生成模拟双时相样本数据（用于快速体验，无需下载真实数据）"""
+"""制作变化检测训练样本。
+
+支持三种模式：
+- synthetic: 生成教学用模拟样本。
+- weak-label: 用 GeoAI ChangeStar 对双时相影像生成弱标签后切片。
+- vector-label: 用真实变化矢量标签栅格化后切片。
+"""
+import argparse
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import numpy as np
-import rasterio
-from rasterio.transform import from_bounds
 from rich.console import Console
 
 console = Console()
 
+
 def main():
-    console.print("[bold blue]生成模拟双时相变化检测样本[/bold blue]\n")
+    parser = argparse.ArgumentParser(description="制作 GeoAI 变化检测训练样本")
+    parser.add_argument("--mode", choices=["synthetic", "weak-label", "vector-label"], default="synthetic")
+    parser.add_argument("--image-a", help="时相 A GeoTIFF，用于 weak-label/vector-label")
+    parser.add_argument("--image-b", help="时相 B GeoTIFF，用于 weak-label/vector-label")
+    parser.add_argument("--vector-label", help="真实变化矢量标签，支持 GeoJSON/GPKG/SHP")
+    parser.add_argument("--num-samples", type=int, default=100, help="synthetic 模式样本数")
+    parser.add_argument("--tile-size", type=int, default=256)
+    parser.add_argument("--stride", type=int, default=256)
+    parser.add_argument("--min-change-pixels", type=int, default=20)
+    parser.add_argument("--max-tiles", type=int, default=None)
+    parser.add_argument("--geoai-model", default="s1_s1c1_vitb")
+    parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument("--keep-existing", action="store_true", help="追加样本，不清空既有 .tif")
+    args = parser.parse_args()
 
     from config import SAMPLES_DIR
-    dir_a = SAMPLES_DIR / "time_a"
-    dir_b = SAMPLES_DIR / "time_b"
-    dir_l = SAMPLES_DIR / "labels"
-    for d in [dir_a, dir_b, dir_l]:
-        d.mkdir(parents=True, exist_ok=True)
+    from cdd.sample_builder import (
+        generate_synthetic_samples,
+        generate_vector_label_samples,
+        generate_weak_label_samples,
+    )
 
-    rng = np.random.RandomState(42)
-    num_samples = 100
-    tile_size = 256
+    overwrite = not args.keep_existing
+    if args.mode == "synthetic":
+        console.print("[bold blue]生成模拟双时相变化检测样本[/bold blue]")
+        result = generate_synthetic_samples(
+            SAMPLES_DIR,
+            num_samples=args.num_samples,
+            tile_size=args.tile_size,
+            overwrite=overwrite,
+        )
+    elif args.mode == "weak-label":
+        _require(args.image_a, "--image-a")
+        _require(args.image_b, "--image-b")
+        console.print("[bold blue]使用 GeoAI ChangeStar 生成弱标签样本[/bold blue]")
+        result = generate_weak_label_samples(
+            args.image_a,
+            args.image_b,
+            SAMPLES_DIR,
+            tile_size=args.tile_size,
+            stride=args.stride,
+            min_change_pixels=args.min_change_pixels,
+            max_tiles=args.max_tiles,
+            model_name=args.geoai_model,
+            threshold=args.threshold,
+            overwrite=overwrite,
+        )
+    else:
+        _require(args.image_a, "--image-a")
+        _require(args.image_b, "--image-b")
+        _require(args.vector_label, "--vector-label")
+        console.print("[bold blue]使用真实变化矢量标签制作监督样本[/bold blue]")
+        result = generate_vector_label_samples(
+            args.image_a,
+            args.image_b,
+            args.vector_label,
+            SAMPLES_DIR,
+            tile_size=args.tile_size,
+            stride=args.stride,
+            min_change_pixels=args.min_change_pixels,
+            max_tiles=args.max_tiles,
+            overwrite=overwrite,
+        )
 
-    # 模拟地理范围
-    transform = from_bounds(116.3, 39.8, 116.4, 39.9, tile_size, tile_size)
-    crs = "EPSG:4326"
+    counts = result["counts"]
+    console.print("[green]样本制作完成[/green]")
+    console.print(f"  时相 A: {counts['time_a']} 张")
+    console.print(f"  时相 B: {counts['time_b']} 张")
+    console.print(f"  标签:   {counts['labels']} 张")
+    console.print(f"  目录:   {result['samples_dir']}")
 
-    for i in range(num_samples):
-        # 时相 A: 随机 RGB 地物
-        base = rng.randint(50, 200, size=(3, tile_size, tile_size), dtype=np.uint8)
 
-        # 添加一些结构（模拟建筑物/道路）
-        for _ in range(rng.randint(3, 8)):
-            cx, cy = rng.randint(20, tile_size-20, 2)
-            w, h = rng.randint(10, 40, 2)
-            color = rng.randint(100, 255, 3)
-            base[:, cy:cy+h, cx:cx+w] = color.reshape(3, 1, 1)
+def _require(value, name):
+    if not value:
+        raise SystemExit(f"{name} 是当前模式的必填参数")
 
-        # 时相 B: 在 A 的基础上引入变化
-        img_b = base.copy()
-
-        # 添加变化区域（模拟新建建筑 / 拆除建筑）
-        label = np.zeros((tile_size, tile_size), dtype=np.uint8)
-        num_changes = rng.randint(1, 5)
-
-        for _ in range(num_changes):
-            cx, cy = rng.randint(30, tile_size-30, 2)
-            w, h = rng.randint(8, 30, 2)
-
-            # 变化：用新颜色替换
-            new_color = rng.randint(50, 255, 3)
-            img_b[:, cy:cy+h, cx:cx+w] = new_color.reshape(3, 1, 1)
-            label[cy:cy+h, cx:cx+w] = 1
-
-            # 有时也在 A 中添加变化（模拟双向变化）
-            if rng.random() > 0.5:
-                old_color = rng.randint(50, 255, 3)
-                base[:, cy:cy+h, cx:cx+w] = old_color.reshape(3, 1, 1)
-
-        # 添加噪声
-        noise_a = rng.normal(0, 5, base.shape).astype(np.int16)
-        noise_b = rng.normal(0, 5, img_b.shape).astype(np.int16)
-        base = np.clip(base.astype(np.int16) + noise_a, 0, 255).astype(np.uint8)
-        img_b = np.clip(img_b.astype(np.int16) + noise_b, 0, 255).astype(np.uint8)
-
-        name = f"sample_{i:04d}"
-        profile = {
-            "driver": "GTiff", "dtype": "uint8",
-            "width": tile_size, "height": tile_size,
-            "count": 3, "crs": crs, "transform": transform,
-        }
-
-        with rasterio.open(dir_a / f"{name}.tif", "w", **profile) as dst:
-            dst.write(base)
-        with rasterio.open(dir_b / f"{name}.tif", "w", **profile) as dst:
-            dst.write(img_b)
-
-        lbl_profile = {**profile, "count": 1, "dtype": "uint8"}
-        with rasterio.open(dir_l / f"{name}.tif", "w", **lbl_profile) as dst:
-            dst.write(label, 1)
-
-    console.print(f"[green]生成 {num_samples} 对样本[/green]")
-    console.print(f"  时相 A: {dir_a}")
-    console.print(f"  时相 B: {dir_b}")
-    console.print(f"  标签:   {dir_l}")
 
 if __name__ == "__main__":
     main()
