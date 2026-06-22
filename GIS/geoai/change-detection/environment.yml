@@ -11,7 +11,7 @@ dependencies:
   - geos>=3.12
   - pytorch>=2.0
   - torchvision>=0.15
-  - cpuonly
+  - pytorch-cuda=11.8
   - rasterio>=1.3
   - fiona>=1.9
   - pyproj>=3.6
@@ -24,7 +24,7 @@ dependencies:
   - scikit-image>=0.21
   - scipy>=1.10
   - matplotlib>=3.7
-  - numpy>=1.24
+  - numpy=2.2.6
   - tqdm>=4.66
   - rich>=13.0
   - pytest>=7.4
