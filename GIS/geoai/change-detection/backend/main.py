@@ -32,7 +32,9 @@ def health():
 @app.get("/api/config")
 def get_config():
     from config import PRESET_REGIONS, MODEL_CONFIG, TRAIN_CONFIG, INFERENCE_CONFIG, COMPARE_CONFIG
+    from cdd.geoai_change import list_geoai_changestar_models
     return {"regions": PRESET_REGIONS, "models": list(MODEL_CONFIG.keys()),
+            "geoai_models": list(list_geoai_changestar_models().keys()),
             "train": TRAIN_CONFIG, "inference": INFERENCE_CONFIG, "compare": COMPARE_CONFIG}
 
 

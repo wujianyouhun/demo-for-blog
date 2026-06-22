@@ -23,14 +23,22 @@ def main():
     from config import SAMPLES_DIR, MODELS_DIR
     from cdd.models import build_model
     from cdd.dataset import create_dataloaders
+    from cdd.sample_builder import validate_samples
     from cdd.trainer import Trainer
 
     dir_a = Path(args.dir_a) if args.dir_a else SAMPLES_DIR / "time_a"
     dir_b = Path(args.dir_b) if args.dir_b else SAMPLES_DIR / "time_b"
     label_dir = Path(args.label_dir) if args.label_dir else SAMPLES_DIR / "labels"
 
-    if not dir_a.exists():
-        console.print(f"[red]样本目录不存在: {dir_a}[/red]"); return
+    check = validate_samples(dir_a.parent)
+    if not check["ok"]:
+        counts = check["counts"]
+        console.print("[red]训练样本不足或数量不匹配[/red]")
+        console.print(f"  时相 A: {counts['time_a']} 张 ({dir_a})")
+        console.print(f"  时相 B: {counts['time_b']} 张 ({dir_b})")
+        console.print(f"  标签:   {counts['labels']} 张 ({label_dir})")
+        console.print("先运行: python scripts/generate_sample.py --mode synthetic")
+        return
 
     console.print(f"[blue]构建模型: {args.model}[/blue]")
     model = build_model(args.model)

@@ -3,11 +3,11 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
 from fastapi.responses import Response
 from pydantic import BaseModel
 from typing import Optional, List
-from config import RAW_DIR, PRESET_REGIONS
+from config import DATA_DIR, RAW_DIR, PRESET_REGIONS
 
 router = APIRouter()
 _tasks = {}
@@ -100,34 +100,69 @@ async def list_regions():
 @router.get("/preview/{subdir}/{filename}")
 async def preview_image(subdir: str, filename: str):
     """将 GeoTIFF 转为 PNG 预览（RGB 三通道）"""
+    filepath = RAW_DIR / subdir / filename
+    return _render_geotiff_preview(filepath)
+
+
+@router.get("/preview-file")
+async def preview_file(path: str = Query(..., description="DATA_DIR 内的 GeoTIFF 路径")):
+    """预览 data 目录内任意 GeoTIFF，包括 output 下的变化检测结果。"""
+    filepath = _resolve_data_path(path)
+    return _render_geotiff_preview(filepath)
+
+
+def _resolve_data_path(path: str) -> Path:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        parts = candidate.parts
+        if parts and parts[0] == DATA_DIR.name:
+            candidate = DATA_DIR.parent / candidate
+        else:
+            candidate = DATA_DIR / candidate
+    try:
+        resolved = candidate.resolve()
+        data_root = DATA_DIR.resolve()
+        resolved.relative_to(data_root)
+    except Exception:
+        raise HTTPException(400, "只能预览 data 目录内的文件")
+    return resolved
+
+
+def _render_geotiff_preview(filepath: Path):
     import numpy as np
     from PIL import Image
     import io
     import rasterio
 
-    filepath = RAW_DIR / subdir / filename
     if not filepath.exists():
         raise HTTPException(404, "文件不存在")
 
     with rasterio.open(filepath) as src:
-        bands = []
-        for i in range(min(3, src.count)):
-            band = src.read(i + 1).astype(np.float32)
-            # 2% 线性拉伸，提升可视化效果
-            lo = np.percentile(band[band > 0], 2) if np.any(band > 0) else 0
-            hi = np.percentile(band, 98) if np.any(band > 0) else 1
-            if hi == lo:
-                hi = lo + 1
-            band = np.clip((band - lo) / (hi - lo) * 255, 0, 255).astype(np.uint8)
-            bands.append(band)
-        while len(bands) < 3:
-            bands.append(bands[-1])
-        rgb = np.stack(bands, axis=-1)
+        if src.count == 1:
+            band = src.read(1).astype(np.float32)
+            mask = band > 0
+            rgb = np.zeros((src.height, src.width, 4), dtype=np.uint8)
+            rgb[..., :3] = [255, 0, 0]
+            rgb[..., 3] = np.where(mask, 190, 0).astype(np.uint8)
+        else:
+            bands = []
+            for i in range(min(3, src.count)):
+                band = src.read(i + 1).astype(np.float32)
+                # 2% 线性拉伸，提升可视化效果
+                lo = np.percentile(band[band > 0], 2) if np.any(band > 0) else 0
+                hi = np.percentile(band, 98) if np.any(band > 0) else 1
+                if hi == lo:
+                    hi = lo + 1
+                band = np.clip((band - lo) / (hi - lo) * 255, 0, 255).astype(np.uint8)
+                bands.append(band)
+            while len(bands) < 3:
+                bands.append(bands[-1])
+            rgb = np.stack(bands, axis=-1)
         # 获取空间信息供前端使用
         bounds = src.bounds
         crs = str(src.crs) if src.crs else "EPSG:4326"
 
-    img = Image.fromarray(rgb)
+    img = Image.fromarray(rgb, mode="RGBA" if rgb.shape[-1] == 4 else "RGB")
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     buf.seek(0)

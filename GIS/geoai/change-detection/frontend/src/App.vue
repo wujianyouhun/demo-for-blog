@@ -113,16 +113,12 @@ function onDownloadProgress(task) {
 }
 
 /**
- * 从后端返回的路径中提取文件信息，构建预览 URL
- * 后端路径形如: data/raw/time_a/xxx.tif
- * 预览 API:     /api/data/preview/time_a/xxx.tif
+ * 构建 GeoTIFF 预览 URL。
+ * 支持 data/raw/time_a、data/raw/time_b 和 data/output 下的结果图。
  */
 function buildPreviewUrl(filePath) {
   if (!filePath) return null
-  // 提取 time_a/xxx.tif 或 time_b/xxx.tif
-  const match = filePath.replace(/\\/g, '/').match(/(time_[ab])\/([^/]+\.tif)$/)
-  if (!match) return null
-  return `/api/data/preview/${match[1]}/${match[2]}`
+  return `/api/data/preview-file?path=${encodeURIComponent(filePath)}`
 }
 
 async function fetchBounds(previewUrl) {
