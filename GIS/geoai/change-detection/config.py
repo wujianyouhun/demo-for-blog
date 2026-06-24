@@ -18,9 +18,15 @@ for d in [TIME_A_DIR, TIME_B_DIR, SAMPLES_DIR, MODELS_DIR, OUTPUT_DIR]:
 # ── 预训练模型缓存目录（避免下载到 C 盘） ──
 PRETRAINED_DIR = DATA_DIR / "pretrained"
 PRETRAINED_DIR.mkdir(parents=True, exist_ok=True)
+HF_HOME_DIR = PRETRAINED_DIR / "huggingface"
+HF_HUB_CACHE_DIR = HF_HOME_DIR / "hub"
+for d in [HF_HOME_DIR, HF_HUB_CACHE_DIR]:
+    d.mkdir(parents=True, exist_ok=True)
 
 import os as _os
 _os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
+_os.environ["HF_HOME"] = str(HF_HOME_DIR)
+_os.environ["HUGGINGFACE_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
 
 STAC_API_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
