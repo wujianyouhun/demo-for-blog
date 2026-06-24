@@ -19,7 +19,7 @@ REQUIREMENTS = PROJECT_ROOT / "requirements.txt"
 
 BACKEND_HOST = "0.0.0.0"
 BACKEND_PORT = 8000
-FRONTEND_PORT = 5173
+FRONTEND_PORT = 5273
 
 # ─── 颜色输出 ────────────────────────────────────────────────
 RESET = "\033[0m"
