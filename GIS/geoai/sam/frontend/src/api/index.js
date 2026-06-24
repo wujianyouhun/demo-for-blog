@@ -5,6 +5,10 @@ const api = axios.create({
   timeout: 120000, // SAM 推理可能较慢
 })
 
+export function getConfig() {
+  return api.get('/config')
+}
+
 /**
  * 加载影像
  */

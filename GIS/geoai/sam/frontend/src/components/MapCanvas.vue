@@ -141,7 +141,13 @@ export default {
       map.addLayer(tileLayer)
 
       // 计算 EPSG:3857 范围用于 fit 视图和 mask 定位
-      if (info.bounds) {
+      if (info.mask_extent) {
+        imageExtent3857 = info.mask_extent
+        map.getView().fit(imageExtent3857, {
+          size: map.getSize(),
+          padding: [30, 30, 30, 30],
+        })
+      } else if (info.bounds && (!info.crs || info.crs.toUpperCase() === 'EPSG:4326')) {
         const [left, bottom, right, top] = info.bounds
         const bl = fromLonLat([left, bottom])
         const tr = fromLonLat([right, top])
@@ -151,6 +157,8 @@ export default {
           size: map.getSize(),
           padding: [30, 30, 30, 30],
         })
+      } else {
+        emit('toast', '影像缺少可用的 EPSG:3857 范围，无法正确定位标注坐标', 'error')
       }
     }
 
@@ -240,6 +248,20 @@ export default {
     }
 
     // ── API 调用 ──
+    async function getErrorMessage(e) {
+      const data = e.response?.data
+      if (data instanceof Blob) {
+        try {
+          const text = await data.text()
+          const parsed = JSON.parse(text)
+          return parsed.detail || text
+        } catch (_) {
+          return e.message
+        }
+      }
+      return data?.detail || e.message
+    }
+
     async function doPointPredict() {
       const allPoints = [...fgPoints, ...bgPoints]
       const allLabels = [
@@ -256,7 +278,7 @@ export default {
         emit('toast', '点分割完成', 'success')
         clearPointMarkers()
       } catch (e) {
-        emit('toast', '分割失败: ' + (e.response?.data?.detail || e.message), 'error')
+        emit('toast', '分割失败: ' + await getErrorMessage(e), 'error')
       } finally {
         emit('loading', false)
       }
@@ -272,7 +294,7 @@ export default {
         emit('toast', '框分割完成', 'success')
         boxLayer.getSource().clear()
       } catch (e) {
-        emit('toast', '分割失败: ' + (e.response?.data?.detail || e.message), 'error')
+        emit('toast', '分割失败: ' + await getErrorMessage(e), 'error')
       } finally {
         emit('loading', false)
       }
@@ -291,7 +313,7 @@ export default {
         emit('mask-updated', true)
         emit('toast', '文本分割完成', 'success')
       } catch (e) {
-        emit('toast', '分割失败: ' + (e.response?.data?.detail || e.message), 'error')
+        emit('toast', '分割失败: ' + await getErrorMessage(e), 'error')
       } finally {
         emit('loading', false)
       }

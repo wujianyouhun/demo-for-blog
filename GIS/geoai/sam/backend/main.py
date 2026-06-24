@@ -14,7 +14,7 @@ import sys
 import uuid
 import traceback
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, Query
@@ -28,6 +28,7 @@ if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
 from services import ImageService, SAMService
+from config import DEFAULT_IMAGE, SAM_MODEL_TYPE, SAM_VERSION
 
 # ── FastAPI 应用 ────────────────────────────────────────────
 app = FastAPI(
@@ -83,6 +84,24 @@ def _get_sam_svc(session: Dict[str, Any]) -> SAMService:
         svc = SAMService()
         session["sam_service"] = svc
     return svc
+
+
+def _raise_predict_error(mode: str, exc: Exception):
+    if isinstance(exc, ImportError):
+        raise HTTPException(
+            status_code=503,
+            detail=f"{mode}所需依赖未安装或不可用: {exc}",
+        )
+    if isinstance(exc, ValueError):
+        raise HTTPException(status_code=400, detail=str(exc))
+    raise HTTPException(status_code=500, detail=f"{mode}失败: {exc}")
+
+
+def _geo_to_pixel_or_error(img_svc: ImageService, lon: float, lat: float):
+    try:
+        return img_svc.geo_to_pixel(lon, lat)
+    except Exception as exc:
+        raise ValueError(f"坐标转换失败，请检查影像 CRS 与前端地图范围: {exc}") from exc
 
 
 # ================================================================
@@ -163,6 +182,7 @@ async def load_image(req: LoadImageRequest):
             f"/tiles/cog/WebMercatorQuad/tilejson.json"
             f"?url={abs_path}"
         )
+        info["mask_extent"] = img_svc.get_mask_extent()
         info["session_id"] = session["id"]
 
         return info
@@ -192,19 +212,64 @@ async def get_image_info(session_id: str = Query(...)):
 _MASK_DISPLAY_MAX = 2048
 
 
-def _downsample_mask_png(mask: np.ndarray, orig_h: int, orig_w: int) -> bytes:
-    """将原始分辨率 mask 降采样到 ≤2048px 并编码为 RGBA PNG。"""
+def _downsample_mask_png(
+    mask: np.ndarray,
+    orig_h: int,
+    orig_w: int,
+    crop_offset: Optional[Tuple[int, int, int, int]] = None,
+) -> bytes:
+    """将原始分辨率 mask 降采样到 ≤2048px 并编码为 RGBA PNG。
+
+    Args:
+        mask: SAM 输出的 mask (可能是裁剪后的子区域)
+        orig_h, orig_w: 原始影像尺寸
+        crop_offset: (col_off, row_off, crop_w, crop_h) 如果是裁剪后的 mask
+    """
     from PIL import Image as PILImage
-    if mask.ndim == 3:
+
+    while mask.ndim > 2:
         mask = mask[0]
+
     scale = min(_MASK_DISPLAY_MAX / max(orig_h, orig_w), 1.0)
     dh = max(1, int(orig_h * scale))
     dw = max(1, int(orig_w * scale))
 
-    m = (mask > 0).astype(np.uint8) * 255
-    pil = PILImage.fromarray(m, mode="L")
-    pil = pil.resize((dw, dh), resample=PILImage.NEAREST)
-    m_small = np.array(pil) > 0
+    if crop_offset is not None:
+        # 裁剪后的 mask: 放置到全图降采样画布的正确位置
+        col_off, row_off, crop_w, crop_h = crop_offset
+
+        # 创建全图降采样画布
+        full_canvas = np.zeros((dh, dw), dtype=bool)
+
+        # 计算 mask 在降采样画布中的位置
+        mask_h, mask_w = mask.shape
+        ds_col_off = int(col_off * scale)
+        ds_row_off = int(row_off * scale)
+        ds_mask_w = max(1, int(mask_w * scale))
+        ds_mask_h = max(1, int(mask_h * scale))
+
+        # 降采样 mask
+        mask_uint8 = (mask > 0).astype(np.uint8) * 255
+        pil_mask = PILImage.fromarray(mask_uint8, mode="L")
+        pil_mask = pil_mask.resize((ds_mask_w, ds_mask_h), resample=PILImage.NEAREST)
+        mask_small = np.array(pil_mask) > 0
+
+        # 放置到画布上 (注意边界裁剪)
+        end_col = min(ds_col_off + ds_mask_w, dw)
+        end_row = min(ds_row_off + ds_mask_h, dh)
+        actual_w = end_col - ds_col_off
+        actual_h = end_row - ds_row_off
+
+        if actual_w > 0 and actual_h > 0:
+            full_canvas[ds_row_off:end_row, ds_col_off:end_col] = mask_small[:actual_h, :actual_w]
+
+        m_small = full_canvas
+    else:
+        # 完整 mask: 直接降采样
+        m = (mask > 0).astype(np.uint8) * 255
+        pil = PILImage.fromarray(m, mode="L")
+        pil = pil.resize((dw, dh), resample=PILImage.NEAREST)
+        m_small = np.array(pil) > 0
 
     rgba = np.zeros((*m_small.shape, 4), dtype=np.uint8)
     rgba[m_small] = [50, 230, 80, 100]  # 绿色半透明
@@ -226,27 +291,33 @@ async def predict_point(req: PointPredictRequest):
     sam_svc = _get_sam_svc(session)
     image_path = session["image_path"]
 
-    # 地理坐标 → 像素坐标
-    pixel_points = []
-    for pt in req.points:
-        col, row = img_svc.geo_to_pixel(pt[0], pt[1])
-        pixel_points.append([col, row])
-
     try:
-        masks = sam_svc.predict_by_point(
+        # 地理坐标 → 像素坐标
+        if not req.points:
+            raise ValueError("点标注至少需要 1 个提示点")
+        if len(req.points) != len(req.labels):
+            raise ValueError("点坐标数量必须与标签数量一致")
+
+        pixel_points = []
+        for pt in req.points:
+            col, row = _geo_to_pixel_or_error(img_svc, pt[0], pt[1])
+            pixel_points.append([col, row])
+
+        masks = sam_svc.predict_by_points(
             image_path=image_path,
             points=pixel_points,
             labels=req.labels,
         )
         session["last_mask"] = masks
         session["processed_mask"] = None
+        session["crop_offset"] = sam_svc._crop_offset
 
         info = img_svc.get_info()
-        png_bytes = _downsample_mask_png(masks, info["height"], info["width"])
+        png_bytes = _downsample_mask_png(masks, info["height"], info["width"], sam_svc._crop_offset)
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"点分割失败: {e}")
+        _raise_predict_error("点标注分割", e)
 
 
 @app.post("/api/predict/box")
@@ -260,24 +331,33 @@ async def predict_box(req: BoxPredictRequest):
     sam_svc = _get_sam_svc(session)
     image_path = session["image_path"]
 
-    col1, row1 = img_svc.geo_to_pixel(req.box[0], req.box[1])
-    col2, row2 = img_svc.geo_to_pixel(req.box[2], req.box[3])
-    pixel_box = [col1, row1, col2, row2]
-
     try:
+        if len(req.box) != 4:
+            raise ValueError("框标注需要 4 个坐标值: [lon1, lat1, lon2, lat2]")
+
+        col1, row1 = _geo_to_pixel_or_error(img_svc, req.box[0], req.box[1])
+        col2, row2 = _geo_to_pixel_or_error(img_svc, req.box[2], req.box[3])
+        pixel_box = [
+            min(col1, col2),
+            min(row1, row2),
+            max(col1, col2),
+            max(row1, row2),
+        ]
+
         masks = sam_svc.predict_by_box(
             image_path=image_path,
             box=pixel_box,
         )
         session["last_mask"] = masks
         session["processed_mask"] = None
+        session["crop_offset"] = sam_svc._crop_offset
 
         info = img_svc.get_info()
-        png_bytes = _downsample_mask_png(masks, info["height"], info["width"])
+        png_bytes = _downsample_mask_png(masks, info["height"], info["width"], sam_svc._crop_offset)
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"框分割失败: {e}")
+        _raise_predict_error("框标注分割", e)
 
 
 @app.post("/api/predict/text")
@@ -306,7 +386,7 @@ async def predict_text(req: TextPredictRequest):
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"文本分割失败: {e}")
+        _raise_predict_error("文本标注分割", e)
 
 
 # ================================================================
@@ -337,7 +417,8 @@ async def postprocess_mask(req: PostProcessRequest):
         session["processed_mask"] = processed
 
         info = img_svc.get_info()
-        png_bytes = _downsample_mask_png(processed, info["height"], info["width"])
+        crop_offset = session.get("crop_offset")
+        png_bytes = _downsample_mask_png(processed, info["height"], info["width"], crop_offset)
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
         traceback.print_exc()
@@ -419,6 +500,15 @@ async def clear_session(session_id: str = Query(...)):
     session["last_mask"] = None
     session["processed_mask"] = None
     return {"ok": True}
+
+
+@app.get("/api/config")
+async def get_config():
+    return {
+        "default_image": DEFAULT_IMAGE,
+        "default_model_type": SAM_MODEL_TYPE,
+        "default_sam_version": SAM_VERSION,
+    }
 
 
 @app.get("/")

@@ -105,7 +105,7 @@ POSTPROCESS_CLOSING_RADIUS: int = int(os.getenv("POSTPROCESS_CLOSING_RADIUS", "3
 # ================================================================
 # 数据路径
 # ================================================================
-DEFAULT_IMAGE: str = os.getenv("DEFAULT_IMAGE", str(PROJECT_ROOT / "西安19级.tif"))
+DEFAULT_IMAGE: str = os.getenv("DEFAULT_IMAGE", r"E:\data\baoji\宝鸡市\I48E006018\I48E006018.tif")
 
 
 # ================================================================
@@ -128,7 +128,8 @@ MODEL_INFO = {
         "vram": "8GB+",
         "params": "636M",
         "url_sam1": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth",
-        "url_sam2": "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_huge.pt",
+        # SAM2.1 没有 huge 变体，vit_h 复用 large
+        "url_sam2": "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_large.pt",
     },
 }
 

@@ -206,10 +206,10 @@
 </template>
 
 <script>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import {
-  loadImage, getImageInfo, postprocessMask,
+  getConfig, loadImage, getImageInfo, postprocessMask,
   exportVectors, downloadExport, clearSession
 } from './api/index.js'
 
@@ -231,7 +231,7 @@ export default {
     const mapCanvas = ref(null)
 
     // ── 影像加载参数 ──
-    const imagePath = ref('')
+    const imagePath = ref('E:\\data\\baoji\\宝鸡市\\I48E006018\\I48E006018.tif')
     const modelType = ref('vit_l')
     const samVersion = ref('sam1')
 
@@ -367,6 +367,17 @@ export default {
     function handleClearPoints() {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     }
+
+    onMounted(async () => {
+      try {
+        const res = await getConfig()
+        imagePath.value = res.data.default_image || imagePath.value
+        modelType.value = res.data.default_model_type || modelType.value
+        samVersion.value = res.data.default_sam_version || samVersion.value
+      } catch (e) {
+        // Keep the built-in defaults if the API is not ready yet.
+      }
+    })
 
     return {
       sessionId, imageInfo, loading, loadingText, mode, hasMask,

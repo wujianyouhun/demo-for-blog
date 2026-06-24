@@ -105,9 +105,10 @@ class SAMWrapper:
             "vit_b": ("https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth",  393891747),
         }
 
-        # SAM2 检查点 URL
+        # SAM2 检查点 URL (sam2.1 系列)
+        # 注意: SAM2.1 没有 huge 变体，vit_h 复用 large
         sam2_checkpoints = {
-            "vit_h": ("https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_huge.pt", 0),
+            "vit_h": ("https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_large.pt", 0),
             "vit_l": ("https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_large.pt", 0),
             "vit_b": ("https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_base_plus.pt", 0),
         }
