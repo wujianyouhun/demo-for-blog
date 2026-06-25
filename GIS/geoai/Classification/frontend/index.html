@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoAI 遥感图像分类系统</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ─── 顶部导航 ─────────────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="nav-icon">🛰️</span>
+      <span class="nav-title">GeoAI 遥感图像分类</span>
+    </div>
+    <div class="nav-actions">
+      <span id="statusDot" class="status-dot offline"></span>
+      <span id="statusText" class="status-text">检查服务...</span>
+      <a href="http://localhost:8000/docs" target="_blank" class="nav-link">API 文档</a>
+    </div>
+  </nav>
+
+  <!-- ─── 主体 ─────────────────────────────────────────────────────── -->
+  <main class="container">
+
+    <!-- 左栏：上传 + 结果 -->
+    <section class="card upload-card">
+      <h2 class="card-title">🖼️ 图像上传</h2>
+
+      <!-- 拖拽上传区 -->
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">📡</div>
+        <p class="dropzone-tip">拖拽遥感图像到此处，或<label for="fileInput" class="file-label">点击上传</label></p>
+        <p class="dropzone-hint">支持 JPG / PNG / TIFF · 最大 10 MB</p>
+        <input type="file" id="fileInput" accept="image/*,.tif,.tiff" hidden />
+      </div>
+
+      <!-- 预览区 -->
+      <div id="previewWrap" class="preview-wrap hidden">
+        <img id="previewImg" class="preview-img" src="" alt="预览" />
+        <button id="clearBtn" class="btn-clear" title="清除">✕</button>
+      </div>
+
+      <!-- 操作按钮 -->
+      <button id="predictBtn" class="btn-predict" disabled>
+        <span class="btn-icon">🔍</span>开始分类
+      </button>
+
+      <!-- 进度条 -->
+      <div id="progressBar" class="progress-bar hidden">
+        <div class="progress-fill"></div>
+      </div>
+
+      <!-- 错误提示 -->
+      <div id="errorBox" class="error-box hidden"></div>
+    </section>
+
+    <!-- 右栏：分类结果 -->
+    <section class="card result-card">
+      <h2 class="card-title">📊 分类结果</h2>
+      <div id="resultPlaceholder" class="result-placeholder">
+        <div class="placeholder-icon">🌍</div>
+        <p>上传遥感图像后显示分类结果</p>
+      </div>
+
+      <!-- 主结果 -->
+      <div id="mainResult" class="main-result hidden">
+        <div class="result-badge">
+          <span id="resultEmoji" class="result-emoji">🌾</span>
+          <div class="result-info">
+            <div id="resultClass" class="result-class">-</div>
+            <div id="resultClassZh" class="result-class-zh">-</div>
+          </div>
+          <div id="resultConf" class="result-conf">-</div>
+        </div>
+        <p id="resultDesc" class="result-desc"></p>
+        <div class="meta-row">
+          <span id="inferTime" class="meta-item">⏱ -</span>
+          <span id="modelInfo" class="meta-item">🧠 -</span>
+        </div>
+      </div>
+
+      <!-- Top-5 概率条 -->
+      <div id="top5Wrap" class="top5-wrap hidden">
+        <h3 class="top5-title">Top-5 预测概率</h3>
+        <div id="top5List" class="top5-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ─── 批量预测面板 ─────────────────────────────────────────────── -->
+  <section class="container batch-section">
+    <div class="card batch-card">
+      <h2 class="card-title">📦 批量分类</h2>
+      <div class="batch-controls">
+        <input type="file" id="batchInput" accept="image/*,.tif,.tiff" multiple hidden />
+        <label for="batchInput" class="btn-secondary">选择多张图片（最多16张）</label>
+        <button id="batchBtn" class="btn-predict" disabled>
+          <span class="btn-icon">🚀</span>批量分类
+        </button>
+      </div>
+      <div id="batchStatus" class="batch-status"></div>
+      <div id="batchResults" class="batch-results"></div>
+    </div>
+  </section>
+
+  <!-- ─── 类别说明 ─────────────────────────────────────────────────── -->
+  <section class="container classes-section">
+    <div class="card">
+      <h2 class="card-title">🗺️ 支持的地物类别</h2>
+      <div id="classesList" class="classes-grid"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>GeoAI 遥感图像分类系统 · 基于 EuroSAT 数据集 · PyTorch ResNet50 / ViT</p>
+    <p>后端服务: <a href="http://localhost:8000/docs" target="_blank">http://localhost:8000</a></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
