@@ -40,10 +40,10 @@ app.add_middleware(
 )
 
 # ── 路径配置 ──
+DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
 TIF_PATH = os.environ.get(
-    "TIF_PATH", r"D:\西安19级.tif"
+    "TIF_PATH", os.path.join(DATA_DIR, "sample.tif")
 )
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 OUTPUT_DIR = os.path.join(DATA_DIR, "output")
 TILES_DIR = os.path.join(DATA_DIR, "tiles")
 os.makedirs(OUTPUT_DIR, exist_ok=True)

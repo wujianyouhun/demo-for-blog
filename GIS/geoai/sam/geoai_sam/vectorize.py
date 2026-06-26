@@ -26,6 +26,7 @@ class MaskVectorizer:
     def __init__(self):
         self._gdf = None
         self._polygons = []
+        self._polygon_pixel_areas = []
         self._reference_crs = None
         self._reference_transform = None
 
@@ -78,19 +79,30 @@ class MaskVectorizer:
             from shapely.geometry import shape
 
             polygons = []
+            polygon_pixel_areas = []
+            pixel_area_units = 1.0
+            if transform is not None:
+                pixel_area_units = abs(transform.a * transform.e)
+                if pixel_area_units == 0:
+                    pixel_area_units = 1.0
+
             for geom, value in shapes(mask_uint8, transform=transform):
                 if value == 1:
                     poly = shape(geom)
-                    if poly.area >= min_area:
+                    pixel_area = poly.area / pixel_area_units
+                    if pixel_area >= min_area:
                         polygons.append(poly)
+                        polygon_pixel_areas.append(pixel_area)
 
             print(f"[矢量化] 生成 {len(polygons)} 个多边形 (过滤 min_area={min_area})")
 
         except ImportError:
             print("[矢量化] rasterio/shapely 未安装，使用简化矢量化")
             polygons = self._simple_vectorize(mask_uint8, min_area)
+            polygon_pixel_areas = [poly.area for poly in polygons]
 
         self._polygons = polygons
+        self._polygon_pixel_areas = polygon_pixel_areas
 
         # 简化多边形
         if simplify_tolerance > 0:
@@ -115,7 +127,7 @@ class MaskVectorizer:
             for i, poly in enumerate(self._polygons):
                 records.append({
                     "id": i,
-                    "area_pixels": poly.area,
+                    "area_pixels": self._polygon_pixel_areas[i],
                     "geometry": poly,
                 })
 

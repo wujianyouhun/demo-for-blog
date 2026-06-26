@@ -231,7 +231,7 @@ export default {
     const mapCanvas = ref(null)
 
     // ── 影像加载参数 ──
-    const imagePath = ref('E:\\data\\baoji\\宝鸡市\\I48E006018\\I48E006018.tif')
+    const imagePath = ref('D:\\西安19级.tif')
     const modelType = ref('vit_l')
     const samVersion = ref('sam1')
 

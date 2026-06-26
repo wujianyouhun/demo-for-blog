@@ -172,15 +172,17 @@ async def load_image(req: LoadImageRequest):
         session["last_mask"] = None
         session["processed_mask"] = None
 
+        import urllib.parse
         abs_path = os.path.abspath(req.image_path)
+        encoded_path = urllib.parse.quote(abs_path.replace(os.sep, "/"))
         # 构造 TiTiler 瓦片 URL 模板
         info["tile_url"] = (
             f"/tiles/cog/tiles/WebMercatorQuad/{{z}}/{{x}}/{{y}}.png"
-            f"?url={abs_path}"
+            f"?url={encoded_path}"
         )
         info["tile_json_url"] = (
             f"/tiles/cog/WebMercatorQuad/tilejson.json"
-            f"?url={abs_path}"
+            f"?url={encoded_path}"
         )
         info["mask_extent"] = img_svc.get_mask_extent()
         info["session_id"] = session["id"]
@@ -436,7 +438,9 @@ async def export_vectors(req: ExportRequest):
     if not session:
         raise HTTPException(status_code=404, detail="会话不存在")
 
-    mask = session.get("processed_mask") or session.get("last_mask")
+    mask = session.get("processed_mask")
+    if mask is None:
+        mask = session.get("last_mask")
     if mask is None:
         raise HTTPException(status_code=400, detail="没有可导出的 Mask，请先执行分割")
 

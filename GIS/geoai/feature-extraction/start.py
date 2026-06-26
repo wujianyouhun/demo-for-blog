@@ -19,7 +19,7 @@ import threading
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BACKEND_DIR = os.path.join(ROOT, "backend")
 FRONTEND_DIR = os.path.join(ROOT, "frontend")
-TIF_PATH = os.environ.get("TIF_PATH", r"D:\西安19级.tif")
+TIF_PATH = os.environ.get("TIF_PATH", os.path.join(ROOT, "data", "sample.tif"))
 
 
 def run_cmd(cmd, cwd=None, shell=False):
