@@ -1,0 +1,56 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+
+# ========================
+# 数据与模型
+# ========================
+data/input/
+data/output/
+data/pretrained/
+*.tif
+*.tiff
+*.gpkg
+*.geojson
+*.shp
+*.dbf
+*.shx
+*.prj
+*.cpg
+*.npy
+*.npz
+*.pth
+*.pt
+*.onnx
+
+# ========================
+# IDE / 编辑器
+# ========================
+.vscode/
+.idea/
+*.swp
+*~
+
+# ========================
+# 系统
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# 测试 / 临时
+# ========================
+.pytest_cache/
+.coverage
+*.log
+*.tmp
