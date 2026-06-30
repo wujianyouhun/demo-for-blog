@@ -17,6 +17,7 @@ env/
 data/input/
 data/output/
 data/pretrained/
+outputs/
 *.tif
 *.tiff
 *.gpkg
