@@ -97,6 +97,31 @@ def log(message: str) -> None:
     print(f"[building-extraction] {message}", flush=True)
 
 
+def normalize_device(device: str) -> str:
+    value = (device or "cpu").strip().lower()
+    aliases = {"gpu": "cuda", "nvidia": "cuda", "cuda0": "cuda:0"}
+    value = aliases.get(value, value)
+    if value == "auto":
+        try:
+            import torch
+
+            return "cuda" if torch.cuda.is_available() else "cpu"
+        except Exception:
+            return "cpu"
+    if value.startswith("cuda"):
+        try:
+            import torch
+
+            if torch.cuda.is_available():
+                return value
+            log(f"Requested device '{device}' but CUDA is not available; falling back to cpu")
+            return "cpu"
+        except Exception:
+            log(f"Requested device '{device}' but torch is not importable; falling back to cpu")
+            return "cpu"
+    return value
+
+
 def parse_models(value: str) -> List[str]:
     models = [item.strip() for item in value.split(",") if item.strip()]
     valid = {"geoai", *SAM_MODELS.keys()}
@@ -339,6 +364,86 @@ def make_test_crop(image_path: Path, tile_size: int) -> Path:
     return crop_path
 
 
+def iter_tile_windows(image_path: Path, tile_size: int, overlap: int) -> List[Tuple[int, Any]]:
+    import rasterio
+    from rasterio.windows import Window
+
+    stride = max(1, tile_size - overlap)
+    windows: List[Tuple[int, Any]] = []
+    with rasterio.open(image_path) as src:
+        idx = 0
+        for row_off in range(0, src.height, stride):
+            height = min(tile_size, src.height - row_off)
+            if height <= 0:
+                continue
+            for col_off in range(0, src.width, stride):
+                width = min(tile_size, src.width - col_off)
+                if width <= 0:
+                    continue
+                windows.append((idx, Window(col_off, row_off, width, height)))
+                idx += 1
+    return windows
+
+
+def write_tile(image_path: Path, window: Any, tile_path: Path) -> Path:
+    import rasterio
+
+    tile_path.parent.mkdir(parents=True, exist_ok=True)
+    with rasterio.open(image_path) as src:
+        data = src.read(window=window)
+        profile = src.profile.copy()
+        profile.update(
+            width=int(window.width),
+            height=int(window.height),
+            transform=src.window_transform(window),
+        )
+        with rasterio.open(tile_path, "w", **profile) as dst:
+            dst.write(data)
+    return tile_path
+
+
+def merge_tile_gdfs(gdfs: Sequence[Any], crs: Any, min_area: float, dedupe_iou: float) -> Any:
+    import geopandas as gpd
+    import pandas as pd
+
+    valid = [gdf for gdf in gdfs if gdf is not None and len(gdf) > 0]
+    if not valid:
+        return empty_gdf_like(crs)
+
+    merged = gpd.GeoDataFrame(pd.concat(valid, ignore_index=True), geometry="geometry", crs=valid[0].crs)
+    if crs and merged.crs and merged.crs != crs:
+        merged = merged.to_crs(crs)
+    elif crs and merged.crs is None:
+        merged = merged.set_crs(crs)
+
+    merged["geometry"] = merged.geometry.make_valid()
+    merged = merged[merged.geometry.notna() & ~merged.geometry.is_empty].copy()
+    merged = add_area_m2(merged)
+    if len(merged) > 0:
+        merged = merged[merged["area_m2"] >= min_area].copy()
+    if len(merged) <= 1:
+        return merged.reset_index(drop=True)
+
+    work = merged.sort_values("area_m2", ascending=False).reset_index(drop=True)
+    keep_indices: List[int] = []
+    dropped = set()
+    spatial_index = work.sindex
+    for idx, geom in enumerate(work.geometry):
+        if idx in dropped:
+            continue
+        keep_indices.append(idx)
+        for other_idx in spatial_index.intersection(geom.bounds):
+            if other_idx <= idx or other_idx in dropped:
+                continue
+            other = work.geometry.iloc[other_idx]
+            union_area = geom.union(other).area
+            if union_area <= 0:
+                continue
+            if geom.intersection(other).area / union_area >= dedupe_iou:
+                dropped.add(other_idx)
+    return work.iloc[keep_indices].reset_index(drop=True)
+
+
 def empty_gdf_like(crs: Any = None):
     import geopandas as gpd
 
@@ -443,48 +548,92 @@ def save_outputs(gdf: Any, run_dir: Path, regularize: bool, min_area: float, sim
     return raw_path, reg_path, gpkg_path, reg
 
 
+def extract_geoai_gdf(image_path: Path, model_path: Path, args: argparse.Namespace, params: Dict[str, Any]) -> Any:
+    import geopandas as gpd
+    import rasterio
+    from geoai.extract import BuildingFootprintExtractor
+
+    with rasterio.open(image_path) as src:
+        crs = src.crs
+
+    extractor_kwargs = {"device": args.device, "model_path": str(model_path)}
+
+    log(f"Running GeoAI BuildingFootprintExtractor with model: {model_path}")
+    extractor = BuildingFootprintExtractor(**extractor_kwargs)
+    gdf = extractor.process_raster(
+        str(image_path),
+        batch_size=args.batch_size,
+        filter_edges=True,
+        edge_buffer=max(8, args.overlap // 4),
+    )
+    if gdf is None:
+        gdf = empty_gdf_like(crs)
+    if gdf.crs is None:
+        gdf = gpd.GeoDataFrame(gdf, geometry="geometry", crs=crs)
+    try:
+        gdf = extractor.regularize_buildings(
+            gdf,
+            min_area=int(args.min_area),
+            angle_threshold=15,
+            rectangularity_threshold=0.7,
+        )
+    except Exception as exc:
+        log(f"GeoAI internal regularization skipped: {exc}")
+    return normalize_gdf(gdf, "geoai", "geoai_building", params, args.min_area)
+
+
 def run_geoai(image_path: Path, model_path: Path, args: argparse.Namespace) -> RunResult:
     start = time.time()
     run_dir = OUTPUT_DIR / "geoai"
     params = {"tile_size": args.tile_size, "overlap": args.overlap, "min_area": args.min_area}
     try:
-        import geopandas as gpd
-        import rasterio
-        from geoai.extract import BuildingFootprintExtractor
-
-        with rasterio.open(image_path) as src:
-            crs = src.crs
-
-        extractor_kwargs = {"device": args.device, "model_path": str(model_path)}
-
-        log(f"Running GeoAI BuildingFootprintExtractor with model: {model_path}")
-        extractor = BuildingFootprintExtractor(**extractor_kwargs)
-        gdf = extractor.process_raster(
-            str(image_path),
-            batch_size=args.batch_size,
-            filter_edges=True,
-            edge_buffer=max(8, args.overlap // 4),
-        )
-        if gdf is None:
-            gdf = empty_gdf_like(crs)
-        if gdf.crs is None:
-            gdf = gpd.GeoDataFrame(gdf, geometry="geometry", crs=crs)
-        try:
-            gdf = extractor.regularize_buildings(
-                gdf,
-                min_area=int(args.min_area),
-                angle_threshold=15,
-                rectangularity_threshold=0.7,
-            )
-        except Exception as exc:
-            log(f"GeoAI internal regularization skipped: {exc}")
-
-        gdf = normalize_gdf(gdf, "geoai", "geoai_building", params, args.min_area)
+        gdf = extract_geoai_gdf(image_path, model_path, args, params)
         raw_path, reg_path, gpkg_path, reg = save_outputs(gdf, run_dir, args.regularize, args.min_area, args.simplify)
         stats_gdf = reg if reg_path else gdf
         return build_result("geoai", "geoai_building", params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok")
     except Exception as exc:
         return build_result("geoai", "geoai_building", params, None, None, None, None, start, "failed", str(exc))
+
+
+def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace) -> RunResult:
+    import rasterio
+
+    start = time.time()
+    run_dir = OUTPUT_DIR / "geoai_tiled"
+    params = {
+        "tile_size": args.tile_size,
+        "overlap": args.overlap,
+        "min_area": args.min_area,
+        "tiled": True,
+        "dedupe_iou": args.dedupe_iou,
+    }
+    try:
+        windows = iter_tile_windows(image_path, args.tile_size, args.overlap)
+        with rasterio.open(image_path) as src:
+            crs = src.crs
+        log(f"GeoAI tiled extraction: {len(windows)} tiles, tile_size={args.tile_size}, overlap={args.overlap}")
+
+        tile_gdfs = []
+        tile_dir = OUTPUT_DIR / "tiles" / "geoai"
+        for idx, window in windows:
+            tile_path = tile_dir / f"tile_{idx:05d}.tif"
+            write_tile(image_path, window, tile_path)
+            log(f"GeoAI tile {idx + 1}/{len(windows)}: {tile_path.name}")
+            tile_params = {**params, "tile_index": idx}
+            try:
+                tile_gdf = extract_geoai_gdf(tile_path, model_path, args, tile_params)
+                if len(tile_gdf) > 0:
+                    tile_gdf["tile_id"] = idx
+                tile_gdfs.append(tile_gdf)
+            except Exception as exc:
+                log(f"GeoAI tile {idx} failed: {exc}")
+
+        gdf = merge_tile_gdfs(tile_gdfs, crs, args.min_area, args.dedupe_iou)
+        raw_path, reg_path, gpkg_path, reg = save_outputs(gdf, run_dir, args.regularize, args.min_area, args.simplify)
+        stats_gdf = reg if reg_path else gdf
+        return build_result("geoai", "geoai_building_tiled", params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok")
+    except Exception as exc:
+        return build_result("geoai", "geoai_building_tiled", params, None, None, None, None, start, "failed", str(exc))
 
 
 def combine_sam_masks(masks: Any, shape: Tuple[int, int]) -> Any:
@@ -762,14 +911,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Extract and regularize Baoji building footprints.")
     parser.add_argument("--source-tif", type=Path, default=DEFAULT_SOURCE_TIF)
     parser.add_argument("--copy-data", action="store_true", help="Copy source GeoTIFF into building-extraction/data.")
-    parser.add_argument("--models", type=parse_models, default=parse_models("geoai,sam_vit_b,sam_vit_l,sam_vit_h"))
+    parser.add_argument("--models", type=parse_models, default=parse_models("geoai"))
     parser.add_argument("--tile-size", type=int, default=1024)
     parser.add_argument("--overlap", type=int, default=128)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--min-area", type=float, default=20.0)
     parser.add_argument("--simplify", type=float, default=0.5)
     add_bool_flag(parser, "regularize", True, "Run polygon regularization.")
-    parser.add_argument("--test-crop", action=argparse.BooleanOptionalAction, default=True)
+    add_bool_flag(parser, "test-crop", False, "Run on a center crop for a quick smoke test.")
+    add_bool_flag(parser, "tile-full-image", True, "Split full images into tiles, extract each tile, then merge results.")
+    parser.add_argument("--dedupe-iou", type=float, default=0.6, help="IoU threshold for removing duplicate polygons from overlapping tiles.")
     add_bool_flag(parser, "download-models", True, "Download missing models into the project models directory.")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--check-env", action="store_true", help="Only check Python dependencies.")
@@ -798,13 +949,23 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
 
     prepare_dirs()
+    args.device = normalize_device(args.device)
+    log(f"Using device: {args.device}")
     image = prepare_data(args.source_tif, args.copy_data, create_synthetic_if_missing=args.test_crop)
     model_paths = ensure_models(args.models, args.download_models)
-    run_image = make_test_crop(image, args.tile_size) if args.test_crop else image
+    if args.test_crop:
+        run_image = make_test_crop(image, args.tile_size)
+        log(f"Processing test crop only: {run_image}")
+    else:
+        run_image = image
+        log(f"Processing full image extent: {run_image}")
 
     results: List[RunResult] = []
     if "geoai" in args.models:
-        result = run_geoai(run_image, model_paths["geoai"], args)
+        if args.tile_full_image and not args.test_crop:
+            result = run_geoai_tiled(run_image, model_paths["geoai"], args)
+        else:
+            result = run_geoai(run_image, model_paths["geoai"], args)
         log(f"GeoAI result: {result.status}, count={result.count}, message={result.message}")
         results.append(result)
 
