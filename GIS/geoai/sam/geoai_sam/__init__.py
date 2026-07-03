@@ -15,13 +15,20 @@ from pathlib import Path
 
 # 在所有模块导入前，确保模型缓存重定向到项目 models/ 目录
 _pkg_dir = Path(__file__).resolve().parent.parent
-_default_model_dir = str(_pkg_dir / "models")
+_repo_root = _pkg_dir.parent
+_model_dir_raw = Path(os.getenv("GEOAI_MODELS_DIR", str(_repo_root / "models"))).expanduser()
+if not _model_dir_raw.is_absolute():
+    _model_dir_raw = (_repo_root / _model_dir_raw).resolve()
+_default_model_dir = str(_model_dir_raw)
 os.makedirs(_default_model_dir, exist_ok=True)
 os.environ.setdefault("TORCH_HOME", os.path.join(_default_model_dir, "torch"))
 os.environ.setdefault("HF_HOME", os.path.join(_default_model_dir, "huggingface"))
 os.environ.setdefault("HF_HUB_CACHE", os.path.join(_default_model_dir, "huggingface", "hub"))
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", os.path.join(_default_model_dir, "huggingface", "hub"))
+os.environ.setdefault("TRANSFORMERS_CACHE", os.path.join(_default_model_dir, "huggingface", "transformers"))
 os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", os.path.join(_default_model_dir, "sentence_transformers"))
 os.environ.setdefault("CLIP_CACHE", os.path.join(_default_model_dir, "clip"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # matplotlib 中文字体配置（解决 Windows 中文乱码）
 # 在所有模块导入前配置，确保后续所有绘图自动生效

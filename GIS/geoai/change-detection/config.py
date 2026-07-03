@@ -1,32 +1,38 @@
 """
 ChangeDetection 全局配置
 """
+import os as _os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent
+REPO_ROOT = PROJECT_ROOT.parent
+SHARED_MODELS_DIR = Path(_os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 TIME_A_DIR = RAW_DIR / "time_a"
 TIME_B_DIR = RAW_DIR / "time_b"
 SAMPLES_DIR = DATA_DIR / "samples"
-MODELS_DIR = DATA_DIR / "models"
+MODELS_DIR = SHARED_MODELS_DIR / "change-detection" / "trained"
 OUTPUT_DIR = DATA_DIR / "output"
 
 for d in [TIME_A_DIR, TIME_B_DIR, SAMPLES_DIR, MODELS_DIR, OUTPUT_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
-# ── 预训练模型缓存目录（避免下载到 C 盘） ──
-PRETRAINED_DIR = DATA_DIR / "pretrained"
+# ── 预训练模型缓存目录（工作区根 models/，供多个子项目共享） ──
+PRETRAINED_DIR = SHARED_MODELS_DIR
 PRETRAINED_DIR.mkdir(parents=True, exist_ok=True)
 HF_HOME_DIR = PRETRAINED_DIR / "huggingface"
 HF_HUB_CACHE_DIR = HF_HOME_DIR / "hub"
 for d in [HF_HOME_DIR, HF_HUB_CACHE_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
-import os as _os
 _os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
 _os.environ["HF_HOME"] = str(HF_HOME_DIR)
+_os.environ["HF_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
 _os.environ["HUGGINGFACE_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
+_os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 STAC_API_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
 

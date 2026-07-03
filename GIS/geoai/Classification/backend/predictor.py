@@ -5,6 +5,7 @@ GeoAI 图像分类 — 推理引擎
 """
 from __future__ import annotations
 import io, sys, time
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -14,6 +15,10 @@ from PIL import Image
 from torchvision import transforms
 
 ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 sys.path.insert(0, str(ROOT / "scripts"))
 
 # EuroSAT 类别
@@ -167,6 +172,6 @@ def get_predictor(checkpoint_path: str | Path | None = None,
     global _predictor
     if _predictor is None:
         if checkpoint_path is None:
-            checkpoint_path = ROOT / "checkpoints" / "best_model.pth"
+            checkpoint_path = SHARED_MODELS_DIR / "Classification" / "checkpoints" / "best_model.pth"
         _predictor = GeoAIPredictor(checkpoint_path, device)
     return _predictor

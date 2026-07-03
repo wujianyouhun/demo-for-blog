@@ -29,7 +29,9 @@ from urllib.request import Request, urlopen
 PROJECT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = PROJECT_DIR.parent
 DATA_DIR = PROJECT_DIR / "data"
-MODEL_DIR = PROJECT_DIR / "models"
+MODEL_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not MODEL_DIR.is_absolute():
+    MODEL_DIR = (REPO_ROOT / MODEL_DIR).resolve()
 OUTPUT_DIR = PROJECT_DIR / "outputs"
 SYNTHETIC_TIF = DATA_DIR / "synthetic_test.tif"
 DEFAULT_SOURCE_TIF = None
@@ -40,6 +42,7 @@ os.environ.setdefault("HF_HOME", str(MODEL_DIR / "huggingface"))
 os.environ.setdefault("HF_HUB_CACHE", str(MODEL_DIR / "huggingface" / "hub"))
 os.environ.setdefault("HUGGINGFACE_HUB_CACHE", str(MODEL_DIR / "huggingface" / "hub"))
 os.environ.setdefault("TORCH_HOME", str(MODEL_DIR / "torch"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # SAM 模型配置。expected_bytes 用于判断下载文件是否完整，避免半截权重参与推理。
 SAM_MODELS = {
@@ -63,7 +66,7 @@ SAM_MODELS = {
     },
 }
 
-# GeoAI 建筑物提取模型位于 Hugging Face 仓库，下载后缓存到 models/geoai/。
+# GeoAI 建筑物提取模型位于 Hugging Face 仓库，下载后缓存到根 models/geoai/。
 GEOAI_BUILDING_MODEL = {
     "repo_id": "giswqs/geoai",
     "filename": "building_footprints_usa.pth",
@@ -1103,7 +1106,7 @@ def build_parser() -> argparse.ArgumentParser:
     add_bool_flag(parser, "test-crop", False, "Run on a center crop for a quick smoke test.")
     add_bool_flag(parser, "tile-full-image", True, "Split full images into tiles, extract each tile, then merge results.")
     parser.add_argument("--dedupe-iou", type=float, default=0.6, help="IoU threshold for removing duplicate polygons from overlapping tiles.")
-    add_bool_flag(parser, "download-models", True, "Download missing models into the project models directory.")
+    add_bool_flag(parser, "download-models", True, "Download missing models into the shared workspace models directory.")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--check-env", action="store_true", help="Only check Python dependencies.")
     add_bool_flag(parser, "validate", True, "Validate generated vector files.")

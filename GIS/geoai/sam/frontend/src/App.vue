@@ -19,7 +19,15 @@
             <div class="form-row">
               <label>文件路径</label>
               <input class="input-field" type="text" v-model="imagePath"
-                     placeholder="例如: F:/data/image.tif" />
+                     :placeholder="dataDir ? dataDir + '/image.tif' : '例如: F:/data/image.tif'" />
+            </div>
+            <div class="form-row" v-if="availableImages.length">
+              <label>data 目录</label>
+              <select v-model="imagePath">
+                <option v-for="path in availableImages" :key="path" :value="path">
+                  {{ fileName(path) }}
+                </option>
+              </select>
             </div>
             <div class="form-row">
               <label>模型</label>
@@ -127,6 +135,63 @@
           </button>
         </div>
 
+        <!-- 整幅影像处理 -->
+        <div class="panel-section" v-if="sessionId">
+          <div class="panel-title">整幅影像处理</div>
+          <div class="form-row">
+            <label>处理模式</label>
+            <select v-model="fullMode">
+              <option value="text">文本</option>
+              <option value="auto">自动</option>
+              <option value="point">点提示</option>
+              <option value="box">框提示</option>
+            </select>
+          </div>
+          <div class="form-row" v-if="fullMode === 'text'">
+            <label>目标文本</label>
+            <input class="input-field" type="text" v-model="promptText"
+                   placeholder="building, road, water..." />
+          </div>
+          <div class="form-row">
+            <label>瓦片尺寸</label>
+            <input type="number" v-model.number="fullTileSize" min="512" step="256" />
+          </div>
+          <div class="form-row">
+            <label>重叠像素</label>
+            <input type="number" v-model.number="fullOverlap" min="0" step="64" />
+          </div>
+          <div class="form-row">
+            <label>最小面积</label>
+            <input type="number" v-model.number="fullMinArea" min="0" step="10" />
+          </div>
+          <div class="form-row">
+            <label>格式</label>
+            <select v-model="fullOutputFormat">
+              <option value="gpkg">GeoPackage</option>
+              <option value="geojson">GeoJSON</option>
+              <option value="shp">Shapefile</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="width:100%; margin-top:4px;"
+                  :disabled="loading || fullTaskStatus === 'running'"
+                  @click="handleStartFullProcess">
+            启动整图处理
+          </button>
+          <div v-if="fullTaskId" style="font-size:11px; color:var(--text-secondary); margin-top:6px;">
+            <p>任务: {{ fullTaskStatus || '-' }} | {{ Math.round(fullProgress * 100) }}%</p>
+            <progress style="width:100%; height:10px;" max="1" :value="fullProgress"></progress>
+            <p v-if="fullTotalTiles">瓦片: {{ fullDoneTiles }} / {{ fullTotalTiles }}</p>
+            <p>{{ fullMessage }}</p>
+            <p v-if="fullError" style="color:#ff8a9a">{{ fullError }}</p>
+            <p v-if="fullResult">多边形数: {{ fullResult.polygon_count }}</p>
+          </div>
+          <button class="btn" style="width:100%; margin-top:4px;"
+                  :disabled="fullTaskStatus !== 'completed'"
+                  @click="handleDownloadFullResult">
+            下载整图结果
+          </button>
+        </div>
+
         <!-- 矢量导出 -->
         <div class="panel-section" v-if="sessionId">
           <div class="panel-title">矢量导出</div>
@@ -163,6 +228,17 @@
             清除当前 Mask
           </button>
         </div>
+
+        <!-- 后台信息 -->
+        <div class="panel-section">
+          <div class="panel-title">后台信息</div>
+          <div class="backend-log">
+            <p v-if="!backendLogs.length">暂无后台信息</p>
+            <p v-for="(log, i) in backendLogs" :key="i" :class="'log-' + log.level">
+              <span>[{{ log.time }}]</span> {{ log.message }}
+            </p>
+          </div>
+        </div>
       </aside>
 
       <!-- 地图主区域 -->
@@ -172,7 +248,7 @@
           :session-id="sessionId"
           :mode="mode"
           :prompt-text="promptText"
-          @loading="loading = $event"
+          @loading="handleLoading"
           @mask-updated="hasMask = $event"
           @toast="addToast"
           @cursor-move="cursorPos = $event"
@@ -206,11 +282,13 @@
 </template>
 
 <script>
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import MapCanvas from './components/MapCanvas.vue'
 import {
   getConfig, loadImage, getImageInfo, postprocessMask,
-  exportVectors, downloadExport, clearSession
+  exportVectors, downloadExport, clearSession,
+  startFullProcess, getFullProcessStatus, downloadFullProcessResult,
+  getBackendLogs,
 } from './api/index.js'
 
 export default {
@@ -229,9 +307,26 @@ export default {
     const toasts = ref([])
     const exportResult = ref(null)
     const mapCanvas = ref(null)
+    const backendLogs = ref([])
+    let backendLogTimer = null
+    const dataDir = ref('')
+    const availableImages = ref([])
+    const fullMode = ref('text')
+    const fullTileSize = ref(2048)
+    const fullOverlap = ref(256)
+    const fullMinArea = ref(50)
+    const fullOutputFormat = ref('gpkg')
+    const fullTaskId = ref('')
+    const fullTaskStatus = ref('')
+    const fullProgress = ref(0)
+    const fullDoneTiles = ref(0)
+    const fullTotalTiles = ref(0)
+    const fullMessage = ref('')
+    const fullError = ref('')
+    const fullResult = ref(null)
 
     // ── 影像加载参数 ──
-    const imagePath = ref('D:\\西安19级.tif')
+    const imagePath = ref('')
     const modelType = ref('vit_l')
     const samVersion = ref('sam1')
 
@@ -271,6 +366,29 @@ export default {
       setTimeout(() => {
         toasts.value.splice(idx, 1)
       }, duration)
+    }
+
+    function fileName(path) {
+      return path.split(/[\\/]/).pop() || path
+    }
+
+    function handleLoading(payload) {
+      if (typeof payload === 'boolean') {
+        loading.value = payload
+        if (!payload) loadingText.value = ''
+        return
+      }
+      loading.value = !!payload?.active
+      loadingText.value = payload?.text || ''
+    }
+
+    async function refreshBackendLogs() {
+      try {
+        const res = await getBackendLogs(40)
+        backendLogs.value = (res.data.logs || []).slice(-8).reverse()
+      } catch (_) {
+        // 后端启动中或暂不可用时保持当前面板状态。
+      }
     }
 
     async function handleLoadImage() {
@@ -359,6 +477,102 @@ export default {
       }
     }
 
+    function validateFullProcessPayload(payload) {
+      if (fullMode.value === 'point' && (!payload.points || payload.points.length === 0)) {
+        addToast('点提示整图处理前，请先在地图上添加前景点/背景点', 'error')
+        return false
+      }
+      if (fullMode.value === 'box' && (!payload.boxes || payload.boxes.length === 0)) {
+        addToast('框提示整图处理前，请先拖拽一个框', 'error')
+        return false
+      }
+      if (fullMode.value === 'text' && !promptText.value.trim()) {
+        addToast('请输入目标文本', 'error')
+        return false
+      }
+      return true
+    }
+
+    async function pollFullProcess(taskId) {
+      try {
+        const res = await getFullProcessStatus(taskId)
+        const task = res.data
+        fullTaskStatus.value = task.status
+        fullProgress.value = task.progress || 0
+        fullDoneTiles.value = task.done_tiles || 0
+        fullTotalTiles.value = task.total_tiles || 0
+        fullMessage.value = task.message || ''
+        fullError.value = task.error || ''
+        fullResult.value = task.result || null
+
+        if (task.status === 'completed') {
+          addToast('整图处理完成', 'success')
+          return
+        }
+        if (task.status === 'failed') {
+          addToast('整图处理失败: ' + (task.error || task.message), 'error', 6000)
+          return
+        }
+        setTimeout(() => pollFullProcess(taskId), 2000)
+      } catch (e) {
+        addToast('查询整图任务失败: ' + (e.response?.data?.detail || e.message), 'error')
+      }
+    }
+
+    async function handleStartFullProcess() {
+      const promptPayload = mapCanvas.value?.getPromptPayload(fullMode.value) || {}
+      if (!validateFullProcessPayload(promptPayload)) return
+
+      loading.value = true
+      loadingText.value = '提交整图任务中...'
+      fullTaskStatus.value = ''
+      fullProgress.value = 0
+      fullDoneTiles.value = 0
+      fullTotalTiles.value = 0
+      fullMessage.value = ''
+      fullError.value = ''
+      fullResult.value = null
+
+      try {
+        const payload = {
+          session_id: sessionId.value,
+          mode: fullMode.value,
+          text: promptText.value,
+          tile_size: fullTileSize.value,
+          overlap: fullOverlap.value,
+          min_area: fullMinArea.value,
+          output_format: fullOutputFormat.value,
+          postprocess: true,
+          ...promptPayload,
+        }
+        const res = await startFullProcess(payload)
+        fullTaskId.value = res.data.task_id
+        fullTaskStatus.value = res.data.status
+        addToast('整图处理任务已启动', 'success')
+        pollFullProcess(fullTaskId.value)
+      } catch (e) {
+        addToast('启动整图处理失败: ' + (e.response?.data?.detail || e.message), 'error', 6000)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    async function handleDownloadFullResult() {
+      try {
+        const res = await downloadFullProcessResult(fullTaskId.value)
+        const blob = res.data
+        const ext = fullOutputFormat.value === 'shp' ? '.zip'
+                  : fullOutputFormat.value === 'geojson' ? '.geojson' : '.gpkg'
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = `full_image_result${ext}`
+        a.click()
+        addToast('整图结果下载已开始', 'success')
+      } catch (e) {
+        addToast('下载整图结果失败: ' + (e.response?.data?.detail || e.message), 'error')
+      }
+    }
+
     function handlePointExecute() {
       // 触发 MapCanvas 内的点分割逻辑（通过模拟 Enter 键）
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }))
@@ -371,24 +585,42 @@ export default {
     onMounted(async () => {
       try {
         const res = await getConfig()
+        dataDir.value = res.data.data_dir || ''
+        availableImages.value = res.data.available_images || []
         imagePath.value = res.data.default_image || imagePath.value
+        if (!imagePath.value && availableImages.value.length) {
+          imagePath.value = availableImages.value[0]
+        }
         modelType.value = res.data.default_model_type || modelType.value
         samVersion.value = res.data.default_sam_version || samVersion.value
       } catch (e) {
         // Keep the built-in defaults if the API is not ready yet.
       }
+      refreshBackendLogs()
+      backendLogTimer = window.setInterval(refreshBackendLogs, 3000)
+    })
+
+    onUnmounted(() => {
+      if (backendLogTimer) {
+        window.clearInterval(backendLogTimer)
+      }
     })
 
     return {
       sessionId, imageInfo, loading, loadingText, mode, hasMask,
-      cursorPos, toasts, exportResult, mapCanvas,
+      cursorPos, toasts, exportResult, mapCanvas, backendLogs,
+      dataDir, availableImages,
+      fullMode, fullTileSize, fullOverlap, fullMinArea, fullOutputFormat,
+      fullTaskId, fullTaskStatus, fullProgress, fullDoneTiles, fullTotalTiles,
+      fullMessage, fullError, fullResult,
       imagePath, modelType, samVersion,
       promptText,
       ppMinSize, ppFillHoles, ppSmoothSigma, ppOpeningRadius, ppClosingRadius,
       exportMinArea, exportFormat,
       sessionStatus, modeHint,
-      addToast, handleLoadImage, handlePostProcess,
+      addToast, fileName, handleLoading, handleLoadImage, handlePostProcess,
       handleExport, handleDownload, handleClear,
+      handleStartFullProcess, handleDownloadFullResult,
       handlePointExecute, handleClearPoints,
     }
   },

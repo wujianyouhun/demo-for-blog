@@ -10,17 +10,26 @@ Grounded-SAM 封装
 
 import os
 import numpy as np
+import inspect
+import tempfile
 from typing import List, Optional, Tuple, Dict, Any
 from pathlib import Path
 
 # 确保模型缓存重定向到项目 models/ 目录
 _this_dir = Path(__file__).resolve().parent.parent
-_default_model_dir = str(_this_dir / "models")
+_repo_root = _this_dir.parent
+_model_dir_raw = Path(os.getenv("GEOAI_MODELS_DIR", str(_repo_root / "models"))).expanduser()
+if not _model_dir_raw.is_absolute():
+    _model_dir_raw = (_repo_root / _model_dir_raw).resolve()
+_default_model_dir = str(_model_dir_raw)
 os.environ.setdefault("TORCH_HOME", os.path.join(_default_model_dir, "torch"))
 os.environ.setdefault("HF_HOME", os.path.join(_default_model_dir, "huggingface"))
 os.environ.setdefault("HF_HUB_CACHE", os.path.join(_default_model_dir, "huggingface", "hub"))
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", os.path.join(_default_model_dir, "huggingface", "hub"))
+os.environ.setdefault("TRANSFORMERS_CACHE", os.path.join(_default_model_dir, "huggingface", "transformers"))
 os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", os.path.join(_default_model_dir, "sentence_transformers"))
 os.environ.setdefault("CLIP_CACHE", os.path.join(_default_model_dir, "clip"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 
 class GroundedSAMWrapper:
@@ -78,6 +87,7 @@ class GroundedSAMWrapper:
         self._masks = None
         self._boxes = None
         self._labels = None
+        self._use_geoai_new_api = False
 
         if device is None:
             import torch
@@ -97,16 +107,46 @@ class GroundedSAMWrapper:
         if self._model is not None:
             return
 
+        # samgeo's LangSAM works better with this project's local SAM checkpoints
+        # and avoids the geoai>=0.40 Transformers meta-tensor loading path.
         try:
-            # 优先使用 geoai 的 GroundedSAM
-            from geoai.segment import GroundedSAM
-            self._model = GroundedSAM(
-                sam_model_type=self.sam_model_type,
-                groundingdino_model=self.groundingdino_model,
-                device=self.device,
-                box_threshold=self.box_threshold,
-                text_threshold=self.text_threshold,
+            from samgeo.text_sam import LangSAM
+            self._model = LangSAM(
+                model_type=self.sam_model_type,
+                checkpoint=self._resolve_sam_checkpoint(),
             )
+            self._use_langsam = True
+            print("[GroundedSAM] 使用 samgeo.text_sam.LangSAM")
+        except Exception as langsam_error:
+            print(f"[GroundedSAM] LangSAM 初始化失败，尝试 geoai GroundedSAM: {langsam_error}")
+            self._model = None
+            self._use_langsam = False
+
+        if self._model is not None:
+            self._use_samgeo_fallback = False
+            return
+
+        try:
+            # 回退使用 geoai 的 GroundedSAM
+            from geoai.segment import GroundedSAM
+            signature = inspect.signature(GroundedSAM.__init__)
+            params = signature.parameters
+            if "sam_model_type" in params:
+                self._model = GroundedSAM(
+                    sam_model_type=self.sam_model_type,
+                    groundingdino_model=self.groundingdino_model,
+                    device=self.device,
+                    box_threshold=self.box_threshold,
+                    text_threshold=self.text_threshold,
+                )
+            else:
+                self._model = GroundedSAM(
+                    detector_id=self._resolve_detector_id(),
+                    segmenter_id=self._resolve_segmenter_id(),
+                    device=self.device,
+                    threshold=self.box_threshold,
+                )
+                self._use_geoai_new_api = True
             print("[GroundedSAM] 使用 geoai.segment.GroundedSAM")
         except ImportError:
             try:
@@ -133,9 +173,46 @@ class GroundedSAMWrapper:
                         f"请安装: pip install geoai-py 或 pip install samgeo\n"
                         f"原始错误: {e}"
                     )
+        except Exception as e:
+            raise RuntimeError(
+                "Grounded-SAM 文本模型初始化失败。当前环境的 geoai/transformers "
+                "在加载 GroundingDINO 时可能触发 meta tensor 问题；"
+                "请优先检查项目 models/huggingface 缓存或使用框/自动模式。"
+                f"原始错误: {e}"
+            ) from e
 
         self._use_langsam = getattr(self, "_use_langsam", False)
         self._use_samgeo_fallback = getattr(self, "_use_samgeo_fallback", False)
+
+    def _resolve_sam_checkpoint(self) -> Optional[str]:
+        """Return a local SAM1 checkpoint when available for LangSAM."""
+        checkpoints = {
+            "vit_h": "sam_vit_h_4b8939.pth",
+            "vit_l": "sam_vit_l_0b3195.pth",
+            "vit_b": "sam_vit_b_01ec64.pth",
+        }
+        filename = checkpoints.get(self.sam_model_type)
+        if not filename:
+            return None
+        path = os.path.join(self.model_dir, filename)
+        return path if os.path.isfile(path) else None
+
+    def _resolve_detector_id(self) -> str:
+        """Map local GroundingDINO aliases to Hugging Face model ids."""
+        mapping = {
+            "GroundingDINO_SwinT": "IDEA-Research/grounding-dino-tiny",
+            "GroundingDINO_SwinB": "IDEA-Research/grounding-dino-base",
+        }
+        return mapping.get(self.groundingdino_model, self.groundingdino_model)
+
+    def _resolve_segmenter_id(self) -> str:
+        """Map SAM aliases to Hugging Face SAM model ids used by geoai>=0.40."""
+        mapping = {
+            "vit_b": "facebook/sam-vit-base",
+            "vit_l": "facebook/sam-vit-large",
+            "vit_h": "facebook/sam-vit-huge",
+        }
+        return mapping.get(self.sam_model_type, self.sam_model_type)
 
     def set_image(self, image_path: str) -> None:
         """
@@ -197,7 +274,29 @@ class GroundedSAMWrapper:
         print(f"[GroundedSAM] 检测阈值: box={box_thresh}, text={text_thresh}")
 
         try:
-            if hasattr(self._model, "segment_image"):
+            if self._use_geoai_new_api:
+                os.makedirs(os.path.join(_this_dir, "output", "tmp"), exist_ok=True)
+                fd, output_path = tempfile.mkstemp(
+                    suffix="_grounded_sam.tif",
+                    dir=os.path.join(_this_dir, "output", "tmp"),
+                )
+                os.close(fd)
+                os.remove(output_path)
+                self._model.threshold = box_thresh
+                result = self._model.segment_image(
+                    input_path=self._image_path,
+                    output_path=output_path,
+                    text_prompts=text_prompt,
+                    export_boxes=False,
+                    export_polygons=False,
+                    min_polygon_area=kwargs.pop("min_polygon_area", 50),
+                    **kwargs,
+                )
+                import rasterio
+                with rasterio.open(result.get("segmentation", output_path)) as src:
+                    self._masks = src.read(1)
+
+            elif hasattr(self._model, "segment_image"):
                 # geoai GroundedSAM 接口
                 result = self._model.segment_image(
                     image_path=self._image_path,

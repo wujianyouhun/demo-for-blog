@@ -306,6 +306,31 @@ html, body, #app {
 .toast-success { background: #1a5c3a; border: 1px solid var(--success); }
 .toast-error { background: #5c1a1a; border: 1px solid var(--accent); }
 
+.backend-log {
+  max-height: 150px;
+  overflow: auto;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.backend-log p {
+  margin: 0 0 4px;
+  word-break: break-word;
+}
+
+.backend-log span {
+  color: #8fb7e8;
+}
+
+.backend-log .log-error {
+  color: #ff8a9a;
+}
+
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }

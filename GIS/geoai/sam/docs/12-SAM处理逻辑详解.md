@@ -18,6 +18,17 @@
   -> 生成前端 PNG 叠加层
   -> 可选后处理
   -> 可选矢量化导出
+
+整幅影像处理是独立任务链路：
+
+```text
+用户启动整图任务
+  -> 后端按 tile_size / overlap 遍历 GeoTIFF
+  -> 每个瓦片写出临时 GeoTIFF 并保留 transform
+  -> 对瓦片执行文本 / 自动 / 点 / 框推理
+  -> 瓦片 Mask 后处理和矢量化
+  -> 合并所有瓦片 GeoDataFrame
+  -> 输出 GeoPackage / GeoJSON / Shapefile
 ```
 
 ## 2. 影像加载
@@ -267,7 +278,7 @@ self._gsam.segment_by_text(text, box_threshold=..., text_threshold=...)
 5. 归一化 Mask。
 6. 生成 PNG 并返回。
 
-文本标注没有进入当前大图裁剪流程；如果后续需要支持超大影像文本标注，应设计瓦片级检测或先裁剪 ROI。
+交互式文本标注用于快速预览；若要处理完整大图，应使用整幅影像处理中的“文本”模式，它会逐瓦片执行 Grounded-SAM 并合并结果。
 
 ## 9. Mask 归一化
 
@@ -353,7 +364,92 @@ output/web_export/
 
 注意：如果当前 Mask 来自裁剪子图，矢量化阶段需要确保 Mask 与原图坐标一致。当前前端显示已通过 `crop_offset` 纠偏；后续若要严格导出原图坐标下的裁剪 Mask，应在导出前把裁剪 Mask 回填到原图尺寸。
 
-## 13. 结果正确性判断
+## 13. 整幅影像瓦片处理逻辑
+
+接口：
+
+```http
+POST /api/process/full
+GET /api/process/status
+GET /api/process/download
+```
+
+核心类：
+
+```python
+FullImageProcessor(...)
+```
+
+关键参数：
+
+| 参数 | 默认值 | 说明 |
+| --- | --- | --- |
+| `tile_size` | 2048 | 每个瓦片最大边长 |
+| `overlap` | 256 | 相邻瓦片重叠像素 |
+| `min_area` | 50 | 矢量化过滤最小面积 |
+| `output_format` | gpkg | 输出格式 |
+| `postprocess` | true | 每个瓦片矢量化前是否后处理 |
+
+瓦片遍历使用 stride：
+
+```python
+stride = tile_size - overlap
+```
+
+最后一列和最后一行会强制贴齐影像边界，避免边缘区域漏处理。
+
+### 13.1 文本模式
+
+文本模式会处理全部瓦片：
+
+```python
+mask = SAMService.predict_by_text(tile_path, text)
+```
+
+适合建筑物、水体、道路等同类目标的全图预提取。
+
+### 13.2 自动模式
+
+自动模式会处理全部瓦片：
+
+```python
+SAMWrapper(automatic=True).generate_masks_auto(...)
+```
+
+它不需要提示词，但结果更依赖 SAM 自动候选质量，通常需要后续筛选。
+
+### 13.3 点模式
+
+点模式只处理包含提示点的瓦片。点坐标从全图像素坐标转为瓦片局部坐标：
+
+```python
+local_point = [x - tile_col_off, y - tile_row_off]
+```
+
+单个点不能代表整幅影像所有同类目标；如果目标需要全图提取，优先使用文本模式。
+
+### 13.4 框模式
+
+框模式只处理与提示框相交的瓦片。框会裁剪为瓦片局部框：
+
+```python
+local_box = intersection(box, tile_window)
+```
+
+如果想处理一个大范围，可以在地图上拖出覆盖该范围的大框。
+
+### 13.5 合并和输出
+
+每个瓦片 Mask 使用瓦片 GeoTIFF 的 transform 直接矢量化，因此生成的 Polygon 已经位于原始影像坐标系中。合并时会：
+
+1. 拼接所有瓦片 GeoDataFrame。
+2. 移除空几何。
+3. 按 WKB 去除完全重复几何。
+4. 输出到 `output/full_image/<task_id>/full_image_result.*`。
+
+Shapefile 下载时会自动打包同名 `.shp/.shx/.dbf/.prj/.cpg`。
+
+## 14. 结果正确性判断
 
 | 阶段 | 正确表现 |
 | --- | --- |

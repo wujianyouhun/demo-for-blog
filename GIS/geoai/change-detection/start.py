@@ -14,6 +14,10 @@ import shutil
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.resolve()
+REPO_ROOT = PROJECT_ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 REQUIREMENTS = PROJECT_ROOT / "requirements.txt"
 
@@ -113,8 +117,11 @@ def start_backend():
     ]
     env = os.environ.copy()
     env["PYTHONPATH"] = str(PROJECT_ROOT) + os.pathsep + env.get("PYTHONPATH", "")
-    # 预训练模型缓存到项目目录，避免下载到 C 盘
-    env["TORCH_HOME"] = str(PROJECT_ROOT / "data" / "pretrained")
+    env["TORCH_HOME"] = str(SHARED_MODELS_DIR)
+    env["HF_HOME"] = str(SHARED_MODELS_DIR / "huggingface")
+    env["HF_HUB_CACHE"] = str(SHARED_MODELS_DIR / "huggingface" / "hub")
+    env["HUGGINGFACE_HUB_CACHE"] = str(SHARED_MODELS_DIR / "huggingface" / "hub")
+    env.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
     info(f"启动后端  →  http://127.0.0.1:{BACKEND_PORT}  (API 文档: /docs)")
     proc = subprocess.Popen(

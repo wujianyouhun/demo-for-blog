@@ -26,8 +26,20 @@ from urllib.error import URLError
 
 # 项目根目录
 PROJECT_ROOT = Path(__file__).resolve().parent
-MODEL_DIR = PROJECT_ROOT / "models"
+REPO_ROOT = PROJECT_ROOT.parent
+MODEL_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not MODEL_DIR.is_absolute():
+    MODEL_DIR = (REPO_ROOT / MODEL_DIR).resolve()
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+os.environ.setdefault("TORCH_HOME", str(MODEL_DIR / "torch"))
+os.environ.setdefault("HF_HOME", str(MODEL_DIR / "huggingface"))
+os.environ.setdefault("HF_HUB_CACHE", str(MODEL_DIR / "huggingface" / "hub"))
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", str(MODEL_DIR / "huggingface" / "hub"))
+os.environ.setdefault("TRANSFORMERS_CACHE", str(MODEL_DIR / "huggingface" / "transformers"))
+os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", str(MODEL_DIR / "sentence_transformers"))
+os.environ.setdefault("CLIP_CACHE", str(MODEL_DIR / "clip"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # ================================================================
 # 模型定义

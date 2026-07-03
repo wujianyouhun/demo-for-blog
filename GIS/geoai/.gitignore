@@ -22,6 +22,10 @@ env/
 # 数据与模型（体积大，不入库）
 # ========================
 data/
+models/
+**/models/
+**/data/pretrained/
+**/checkpoints/
 *.tif
 *.tiff
 *.geotiff

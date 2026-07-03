@@ -24,6 +24,7 @@ import {
   predictByPoint,
   predictByBox,
   predictByText,
+  getSessionProgress,
 } from '../api/index.js'
 
 export default {
@@ -57,6 +58,7 @@ export default {
     // 框标注状态
     let isDrawingBox = false
     let boxStart = null
+    let lastBoxGeo = null
 
     // ── 初始化地图（标准 Web Mercator） ──
     function initMap() {
@@ -183,7 +185,7 @@ export default {
           addPointMarker(coord3857, 'fg')
         }
       } else if (props.mode === 'text') {
-        doTextPredict()
+        doTextPredict({ lon, lat })
       }
     }
 
@@ -235,7 +237,8 @@ export default {
       // 转为 WGS84
       const [lon1, lat1] = toLonLat([x1, y1])
       const [lon2, lat2] = toLonLat([x2, y2])
-      doBoxPredict([lon1, lat1, lon2, lat2])
+      lastBoxGeo = [lon1, lat1, lon2, lat2]
+      doBoxPredict(lastBoxGeo)
     }
 
     // ── 添加点标记 ──
@@ -269,7 +272,7 @@ export default {
         ...bgPoints.map(() => 0),
       ]
 
-      emit('loading', true)
+      emit('loading', { active: true, text: '点标注：正在调用 SAM 模型...' })
       try {
         const res = await predictByPoint(props.sessionId, allPoints, allLabels)
         const url = URL.createObjectURL(res.data)
@@ -285,7 +288,7 @@ export default {
     }
 
     async function doBoxPredict(box) {
-      emit('loading', true)
+      emit('loading', { active: true, text: '框标注：正在调用 SAM 模型...' })
       try {
         const res = await predictByBox(props.sessionId, box)
         const url = URL.createObjectURL(res.data)
@@ -300,14 +303,33 @@ export default {
       }
     }
 
-    async function doTextPredict() {
+    async function doTextPredict(clickPoint = null) {
       if (!props.promptText?.trim()) {
         emit('toast', '请输入目标文本', 'error')
         return
       }
-      emit('loading', true)
+      emit('loading', { active: true, text: '文本标注：正在提交请求...' })
+      let progressTimer = null
+      const pollProgress = async () => {
+        if (!props.sessionId) return
+        try {
+          const res = await getSessionProgress(props.sessionId)
+          const op = res.data || {}
+          if (op.name === 'predict_text' && op.message) {
+            const percent = Math.round((op.progress || 0) * 100)
+            emit('loading', {
+              active: op.status !== 'completed' && op.status !== 'failed',
+              text: `${op.message} (${percent}%)`,
+            })
+          }
+        } catch (_) {
+          // Keep the main request running even if progress polling misses once.
+        }
+      }
+      progressTimer = window.setInterval(pollProgress, 1000)
+      pollProgress()
       try {
-        const res = await predictByText(props.sessionId, props.promptText)
+        const res = await predictByText(props.sessionId, props.promptText, 0.25, 0.25, clickPoint)
         const url = URL.createObjectURL(res.data)
         updateMaskOverlay(url)
         emit('mask-updated', true)
@@ -315,6 +337,9 @@ export default {
       } catch (e) {
         emit('toast', '分割失败: ' + await getErrorMessage(e), 'error')
       } finally {
+        if (progressTimer) {
+          window.clearInterval(progressTimer)
+        }
         emit('loading', false)
       }
     }
@@ -354,6 +379,24 @@ export default {
       pointsLayer.getSource().clear()
     }
 
+    function getPromptPayload(mode) {
+      if (mode === 'point') {
+        return {
+          points: [...fgPoints, ...bgPoints],
+          labels: [
+            ...fgPoints.map(() => 1),
+            ...bgPoints.map(() => 0),
+          ],
+        }
+      }
+      if (mode === 'box') {
+        return {
+          boxes: lastBoxGeo ? [lastBoxGeo] : [],
+        }
+      }
+      return {}
+    }
+
     // ── 监听 mode 变化 ──
     watch(
       () => props.mode,
@@ -388,6 +431,7 @@ export default {
       updateMaskOverlay,
       clearMask,
       loadDisplayImage,
+      getPromptPayload,
     })
 
     onMounted(() => {

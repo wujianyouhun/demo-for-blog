@@ -221,8 +221,14 @@ def start_backend(project_root):
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(project_root) + os.pathsep + env.get("PYTHONPATH", "")
-    # 预训练模型缓存到项目目录，避免下载到 C 盘
-    env["TORCH_HOME"] = str(project_root / "data" / "pretrained")
+    shared_models = Path(env.get("GEOAI_MODELS_DIR", str(project_root.parent / "models"))).expanduser()
+    if not shared_models.is_absolute():
+        shared_models = (project_root.parent / shared_models).resolve()
+    env["TORCH_HOME"] = str(shared_models)
+    env["HF_HOME"] = str(shared_models / "huggingface")
+    env["HF_HUB_CACHE"] = str(shared_models / "huggingface" / "hub")
+    env["HUGGINGFACE_HUB_CACHE"] = str(shared_models / "huggingface" / "hub")
+    env.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
     proc = subprocess.Popen(
         cmd,

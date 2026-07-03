@@ -16,6 +16,18 @@ GeoAI 图像分类 — 训练脚本
 import argparse, os, sys, time, json
 from pathlib import Path
 
+# 在导入 torch/torchvision/timm 前固定共享模型缓存目录。
+ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
+os.environ.setdefault("TORCH_HOME", str(SHARED_MODELS_DIR))
+os.environ.setdefault("HF_HOME", str(SHARED_MODELS_DIR / "huggingface"))
+os.environ.setdefault("HF_HUB_CACHE", str(SHARED_MODELS_DIR / "huggingface" / "hub"))
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", str(SHARED_MODELS_DIR / "huggingface" / "hub"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -27,8 +39,6 @@ from tqdm import tqdm
 from rich.console import Console
 from rich.table import Table
 
-# 项目根目录
-ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from dataset import build_dataloaders, CLASS_NAMES
 
@@ -51,7 +61,7 @@ def parse_args():
     p.add_argument("--resume",     default=None, help="checkpoint 路径")
     p.add_argument("--amp",        action="store_true", default=True,
                    help="混合精度训练 (AMP)")
-    p.add_argument("--output_dir", default=str(ROOT/"checkpoints"))
+    p.add_argument("--output_dir", default=str(SHARED_MODELS_DIR / "Classification" / "checkpoints"))
     p.add_argument("--log_dir",    default=str(ROOT/"logs"))
     return p.parse_args()
 

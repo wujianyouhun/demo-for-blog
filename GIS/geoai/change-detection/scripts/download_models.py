@@ -10,10 +10,14 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PRETRAINED_DIR = PROJECT_ROOT / "data" / "pretrained"
+REPO_ROOT = PROJECT_ROOT.parent
+PRETRAINED_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not PRETRAINED_DIR.is_absolute():
+    PRETRAINED_DIR = (REPO_ROOT / PRETRAINED_DIR).resolve()
 HF_HOME_DIR = PRETRAINED_DIR / "huggingface"
 HF_HUB_CACHE_DIR = HF_HOME_DIR / "hub"
-MODEL_DIR = PRETRAINED_DIR / "models"
+MODEL_DIR = PRETRAINED_DIR / "change-detection"
+HF_ENDPOINT = os.getenv("HF_ENDPOINT", "https://hf-mirror.com").rstrip("/")
 
 CHANGESTAR_REPO = "EVER-Z/Changen2-ChangeStar1x256"
 CHANGESTAR_KEYS = {
@@ -134,7 +138,9 @@ def configure_project_cache() -> None:
         directory.mkdir(parents=True, exist_ok=True)
     os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
     os.environ["HF_HOME"] = str(HF_HOME_DIR)
+    os.environ["HF_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
     os.environ["HUGGINGFACE_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
+    os.environ.setdefault("HF_ENDPOINT", HF_ENDPOINT)
     os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 
 
@@ -159,7 +165,7 @@ def download_changestar(model_names: list[str]) -> list[Path]:
             raise KeyError(f"{key} not found in {CHANGESTAR_REPO}/config.json")
 
         filename = available[key]
-        url = f"https://huggingface.co/{CHANGESTAR_REPO}/resolve/main/{filename}"
+        url = f"{HF_ENDPOINT}/{CHANGESTAR_REPO}/resolve/main/{filename}"
         target = MODEL_DIR / f"{model_name}__{Path(filename).name}"
         cache_path = range_download(
             url,
@@ -198,7 +204,7 @@ def download_torchvision_backbones() -> list[Path]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="下载项目所需的预训练模型到 data/pretrained")
+    parser = argparse.ArgumentParser(description="下载项目所需的预训练模型到工作区根 models/")
     parser.add_argument(
         "--changestar-model",
         action="append",

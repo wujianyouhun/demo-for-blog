@@ -23,13 +23,16 @@ from dotenv import load_dotenv
 
 # ── 环境配置 ────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(ROOT.parent / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (ROOT.parent / SHARED_MODELS_DIR).resolve()
 load_dotenv(ROOT / ".env")
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "backend"))
 
 from predictor import get_predictor, CLASS_NAMES, CLASS_NAMES_ZH
 
-MODEL_PATH  = os.getenv("MODEL_PATH",  str(ROOT / "checkpoints" / "best_model.pth"))
+MODEL_PATH  = os.getenv("MODEL_PATH",  str(SHARED_MODELS_DIR / "Classification" / "checkpoints" / "best_model.pth"))
 DEVICE      = os.getenv("DEVICE", "cpu")
 MAX_FILE_MB = 10
 

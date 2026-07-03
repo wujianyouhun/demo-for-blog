@@ -4,6 +4,71 @@
 
 ---
 
+### Web 整幅影像处理接口
+
+整图处理接口位于 FastAPI 后端，用于大范围 GeoTIFF 的瓦片化推理和矢量导出。
+
+#### 启动任务
+
+```http
+POST /api/process/full
+```
+
+请求体：
+
+```json
+{
+  "session_id": "已加载影像的会话 ID",
+  "mode": "text",
+  "text": "building",
+  "points": [[lon, lat]],
+  "labels": [1],
+  "boxes": [[lon1, lat1, lon2, lat2]],
+  "tile_size": 2048,
+  "overlap": 256,
+  "min_area": 50,
+  "output_format": "gpkg",
+  "postprocess": true
+}
+```
+
+| 字段 | 说明 |
+| --- | --- |
+| `mode` | `text` / `auto` / `point` / `box` |
+| `text` | 文本模式提示词 |
+| `points` / `labels` | 点模式提示，1=前景，0=背景 |
+| `boxes` | 框模式提示 |
+| `tile_size` | 瓦片尺寸 |
+| `overlap` | 相邻瓦片重叠像素 |
+| `output_format` | `gpkg` / `geojson` / `shp` |
+
+返回：
+
+```json
+{
+  "task_id": "uuid",
+  "status": "running"
+}
+```
+
+#### 查询任务
+
+```http
+GET /api/process/status?task_id=uuid
+```
+
+返回任务状态、进度、瓦片数量、消息、错误信息和完成后的结果路径。
+
+#### 下载结果
+
+```http
+GET /api/process/download?task_id=uuid
+```
+
+任务完成后下载结果文件。若输出为 Shapefile，接口会返回包含 `.shp/.shx/.dbf/.prj/.cpg` 的 zip。
+
+---
+
 ### SAMWrapper
 
 SAM / SAM2 / SAM3 模型的统一封装。

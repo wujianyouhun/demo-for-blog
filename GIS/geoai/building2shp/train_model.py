@@ -23,7 +23,12 @@ from PIL import Image
 
 # 设置 TORCH_HOME
 PROJECT_ROOT = Path(__file__).parent
-os.environ["TORCH_HOME"] = str(PROJECT_ROOT / "data" / "pretrained")
+REPO_ROOT = PROJECT_ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
+os.environ["TORCH_HOME"] = str(SHARED_MODELS_DIR)
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 TILE_SIZE = 256
 NUM_CLASSES = 6
@@ -34,7 +39,7 @@ LR = 1e-4
 
 IMG_DIR = PROJECT_ROOT / "data" / "train_images"
 LBL_DIR = PROJECT_ROOT / "data" / "train_labels"
-MODEL_DIR = PROJECT_ROOT / "data" / "models"
+MODEL_DIR = SHARED_MODELS_DIR / "building2shp" / "trained"
 
 
 def generate_sample(idx: int):

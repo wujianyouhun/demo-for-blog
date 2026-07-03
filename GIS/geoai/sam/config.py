@@ -7,11 +7,18 @@ GeoAI SAM 项目配置文件
 
 import os
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 
 # 项目根目录
 PROJECT_ROOT = Path(__file__).parent
+REPO_ROOT = PROJECT_ROOT.parent
+
+# 项目数据目录：默认读取这里的 GeoTIFF
+DATA_DIR: Path = Path(os.getenv("DATA_DIR", str(PROJECT_ROOT / "data"))).expanduser()
+if not DATA_DIR.is_absolute():
+    DATA_DIR = (PROJECT_ROOT / DATA_DIR).resolve()
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_dotenv():
@@ -36,7 +43,10 @@ load_dotenv()
 # ================================================================
 # 将所有模型缓存重定向到项目 models/ 目录，
 # 避免下载到 C:\Users\...\*.cache 等系统目录。
-MODEL_DIR: str = os.getenv("MODEL_DIR", str(PROJECT_ROOT / "models"))
+_model_dir_raw = Path(os.getenv("MODEL_DIR") or os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not _model_dir_raw.is_absolute():
+    _model_dir_raw = (REPO_ROOT / _model_dir_raw).resolve()
+MODEL_DIR: str = str(_model_dir_raw)
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 # PyTorch Hub (SAM 模型下载)
@@ -45,6 +55,8 @@ os.environ.setdefault("TORCH_HOME", os.path.join(MODEL_DIR, "torch"))
 # HuggingFace (GroundingDINO, CLIP, transformers)
 os.environ.setdefault("HF_HOME", os.path.join(MODEL_DIR, "huggingface"))
 os.environ.setdefault("HF_HUB_CACHE", os.path.join(MODEL_DIR, "huggingface", "hub"))
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", os.path.join(MODEL_DIR, "huggingface", "hub"))
+os.environ.setdefault("TRANSFORMERS_CACHE", os.path.join(MODEL_DIR, "huggingface", "transformers"))
 
 # SentenceTransformers
 os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", os.path.join(MODEL_DIR, "sentence_transformers"))
@@ -54,6 +66,7 @@ os.environ.setdefault("CLIP_CACHE", os.path.join(MODEL_DIR, "clip"))
 
 # samgeo
 os.environ.setdefault("SAMGEO_CACHE", os.path.join(MODEL_DIR, "samgeo"))
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 
 # ================================================================
@@ -88,7 +101,10 @@ DEVICE: Optional[str] = os.getenv("DEVICE") or None
 # ================================================================
 # 输出配置
 # ================================================================
-OUTPUT_DIR: str = os.getenv("OUTPUT_DIR", str(PROJECT_ROOT / "output"))
+_output_dir_raw = Path(os.getenv("OUTPUT_DIR", str(PROJECT_ROOT / "output"))).expanduser()
+if not _output_dir_raw.is_absolute():
+    _output_dir_raw = (PROJECT_ROOT / _output_dir_raw).resolve()
+OUTPUT_DIR: str = str(_output_dir_raw)
 OUTPUT_FORMAT: str = os.getenv("OUTPUT_FORMAT", "geojson")
 
 
@@ -105,7 +121,32 @@ POSTPROCESS_CLOSING_RADIUS: int = int(os.getenv("POSTPROCESS_CLOSING_RADIUS", "3
 # ================================================================
 # 数据路径
 # ================================================================
-DEFAULT_IMAGE: str = os.getenv("DEFAULT_IMAGE", r"E:\data\baoji\宝鸡市\I48E006018\I48E006018.tif")
+def list_tif_images(data_dir: Optional[Path] = None) -> List[str]:
+    """列出 data 目录下可加载的 tif/tiff 影像。"""
+    root = data_dir or DATA_DIR
+    if not root.exists():
+        return []
+
+    paths = []
+    for pattern in ("*.tif", "*.tiff"):
+        paths.extend(root.rglob(pattern))
+    return [str(path.resolve()) for path in sorted(paths, key=lambda p: str(p).lower())]
+
+
+def _resolve_default_image() -> str:
+    """优先使用 DEFAULT_IMAGE；未设置时读取 data 目录下第一个 tif。"""
+    configured = (os.getenv("DEFAULT_IMAGE") or "").strip()
+    if configured:
+        path = Path(configured).expanduser()
+        if not path.is_absolute():
+            path = (PROJECT_ROOT / path).resolve()
+        return str(path)
+
+    images = list_tif_images()
+    return images[0] if images else ""
+
+
+DEFAULT_IMAGE: str = _resolve_default_image()
 
 
 # ================================================================

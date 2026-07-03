@@ -7,11 +7,15 @@ GeoAI 图像分类 — 命令行单张/批量推理
     # 批量目录
     python scripts/infer.py --dir path/to/images/ --output results.json
 """
-import argparse, sys, json
+import argparse, os, sys, json
 from pathlib import Path
 
 import torch
 ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "backend"))
 
@@ -19,7 +23,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="GeoAI 命令行推理")
     p.add_argument("--image",      default=None, help="单张图像路径")
     p.add_argument("--dir",        default=None, help="批量推理目录")
-    p.add_argument("--checkpoint", default=str(ROOT/"checkpoints"/"best_model.pth"))
+    p.add_argument("--checkpoint", default=str(SHARED_MODELS_DIR / "Classification" / "checkpoints" / "best_model.pth"))
     p.add_argument("--device",     default="auto")
     p.add_argument("--output",     default=None, help="结果输出 JSON 路径")
     p.add_argument("--topk",       type=int, default=5)

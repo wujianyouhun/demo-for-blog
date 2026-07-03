@@ -50,8 +50,11 @@ def banner():
 
 # ─── 项目路径 ─────────────────────────────────────────────────────────────────
 ROOT          = Path(__file__).resolve().parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(ROOT.parent / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (ROOT.parent / SHARED_MODELS_DIR).resolve()
 FRONTEND_HTML = ROOT / "frontend" / "index.html"
-CHECKPOINT    = ROOT / "checkpoints" / "best_model.pth"
+CHECKPOINT    = SHARED_MODELS_DIR / "Classification" / "checkpoints" / "best_model.pth"
 ENV_FILE      = ROOT / ".env"
 
 # ─── 默认参数（可被 .env 覆盖）────────────────────────────────────────────────

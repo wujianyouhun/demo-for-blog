@@ -8,16 +8,26 @@ from pathlib import Path
 # 备用 DeepLabV3+ 流程使用的目录配置。主流程 extract_buildings.py 使用 models/
 # 和 outputs/；这里保留 data/models 与 data/output，是为了兼容原始语义分割脚本。
 PROJECT_ROOT = Path(__file__).parent
+REPO_ROOT = PROJECT_ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 DATA_DIR = PROJECT_ROOT / "data"
 INPUT_DIR = DATA_DIR
-MODELS_DIR = DATA_DIR / "models"
+MODELS_DIR = SHARED_MODELS_DIR / "building-extraction"
 OUTPUT_DIR = DATA_DIR / "output"
 
-# 预训练模型缓存到项目目录，避免 PyTorch 默认把权重写到用户目录或 C 盘。
-PRETRAINED_DIR = DATA_DIR / "pretrained"
-for d in [INPUT_DIR, MODELS_DIR, OUTPUT_DIR, PRETRAINED_DIR]:
+# 预训练模型缓存到工作区根目录 models/，避免各子项目重复下载。
+PRETRAINED_DIR = SHARED_MODELS_DIR / "torch"
+HF_HOME_DIR = SHARED_MODELS_DIR / "huggingface"
+HF_HUB_CACHE_DIR = HF_HOME_DIR / "hub"
+for d in [INPUT_DIR, MODELS_DIR, OUTPUT_DIR, PRETRAINED_DIR, HF_HOME_DIR, HF_HUB_CACHE_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
+os.environ["HF_HOME"] = str(HF_HOME_DIR)
+os.environ["HF_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
+os.environ["HUGGINGFACE_HUB_CACHE"] = str(HF_HUB_CACHE_DIR)
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # ── 类别定义 ──
 # DeepLabV3+ 输出的是多类别语义分割图，后续只提取 BUILDING_CLASS_ID 对应类别。

@@ -10,8 +10,9 @@ import io
 import sys
 import importlib.util
 import numpy as np
+import pandas as pd
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Callable, Optional, List, Dict, Any, Tuple
 from PIL import Image
 
 # 将项目根目录加入 path，以便导入 geoai_sam
@@ -425,6 +426,7 @@ class SAMService:
         text: str,
         box_threshold: float = 0.25,
         text_threshold: float = 0.25,
+        point: Optional[List[float]] = None,
     ) -> np.ndarray:
         """文本提示分割 (Grounded-SAM)。"""
         self._validate_sam_runtime()
@@ -435,8 +437,19 @@ class SAMService:
                 box_threshold=box_threshold,
                 text_threshold=text_threshold,
             )
-        if getattr(self._gsam, "_image_path", None) != image_path:
-            self._gsam.set_image(image_path)
+
+        target_path = image_path
+        if point is not None and self._needs_cropping(image_path):
+            temp_path, col_off, row_off, crop_w, crop_h = self._crop_around_region(
+                image_path, point[0], point[1]
+            )
+            self._crop_offset = (col_off, row_off, crop_w, crop_h)
+            target_path = temp_path
+        else:
+            self._crop_offset = None
+
+        if getattr(self._gsam, "_image_path", None) != target_path:
+            self._gsam.set_image(target_path)
 
         masks = self._gsam.segment_by_text(
             text,
@@ -524,3 +537,283 @@ class SAMService:
         buf = io.BytesIO()
         pil.save(buf, format="PNG")
         return buf.getvalue()
+
+
+class FullImageProcessor:
+    """Tile-based full-image SAM processing for large GeoTIFFs."""
+
+    def __init__(
+        self,
+        model_type: str = "vit_l",
+        sam_version: str = "sam1",
+        tile_size: int = 2048,
+        overlap: int = 256,
+        min_area: int = 50,
+        output_format: str = "gpkg",
+        postprocess: bool = True,
+        progress_callback: Optional[Callable[[int, int, str], None]] = None,
+    ):
+        if tile_size <= 0:
+            raise ValueError("tile_size 必须大于 0")
+        if overlap < 0 or overlap >= tile_size:
+            raise ValueError("overlap 必须 >= 0 且小于 tile_size")
+
+        self.model_type = model_type
+        self.sam_version = sam_version
+        self.tile_size = tile_size
+        self.overlap = overlap
+        self.min_area = min_area
+        self.output_format = output_format
+        self.postprocess = postprocess
+        self.progress_callback = progress_callback
+        self.sam_service = SAMService(model_type=model_type, sam_version=sam_version)
+
+    @staticmethod
+    def _axis_offsets(length: int, tile_size: int, overlap: int) -> List[int]:
+        if length <= tile_size:
+            return [0]
+
+        stride = tile_size - overlap
+        offsets = list(range(0, max(length - tile_size + 1, 1), stride))
+        last = length - tile_size
+        if offsets[-1] != last:
+            offsets.append(last)
+        return offsets
+
+    @staticmethod
+    def _collapse_mask(mask: np.ndarray) -> np.ndarray:
+        if isinstance(mask, dict):
+            mask = mask.get("masks", mask.get("mask", mask.get("segmentation")))
+        elif isinstance(mask, list) and mask and isinstance(mask[0], dict):
+            segmentations = [item["segmentation"] for item in mask if "segmentation" in item]
+            if not segmentations:
+                return np.zeros((1, 1), dtype=np.uint8)
+            mask = np.stack(segmentations, axis=0)
+
+        arr = np.asarray(mask)
+        if arr.size == 0:
+            return np.zeros((1, 1), dtype=np.uint8)
+        while arr.ndim > 2:
+            arr = np.any(arr > 0, axis=0)
+        return (arr > 0).astype(np.uint8)
+
+    @staticmethod
+    def _intersect_box(box: List[float], x0: int, y0: int, x1: int, y1: int) -> Optional[List[float]]:
+        bx0, by0, bx1, by1 = box
+        ix0 = max(bx0, x0)
+        iy0 = max(by0, y0)
+        ix1 = min(bx1, x1)
+        iy1 = min(by1, y1)
+        if ix1 <= ix0 or iy1 <= iy0:
+            return None
+        return [ix0 - x0, iy0 - y0, ix1 - x0, iy1 - y0]
+
+    def _write_tile(self, src, window, tile_path: str):
+        import rasterio
+
+        data = src.read(window=window)
+        profile = src.profile.copy()
+        profile.update(
+            width=int(window.width),
+            height=int(window.height),
+            transform=rasterio.windows.transform(window, src.transform),
+        )
+        with rasterio.open(tile_path, "w", **profile) as dst:
+            dst.write(data)
+
+    def _vectorize_tile(self, mask: np.ndarray, tile_path: str, tile_id: str, mode: str):
+        from geoai_sam import MaskVectorizer
+
+        mask_2d = self._collapse_mask(mask)
+        if self.postprocess:
+            try:
+                mask_2d = self.sam_service.postprocess(mask_2d, min_size=self.min_area)
+            except Exception as exc:
+                print(f"[FullImageProcessor] 后处理失败，使用原始 mask: {exc}")
+
+        if not np.any(mask_2d):
+            return None
+
+        vec = MaskVectorizer()
+        gdf = vec.vectorize(mask_2d, reference_image=tile_path, min_area=self.min_area)
+        if getattr(gdf, "empty", True):
+            return None
+
+        gdf = gdf.copy()
+        gdf["tile_id"] = tile_id
+        gdf["mode"] = mode
+        return gdf
+
+    def _save_outputs(self, gdfs: List[Any], output_dir: str, output_format: str) -> Dict[str, Any]:
+        import geopandas as gpd
+
+        os.makedirs(output_dir, exist_ok=True)
+        ext_map = {
+            "geojson": ".geojson",
+            "json": ".geojson",
+            "gpkg": ".gpkg",
+            "shp": ".shp",
+        }
+        ext = ext_map.get(output_format.lower(), ".gpkg")
+        out_path = os.path.join(output_dir, f"full_image_result{ext}")
+
+        if gdfs:
+            merged = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True), crs=gdfs[0].crs)
+            merged = merged[~merged.geometry.is_empty & merged.geometry.notna()].copy()
+            if not merged.empty:
+                merged["_wkb"] = merged.geometry.apply(lambda geom: geom.wkb_hex)
+                merged = merged.drop_duplicates("_wkb").drop(columns=["_wkb"]).reset_index(drop=True)
+        else:
+            merged = gpd.GeoDataFrame(columns=["id", "area_pixels", "tile_id", "mode", "geometry"], geometry="geometry")
+
+        if ext == ".geojson":
+            driver = "GeoJSON"
+        elif ext == ".shp":
+            driver = "ESRI Shapefile"
+        else:
+            driver = "GPKG"
+        merged.to_file(out_path, driver=driver)
+
+        return {
+            "file": out_path,
+            "polygon_count": int(len(merged)),
+            "output_format": output_format,
+        }
+
+    def process(
+        self,
+        image_path: str,
+        mode: str,
+        output_dir: str,
+        text: Optional[str] = None,
+        points: Optional[List[List[float]]] = None,
+        labels: Optional[List[int]] = None,
+        boxes: Optional[List[List[float]]] = None,
+    ) -> Dict[str, Any]:
+        import rasterio
+        from rasterio.windows import Window
+
+        mode = mode.lower()
+        if mode not in ("text", "point", "box", "auto"):
+            raise ValueError("mode 仅支持 text / point / box / auto")
+        if mode == "text" and not text:
+            raise ValueError("文本整图处理需要 text 参数")
+        if mode == "point" and not points:
+            raise ValueError("点整图处理至少需要 1 个点")
+        if mode == "box" and not boxes:
+            raise ValueError("框整图处理至少需要 1 个框")
+
+        tile_dir = os.path.join(output_dir, "tiles")
+        os.makedirs(tile_dir, exist_ok=True)
+
+        gdfs = []
+        processed_tiles = 0
+        skipped_tiles = 0
+        auto_sam = None
+
+        with rasterio.open(image_path) as src:
+            x_offsets = self._axis_offsets(src.width, self.tile_size, self.overlap)
+            y_offsets = self._axis_offsets(src.height, self.tile_size, self.overlap)
+            tile_windows = [(x, y) for y in y_offsets for x in x_offsets]
+            total = len(tile_windows)
+            if self.progress_callback:
+                self.progress_callback(0, total, f"已生成 {total} 个瓦片，准备处理")
+
+            for index, (x0, y0) in enumerate(tile_windows, start=1):
+                crop_w = min(self.tile_size, src.width - x0)
+                crop_h = min(self.tile_size, src.height - y0)
+                x1 = x0 + crop_w
+                y1 = y0 + crop_h
+
+                local_points = []
+                local_labels = []
+                local_boxes = []
+
+                if mode == "point":
+                    for pt, label in zip(points or [], labels or []):
+                        px, py = pt
+                        if x0 <= px < x1 and y0 <= py < y1:
+                            local_points.append([px - x0, py - y0])
+                            local_labels.append(label)
+                    if not local_points:
+                        skipped_tiles += 1
+                        if self.progress_callback:
+                            self.progress_callback(index, total, f"跳过瓦片 {index}/{total}")
+                        continue
+
+                if mode == "box":
+                    for box in boxes or []:
+                        local_box = self._intersect_box(box, x0, y0, x1, y1)
+                        if local_box:
+                            local_boxes.append(local_box)
+                    if not local_boxes:
+                        skipped_tiles += 1
+                        if self.progress_callback:
+                            self.progress_callback(index, total, f"跳过瓦片 {index}/{total}")
+                        continue
+
+                tile_id = f"r{y0}_c{x0}"
+                tile_path = os.path.join(tile_dir, f"{tile_id}.tif")
+                self._write_tile(src, Window(x0, y0, crop_w, crop_h), tile_path)
+
+                if self.progress_callback:
+                    self.progress_callback(index - 1, total, f"处理瓦片 {index}/{total}")
+
+                try:
+                    if mode == "text":
+                        if index == 1 and self.progress_callback:
+                            self.progress_callback(
+                                0,
+                                total,
+                                "正在加载文本标注模型（首次加载可能需要数分钟）",
+                            )
+                        mask = self.sam_service.predict_by_text(tile_path, text=text)
+                    elif mode == "point":
+                        mask = self.sam_service.predict_by_points(tile_path, local_points, local_labels)
+                    elif mode == "box":
+                        if len(local_boxes) == 1:
+                            mask = self.sam_service.predict_by_box(tile_path, local_boxes[0])
+                        else:
+                            mask = self.sam_service.predict_by_boxes(tile_path, local_boxes)
+                    else:
+                        from geoai_sam import SAMWrapper
+                        if auto_sam is None:
+                            if self.progress_callback:
+                                self.progress_callback(
+                                    index - 1,
+                                    total,
+                                    "正在加载 SAM 自动分割模型（首次加载可能需要数分钟）",
+                                )
+                            auto_sam = SAMWrapper(
+                                model_type=self.model_type,
+                                sam_version=self.sam_version,
+                                automatic=True,
+                            )
+                        auto_sam.set_image(tile_path)
+                        mask = auto_sam.generate_masks_auto(min_mask_region_area=self.min_area)
+
+                    gdf = self._vectorize_tile(mask, tile_path, tile_id, mode)
+                    if gdf is not None:
+                        gdfs.append(gdf)
+                    processed_tiles += 1
+                except ValueError as exc:
+                    print(f"[FullImageProcessor] 瓦片无结果 {tile_id}: {exc}")
+                    skipped_tiles += 1
+                except Exception:
+                    raise
+                finally:
+                    if self.progress_callback:
+                        self.progress_callback(index, total, f"完成瓦片 {index}/{total}")
+
+        if self.progress_callback:
+            self.progress_callback(total, total, "正在合并并保存矢量结果")
+        result = self._save_outputs(gdfs, output_dir, self.output_format)
+        result.update({
+            "mode": mode,
+            "tile_size": self.tile_size,
+            "overlap": self.overlap,
+            "processed_tiles": processed_tiles,
+            "skipped_tiles": skipped_tiles,
+            "total_tiles": processed_tiles + skipped_tiles,
+        })
+        return result

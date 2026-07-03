@@ -123,6 +123,90 @@ python config.py
 
 ## 快速开始
 
+### Web 平台启动
+
+推荐直接使用一键启动脚本：
+
+```bash
+python start_web.py
+```
+
+当前 Web 开发端口：
+
+| 服务 | 地址 |
+|------|------|
+| 前端页面 | `http://127.0.0.1:5173` |
+| 后端 API | `http://127.0.0.1:8011/docs` |
+
+如果不使用 `python start_web.py`，可以分别启动后端和前端。
+
+#### 1. 单独启动后端
+
+在项目根目录打开一个终端：
+
+```powershell
+conda activate geoai
+cd F:\study\demo-for-blog\GIS\geoai\sam
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8011 --reload
+```
+
+也可以进入 `backend/` 目录启动：
+
+```powershell
+conda activate geoai
+cd F:\study\demo-for-blog\GIS\geoai\sam\backend
+python -m uvicorn main:app --host 127.0.0.1 --port 8011 --reload
+```
+
+启动成功后访问：
+
+```text
+http://127.0.0.1:8011/docs
+```
+
+#### 2. 单独启动前端
+
+另开一个终端：
+
+```powershell
+cd F:\study\demo-for-blog\GIS\geoai\sam\frontend
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+首次启动前如果还没有安装前端依赖，先执行：
+
+```powershell
+npm install
+```
+
+前端启动后访问：
+
+```text
+http://127.0.0.1:5173
+```
+
+前端接口代理配置在 `frontend/vite.config.js` 中，当前 `/api` 和 `/tiles` 都代理到：
+
+```text
+http://127.0.0.1:8011
+```
+
+如果修改后端端口，需要同步修改 `frontend/vite.config.js`，否则页面会请求不到后端。
+
+#### 3. 检查模型是否加载到项目目录
+
+项目会把 PyTorch、HuggingFace、Transformers、CLIP 等缓存统一重定向到本项目 `models/` 目录。启动后可以访问：
+
+```text
+http://127.0.0.1:8011/api/config
+```
+
+确认返回的 `model_dir` 和 `model_cache` 都位于：
+
+```text
+F:\study\demo-for-blog\GIS\geoai\sam\models
+```
+
 ### 最短可运行示例
 
 ```bash
@@ -290,6 +374,8 @@ python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}, GPU: {torch.
 | `CUDA out of memory` | 换用 `vit_l` 或 `vit_b`，或设 `DEVICE=cpu` |
 | 模型下载慢/失败 | 手动下载 `.pth` 放入 `models/`，设 `SAM_CHECKPOINT_PATH` |
 | 模型下载到了 .cache | 项目已自动重定向，如仍有问题运行 `python config.py` 检查环境变量 |
+| 页面能打开但不处理 | 先访问 `http://127.0.0.1:5173/api/config`；若 404 或连接失败，说明前端不是当前项目的 Vite 服务，关闭占用 5173 的 node 后在 `frontend/` 目录重新运行 `npm run dev` |
+| 整图处理进度停在 0% | 文本/自动模式首次加载模型可能较慢，页面会显示“正在加载文本标注模型”或“正在加载 SAM 自动分割模型”；等瓦片开始处理后会显示瓦片数 |
 | `rasterio` 安装失败 | `conda install -c conda-forge rasterio` |
 | GroundingDINO 不可用 | 文本模式回退到 LangSAM；或 `pip install groundingdino-py` |
 

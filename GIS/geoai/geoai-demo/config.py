@@ -1,23 +1,31 @@
 """GeoAI Demo - 全局配置"""
+import os as _os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent
+REPO_ROOT = PROJECT_ROOT.parent
+SHARED_MODELS_DIR = Path(_os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 SAMPLES_DIR = DATA_DIR / "samples"
 LABEL_DIR = DATA_DIR / "labels"
-MODELS_DIR = DATA_DIR / "models"
+MODELS_DIR = SHARED_MODELS_DIR / "geoai-demo" / "trained"
 OUTPUT_DIR = DATA_DIR / "output"
 
 for d in [RAW_DIR, SAMPLES_DIR, LABEL_DIR, MODELS_DIR, OUTPUT_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
-# ── 预训练模型缓存目录（避免下载到 C 盘） ──
-PRETRAINED_DIR = DATA_DIR / "pretrained"
+# ── 预训练模型缓存目录（工作区根 models/，供多个子项目共享） ──
+PRETRAINED_DIR = SHARED_MODELS_DIR
 PRETRAINED_DIR.mkdir(parents=True, exist_ok=True)
 
-import os as _os
 _os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
+_os.environ["HF_HOME"] = str(PRETRAINED_DIR / "huggingface")
+_os.environ["HF_HUB_CACHE"] = str(PRETRAINED_DIR / "huggingface" / "hub")
+_os.environ["HUGGINGFACE_HUB_CACHE"] = str(PRETRAINED_DIR / "huggingface" / "hub")
+_os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # 类别定义
 CLASS_NAMES = ["background", "building", "road", "water", "vegetation", "barren"]

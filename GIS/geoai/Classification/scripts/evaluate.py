@@ -5,7 +5,7 @@ GeoAI 图像分类 — 评估脚本
     conda activate geoai
     python scripts/evaluate.py --checkpoint checkpoints/best_model.pth
 """
-import argparse, sys, json
+import argparse, os, sys, json
 from pathlib import Path
 
 import torch
@@ -19,12 +19,16 @@ import matplotlib.ticker as mticker
 from tqdm import tqdm
 
 ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 sys.path.insert(0, str(ROOT / "scripts"))
 from dataset import build_dataloaders, CLASS_NAMES
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--checkpoint", default=str(ROOT/"checkpoints"/"best_model.pth"))
+    p.add_argument("--checkpoint", default=str(SHARED_MODELS_DIR / "Classification" / "checkpoints" / "best_model.pth"))
     p.add_argument("--data_root",  default=str(ROOT/"data"/"processed"/"EuroSAT"))
     p.add_argument("--batch_size", type=int, default=64)
     p.add_argument("--num_workers",type=int, default=4)

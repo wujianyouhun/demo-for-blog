@@ -9,10 +9,15 @@ SAM 遥感标注 Web 服务 — FastAPI 入口
     uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 """
 
+import asyncio
 import os
 import sys
+import time
 import uuid
+import threading
 import traceback
+import zipfile
+from collections import deque
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
 
@@ -27,8 +32,12 @@ _project_root = str(Path(__file__).resolve().parent.parent)
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
-from services import ImageService, SAMService
-from config import DEFAULT_IMAGE, SAM_MODEL_TYPE, SAM_VERSION
+try:
+    from .services import FullImageProcessor, ImageService, SAMService
+except ImportError:
+    from services import FullImageProcessor, ImageService, SAMService
+
+from config import DATA_DIR, DEFAULT_IMAGE, MODEL_DIR, SAM_MODEL_TYPE, SAM_VERSION, list_tif_images
 
 # ── FastAPI 应用 ────────────────────────────────────────────
 app = FastAPI(
@@ -54,6 +63,38 @@ app.include_router(cog_tiler.router, prefix="/tiles/cog", tags=["TiTiler 瓦片"
 
 # ── 会话存储 ────────────────────────────────────────────────
 _sessions: Dict[str, Dict[str, Any]] = {}
+_tasks: Dict[str, Dict[str, Any]] = {}
+_runtime_logs = deque(maxlen=300)
+
+
+def _append_log(message: str, level: str = "info", session_id: Optional[str] = None):
+    entry = {
+        "time": time.strftime("%H:%M:%S"),
+        "level": level,
+        "message": message,
+        "session_id": session_id,
+    }
+    _runtime_logs.append(entry)
+    print(f"[{entry['time']}] [{level.upper()}] {message}", flush=True)
+
+
+def _set_operation(
+    session: Dict[str, Any],
+    status: str,
+    message: str,
+    progress: float = 0.0,
+    name: str = "idle",
+    error: Optional[str] = None,
+):
+    session["operation"] = {
+        "name": name,
+        "status": status,
+        "progress": max(0.0, min(float(progress), 1.0)),
+        "message": message,
+        "error": error,
+        "updated_at": time.time(),
+    }
+    _append_log(message, "error" if status == "failed" else "info", session.get("id"))
 
 
 def _get_session(session_id: Optional[str]) -> Dict[str, Any]:
@@ -66,6 +107,14 @@ def _get_session(session_id: Optional[str]) -> Dict[str, Any]:
             "last_mask": None,
             "processed_mask": None,
             "image_path": None,
+            "operation": {
+                "name": "idle",
+                "status": "idle",
+                "progress": 0.0,
+                "message": "空闲",
+                "error": None,
+                "updated_at": time.time(),
+            },
         }
         return _sessions[sid]
     return _sessions[session_id]
@@ -130,6 +179,8 @@ class BoxPredictRequest(BaseModel):
 class TextPredictRequest(BaseModel):
     session_id: str
     text: str
+    lon: Optional[float] = None
+    lat: Optional[float] = None
     box_threshold: float = 0.25
     text_threshold: float = 0.25
 
@@ -147,6 +198,20 @@ class ExportRequest(BaseModel):
     session_id: str
     min_area: int = 50
     output_format: str = "geojson"
+
+
+class FullProcessRequest(BaseModel):
+    session_id: str
+    mode: str = "text"                 # text / point / box / auto
+    text: Optional[str] = None
+    points: Optional[List[List[float]]] = None
+    labels: Optional[List[int]] = None
+    boxes: Optional[List[List[float]]] = None
+    tile_size: int = 2048
+    overlap: int = 256
+    min_area: int = 50
+    output_format: str = "gpkg"
+    postprocess: bool = True
 
 
 # ================================================================
@@ -171,6 +236,13 @@ async def load_image(req: LoadImageRequest):
         )
         session["last_mask"] = None
         session["processed_mask"] = None
+        _set_operation(
+            session,
+            status="completed",
+            message=f"影像加载完成: {os.path.basename(req.image_path)}",
+            progress=1.0,
+            name="load_image",
+        )
 
         import urllib.parse
         abs_path = os.path.abspath(req.image_path)
@@ -373,21 +445,69 @@ async def predict_text(req: TextPredictRequest):
     image_path = session["image_path"]
 
     try:
-        masks = sam_svc.predict_by_text(
+        _set_operation(
+            session,
+            status="running",
+            message=f"文本标注已收到: {req.text}",
+            progress=0.05,
+            name="predict_text",
+        )
+        _set_operation(
+            session,
+            status="running",
+            message="正在加载/调用文本标注模型（首次可能需要数分钟）",
+            progress=0.2,
+            name="predict_text",
+        )
+        img_svc = _get_image_svc(session)
+        point = None
+        if req.lon is not None and req.lat is not None:
+            point = list(_geo_to_pixel_or_error(img_svc, req.lon, req.lat))
+            _set_operation(
+                session,
+                status="running",
+                message=f"已定位点击窗口，像素坐标: {int(point[0])}, {int(point[1])}",
+                progress=0.25,
+                name="predict_text",
+            )
+        masks = await asyncio.to_thread(
+            sam_svc.predict_by_text,
             image_path=image_path,
             text=req.text,
             box_threshold=req.box_threshold,
             text_threshold=req.text_threshold,
+            point=point,
+        )
+        _set_operation(
+            session,
+            status="running",
+            message="文本标注推理完成，正在生成前端 Mask 叠加层",
+            progress=0.85,
+            name="predict_text",
         )
         session["last_mask"] = masks
         session["processed_mask"] = None
-
-        img_svc = _get_image_svc(session)
+        session["crop_offset"] = sam_svc._crop_offset
         info = img_svc.get_info()
-        png_bytes = _downsample_mask_png(masks, info["height"], info["width"])
+        png_bytes = _downsample_mask_png(masks, info["height"], info["width"], sam_svc._crop_offset)
+        _set_operation(
+            session,
+            status="completed",
+            message="文本标注完成",
+            progress=1.0,
+            name="predict_text",
+        )
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
         traceback.print_exc()
+        _set_operation(
+            session,
+            status="failed",
+            message=f"文本标注失败: {e}",
+            progress=1.0,
+            name="predict_text",
+            error=str(e),
+        )
         _raise_predict_error("文本标注分割", e)
 
 
@@ -479,8 +599,197 @@ async def download_export(session_id: str = Query(...)):
 
 
 # ================================================================
+#  整图瓦片化处理
+# ================================================================
+
+def _boxes_geo_to_pixel(img_svc: ImageService, boxes: Optional[List[List[float]]]) -> Optional[List[List[float]]]:
+    if not boxes:
+        return None
+
+    pixel_boxes = []
+    for box in boxes:
+        if len(box) != 4:
+            raise ValueError("每个框需要 4 个坐标值: [lon1, lat1, lon2, lat2]")
+        col1, row1 = _geo_to_pixel_or_error(img_svc, box[0], box[1])
+        col2, row2 = _geo_to_pixel_or_error(img_svc, box[2], box[3])
+        pixel_boxes.append([
+            min(col1, col2),
+            min(row1, row2),
+            max(col1, col2),
+            max(row1, row2),
+        ])
+    return pixel_boxes
+
+
+def _points_geo_to_pixel(img_svc: ImageService, points: Optional[List[List[float]]]) -> Optional[List[List[float]]]:
+    if not points:
+        return None
+    pixel_points = []
+    for pt in points:
+        if len(pt) != 2:
+            raise ValueError("每个点需要 2 个坐标值: [lon, lat]")
+        col, row = _geo_to_pixel_or_error(img_svc, pt[0], pt[1])
+        pixel_points.append([col, row])
+    return pixel_points
+
+
+def _zip_shapefile(shp_path: str) -> str:
+    base = os.path.splitext(shp_path)[0]
+    zip_path = base + ".zip"
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for ext in [".shp", ".shx", ".dbf", ".prj", ".cpg"]:
+            part = base + ext
+            if os.path.isfile(part):
+                zf.write(part, arcname=os.path.basename(part))
+    return zip_path
+
+
+@app.post("/api/process/full")
+async def start_full_process(req: FullProcessRequest):
+    """启动整幅影像瓦片化处理任务。"""
+    session = _sessions.get(req.session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="会话不存在")
+
+    img_svc = _get_image_svc(session)
+    image_path = session.get("image_path")
+    if not image_path or not os.path.isfile(image_path):
+        raise HTTPException(status_code=400, detail="当前会话没有可处理的影像")
+
+    mode = req.mode.lower()
+    if mode not in ("text", "point", "box", "auto"):
+        raise HTTPException(status_code=400, detail="mode 仅支持 text / point / box / auto")
+    if mode == "point" and (not req.points or not req.labels or len(req.points) != len(req.labels)):
+        raise HTTPException(status_code=400, detail="点整图处理需要 points，且 points 数量必须等于 labels 数量")
+    if mode == "box" and not req.boxes:
+        raise HTTPException(status_code=400, detail="框整图处理需要 boxes")
+    if mode == "text" and not (req.text or "").strip():
+        raise HTTPException(status_code=400, detail="文本整图处理需要 text")
+
+    task_id = str(uuid.uuid4())
+    _tasks[task_id] = {
+        "id": task_id,
+        "status": "queued",
+        "progress": 0.0,
+        "done_tiles": 0,
+        "total_tiles": 0,
+        "message": "任务已创建",
+        "result": None,
+        "error": None,
+        "started_at": time.time(),
+        "updated_at": time.time(),
+    }
+
+    def update_progress(done: int, total: int, message: str):
+        task = _tasks[task_id]
+        task["done_tiles"] = done
+        task["total_tiles"] = total
+        task["progress"] = float(done / total) if total else 0.0
+        task["message"] = message
+        task["updated_at"] = time.time()
+
+    def worker():
+        try:
+            _tasks[task_id].update({
+                "status": "running",
+                "message": "正在准备整图任务",
+                "updated_at": time.time(),
+            })
+            update_progress(0, 0, "正在转换标注坐标")
+            points_px = _points_geo_to_pixel(img_svc, req.points)
+            boxes_px = _boxes_geo_to_pixel(img_svc, req.boxes)
+
+            update_progress(0, 0, "正在创建瓦片处理器")
+            output_dir = os.path.join(_project_root, "output", "full_image", task_id)
+            current_sam = session.get("sam_service")
+            processor = FullImageProcessor(
+                model_type=getattr(current_sam, "model_type", SAM_MODEL_TYPE),
+                sam_version=getattr(current_sam, "sam_version", SAM_VERSION),
+                tile_size=req.tile_size,
+                overlap=req.overlap,
+                min_area=req.min_area,
+                output_format=req.output_format,
+                postprocess=req.postprocess,
+                progress_callback=update_progress,
+            )
+            result = processor.process(
+                image_path=image_path,
+                mode=mode,
+                output_dir=output_dir,
+                text=req.text,
+                points=points_px,
+                labels=req.labels,
+                boxes=boxes_px,
+            )
+            _tasks[task_id].update({
+                "status": "completed",
+                "progress": 1.0,
+                "message": "整图处理完成",
+                "result": result,
+                "updated_at": time.time(),
+            })
+        except Exception as exc:
+            traceback.print_exc()
+            _tasks[task_id].update({
+                "status": "failed",
+                "message": "整图处理失败",
+                "error": str(exc),
+                "updated_at": time.time(),
+            })
+
+    thread = threading.Thread(target=worker, daemon=True)
+    thread.start()
+
+    return {"task_id": task_id, "status": _tasks[task_id]["status"]}
+
+
+@app.get("/api/process/status")
+async def get_full_process_status(task_id: str = Query(...)):
+    task = _tasks.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    return task
+
+
+@app.get("/api/process/download")
+async def download_full_process_result(task_id: str = Query(...)):
+    task = _tasks.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    if task.get("status") != "completed" or not task.get("result"):
+        raise HTTPException(status_code=400, detail="任务尚未完成")
+
+    fpath = task["result"].get("file")
+    if not fpath or not os.path.isfile(fpath):
+        raise HTTPException(status_code=404, detail="结果文件不存在")
+
+    if fpath.lower().endswith(".shp"):
+        fpath = _zip_shapefile(fpath)
+    return FileResponse(fpath, filename=os.path.basename(fpath))
+
+
+# ================================================================
 #  会话管理
 # ================================================================
+
+@app.get("/api/logs")
+async def get_runtime_logs(limit: int = Query(80, ge=1, le=300)):
+    return {"logs": list(_runtime_logs)[-limit:]}
+
+
+@app.get("/api/session/progress")
+async def session_progress(session_id: str = Query(...)):
+    session = _sessions.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    return session.get("operation") or {
+        "name": "idle",
+        "status": "idle",
+        "progress": 0.0,
+        "message": "空闲",
+        "error": None,
+        "updated_at": time.time(),
+    }
 
 @app.get("/api/session/status")
 async def session_status(session_id: str = Query(...)):
@@ -510,6 +819,19 @@ async def clear_session(session_id: str = Query(...)):
 async def get_config():
     return {
         "default_image": DEFAULT_IMAGE,
+        "data_dir": str(DATA_DIR),
+        "available_images": list_tif_images(),
+        "model_dir": str(MODEL_DIR),
+        "model_cache": {
+            "TORCH_HOME": os.environ.get("TORCH_HOME"),
+            "HF_HOME": os.environ.get("HF_HOME"),
+            "HF_HUB_CACHE": os.environ.get("HF_HUB_CACHE"),
+            "HUGGINGFACE_HUB_CACHE": os.environ.get("HUGGINGFACE_HUB_CACHE"),
+            "TRANSFORMERS_CACHE": os.environ.get("TRANSFORMERS_CACHE"),
+            "SENTENCE_TRANSFORMERS_HOME": os.environ.get("SENTENCE_TRANSFORMERS_HOME"),
+            "CLIP_CACHE": os.environ.get("CLIP_CACHE"),
+            "SAMGEO_CACHE": os.environ.get("SAMGEO_CACHE"),
+        },
         "default_model_type": SAM_MODEL_TYPE,
         "default_sam_version": SAM_VERSION,
     }

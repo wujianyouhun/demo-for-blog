@@ -6,16 +6,24 @@ from pathlib import Path
 
 # ── 项目路径 ──
 PROJECT_ROOT = Path(__file__).parent
+REPO_ROOT = PROJECT_ROOT.parent
+SHARED_MODELS_DIR = Path(os.getenv("GEOAI_MODELS_DIR", str(REPO_ROOT / "models"))).expanduser()
+if not SHARED_MODELS_DIR.is_absolute():
+    SHARED_MODELS_DIR = (REPO_ROOT / SHARED_MODELS_DIR).resolve()
 DATA_DIR = PROJECT_ROOT / "data"
 INPUT_DIR = DATA_DIR / "input"
-MODELS_DIR = DATA_DIR / "models"
+MODELS_DIR = SHARED_MODELS_DIR / "building2shp" / "trained"
 OUTPUT_DIR = DATA_DIR / "output"
 
-# 预训练模型缓存到项目目录（不存 C 盘）
-PRETRAINED_DIR = DATA_DIR / "pretrained"
+# 预训练模型缓存到工作区根 models/，供多个子项目共享。
+PRETRAINED_DIR = SHARED_MODELS_DIR
 for d in [INPUT_DIR, MODELS_DIR, OUTPUT_DIR, PRETRAINED_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
+os.environ["HF_HOME"] = str(PRETRAINED_DIR / "huggingface")
+os.environ["HF_HUB_CACHE"] = str(PRETRAINED_DIR / "huggingface" / "hub")
+os.environ["HUGGINGFACE_HUB_CACHE"] = str(PRETRAINED_DIR / "huggingface" / "hub")
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # ── 类别定义 ──
 CLASS_NAMES = ["background", "building", "road", "water", "vegetation", "barren"]
