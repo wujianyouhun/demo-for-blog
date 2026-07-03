@@ -5,19 +5,22 @@ import os
 from pathlib import Path
 
 # ── 项目路径 ──
+# 备用 DeepLabV3+ 流程使用的目录配置。主流程 extract_buildings.py 使用 models/
+# 和 outputs/；这里保留 data/models 与 data/output，是为了兼容原始语义分割脚本。
 PROJECT_ROOT = Path(__file__).parent
 DATA_DIR = PROJECT_ROOT / "data"
-INPUT_DIR = DATA_DIR / "input"
+INPUT_DIR = DATA_DIR
 MODELS_DIR = DATA_DIR / "models"
 OUTPUT_DIR = DATA_DIR / "output"
 
-# 预训练模型缓存到项目目录（不存 C 盘）
+# 预训练模型缓存到项目目录，避免 PyTorch 默认把权重写到用户目录或 C 盘。
 PRETRAINED_DIR = DATA_DIR / "pretrained"
 for d in [INPUT_DIR, MODELS_DIR, OUTPUT_DIR, PRETRAINED_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 os.environ["TORCH_HOME"] = str(PRETRAINED_DIR)
 
 # ── 类别定义 ──
+# DeepLabV3+ 输出的是多类别语义分割图，后续只提取 BUILDING_CLASS_ID 对应类别。
 CLASS_NAMES = ["background", "building", "road", "water", "vegetation", "barren"]
 CLASS_COLORS = {
     0: [0, 0, 0],
@@ -31,6 +34,8 @@ NUM_CLASSES = len(CLASS_NAMES)
 BUILDING_CLASS_ID = 1
 
 # ── 模型配置 ──
+# 这里的模型需要与训练权重匹配；如果没有训练权重，只使用 ImageNet 预训练编码器，
+# 建筑物分割效果会比较有限。
 MODEL_CONFIG = {
     "deeplabv3p_resnet50":  {"backbone": "resnet50",  "in_channels": 3},
     "deeplabv3p_resnet101": {"backbone": "resnet101", "in_channels": 3},
@@ -39,6 +44,7 @@ MODEL_CONFIG = {
 DEFAULT_MODEL = "deeplabv3p_resnet50"
 
 # ── 推理参数 ──
+# tile_size/overlap 控制滑动窗口推理；重叠区域会做概率平均，减轻窗口边界伪影。
 INFERENCE_CONFIG = {
     "tile_size": 256,
     "overlap": 32,
@@ -49,6 +55,7 @@ INFERENCE_CONFIG = {
 }
 
 # ── 正则化参数 ──
+# 正则化用于让建筑物边界更规整，适合输出给 GIS 软件继续制图或分析。
 REGULARIZE_CONFIG = {
     "simplify_tolerance": 2.0,
     "smooth_iterations": 3,

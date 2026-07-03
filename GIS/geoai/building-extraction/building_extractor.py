@@ -4,6 +4,11 @@
 ===========================
 从高分辨率遥感 TIF 影像中提取建筑物，执行正则化后输出 SHP 文件。
 
+说明:
+  这是备用的语义分割流程，依赖 segmentation_models_pytorch 构建 DeepLabV3+
+  模型。推荐的公众号演示主流程是 extract_buildings.py；本脚本适合已有本地
+  训练权重 (.pth) 时使用。
+
 流程:
   1. 加载 DeepLabV3+ 语义分割模型
   2. 滑动窗口推理 → 分类栅格图
@@ -12,8 +17,8 @@
   5. 导出 SHP 文件
 
 用法:
-  python building_extractor.py                           # 自动扫描 data/input/ 下所有 tif
-  python building_extractor.py --image data/input/xx.tif # 指定影像
+  python building_extractor.py                           # 自动扫描 data/ 下所有 tif
+  python building_extractor.py --image data/xx.tif       # 指定影像
   python building_extractor.py --model data/models/best.pth --model-name deeplabv3p_resnet50
   python building_extractor.py --device cuda             # 使用 GPU
 """
@@ -299,7 +304,7 @@ def mask_to_buildings(
 # ════════════════════════════════════════════════════════════
 
 def _chaikin_smooth(coords, iterations=1):
-    """Chaikin 曲线平滑。"""
+    """使用 Chaikin 算法平滑边界点，让建筑物边缘减少锯齿。"""
     for _ in range(iterations):
         new_coords = [coords[0]]
         for i in range(len(coords) - 1):
@@ -314,6 +319,7 @@ def _chaikin_smooth(coords, iterations=1):
 
 
 def _smooth_polygon(geom, iters):
+    """对 Polygon 或 MultiPolygon 执行边界平滑，失败时保持原几何。"""
     if isinstance(geom, Polygon):
         ext = _chaikin_smooth(list(geom.exterior.coords), iters)
         holes = [_chaikin_smooth(list(h.coords), iters) for h in geom.interiors]
@@ -327,7 +333,7 @@ def _smooth_polygon(geom, iters):
 
 
 def _orthogonalize_polygon(geom: Polygon) -> Polygon:
-    """正交化：使建筑物角点更接近直角。"""
+    """正交化建筑物边界，使接近直角的角点更规整。"""
     if not isinstance(geom, Polygon) or not geom.is_valid:
         return geom
 
@@ -475,7 +481,7 @@ def export_shp(gdf: gpd.GeoDataFrame, output_path: Path) -> Path:
 # ════════════════════════════════════════════════════════════
 
 def find_model_file(models_dir: Path) -> Optional[Path]:
-    """自动在 data/models/ 下查找最新的 .pth 模型文件。"""
+    """自动在 data/models/ 下查找最新的 .pth 训练权重。"""
     pth_files = sorted(models_dir.glob("*.pth"), key=lambda p: p.stat().st_mtime, reverse=True)
     if pth_files:
         return pth_files[0]
@@ -483,7 +489,7 @@ def find_model_file(models_dir: Path) -> Optional[Path]:
 
 
 def find_input_images(input_dir: Path) -> list[Path]:
-    """扫描 data/input/ 下所有 TIF 影像。"""
+    """扫描 data/ 下所有 TIF/TIFF 影像，去重后按文件名排序。"""
     seen = set()
     tifs = []
     for ext in ("*.tif", "*.tiff", "*.TIF", "*.TIFF"):
@@ -596,12 +602,13 @@ def run_pipeline(
 # ════════════════════════════════════════════════════════════
 
 def main():
+    """命令行入口：解析参数、准备模型、扫描影像并逐张执行提取。"""
     parser = argparse.ArgumentParser(
         description="从遥感 TIF 影像中提取建筑物并输出 SHP",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--image", type=str, default=None,
-                        help="输入 TIF 影像路径 (默认扫描 data/input/ 下所有 tif)")
+                        help="输入 TIF 影像路径 (默认扫描 data/ 下所有 tif)")
     parser.add_argument("--model", type=str, default=None,
                         help="训练模型 .pth 路径 (默认自动查找 data/models/ 下最新 .pth)")
     parser.add_argument("--model-name", type=str, default=DEFAULT_MODEL,
@@ -680,7 +687,7 @@ def main():
         if not images:
             logger.error(
                 "未在 %s 下找到 TIF 影像。\n"
-                "  请将 .tif 文件放入 data/input/ 目录，或使用 --image 参数指定路径。",
+                "  请将 .tif 文件放入 data/ 目录，或使用 --image 参数指定路径。",
                 INPUT_DIR,
             )
             sys.exit(1)
