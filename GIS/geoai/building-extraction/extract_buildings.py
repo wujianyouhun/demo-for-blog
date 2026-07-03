@@ -25,7 +25,7 @@ REPO_ROOT = PROJECT_DIR.parent
 DATA_DIR = PROJECT_DIR / "data"
 MODEL_DIR = PROJECT_DIR / "models"
 OUTPUT_DIR = PROJECT_DIR / "outputs"
-LOCAL_TIF = DATA_DIR / "I48E006018.tif"
+LOCAL_TIF = DATA_DIR / "西安19级.tif"
 DEFAULT_SOURCE_TIF = LOCAL_TIF
 EXISTING_SAM_MODEL_DIR = REPO_ROOT / "sam" / "models"
 
@@ -202,28 +202,54 @@ def create_synthetic_image(path: Path, size: int = 768) -> Path:
     return path
 
 
+def same_path(left: Path, right: Path) -> bool:
+    try:
+        return left.resolve() == right.resolve()
+    except FileNotFoundError:
+        return left.absolute() == right.absolute()
+
+
 def prepare_data(source_tif: Path, copy_data: bool, create_synthetic_if_missing: bool) -> Path:
     prepare_dirs()
-    if LOCAL_TIF.exists() and not copy_data:
-        return LOCAL_TIF
-
+    source_tif = Path(source_tif)
     if source_tif.exists():
-        if source_tif.resolve() == LOCAL_TIF.resolve():
+        if same_path(source_tif, LOCAL_TIF):
             return LOCAL_TIF
+        if not copy_data:
+            log(f"Using source image directly: {source_tif}")
+            return source_tif
         if LOCAL_TIF.exists() and LOCAL_TIF.stat().st_size == source_tif.stat().st_size:
             log(f"Data already copied: {LOCAL_TIF}")
-        else:
-            log(f"Copying image to project data: {LOCAL_TIF}")
-            shutil.copy2(source_tif, LOCAL_TIF)
-    elif create_synthetic_if_missing:
-        log(f"Source image not found: {source_tif}. Creating a project-local synthetic test image.")
-        create_synthetic_image(LOCAL_TIF)
-    else:
-        raise FileNotFoundError(f"Source image not found: {source_tif}")
+            return LOCAL_TIF
+        log(f"Copying image to project data: {LOCAL_TIF}")
+        shutil.copy2(source_tif, LOCAL_TIF)
+        return LOCAL_TIF
 
-    if not LOCAL_TIF.exists():
-        raise FileNotFoundError(f"Project image not found: {LOCAL_TIF}. Use --copy-data.")
-    return LOCAL_TIF
+    if same_path(source_tif, LOCAL_TIF) and LOCAL_TIF.exists() and not copy_data:
+        return LOCAL_TIF
+
+    if create_synthetic_if_missing:
+        log(f"Source image not found: {source_tif}. Creating a project-local synthetic test image.")
+        return create_synthetic_image(LOCAL_TIF)
+
+    raise FileNotFoundError(f"Source image not found: {source_tif}")
+
+
+def safe_name(value: str) -> str:
+    cleaned = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in value)
+    return cleaned.strip("_") or "image"
+
+
+def tile_cache_dir(image_path: Path, tile_size: int, overlap: int) -> Path:
+    return OUTPUT_DIR / "tiles" / safe_name(f"{image_path.stem}_ts{tile_size}_ov{overlap}")
+
+
+def tile_vector_path(image_path: Path, tile_size: int, overlap: int, tile_index: int) -> Path:
+    return tile_cache_dir(image_path, tile_size, overlap) / "vectors" / f"tile_{tile_index:05d}.gpkg"
+
+
+def tile_empty_marker_path(image_path: Path, tile_size: int, overlap: int, tile_index: int) -> Path:
+    return tile_cache_dir(image_path, tile_size, overlap) / "vectors" / f"tile_{tile_index:05d}.empty.json"
 
 
 def valid_model_file(path: Path, expected_bytes: int = 0) -> bool:
@@ -596,6 +622,7 @@ def run_geoai(image_path: Path, model_path: Path, args: argparse.Namespace) -> R
 
 
 def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace) -> RunResult:
+    import geopandas as gpd
     import rasterio
 
     start = time.time()
@@ -614,8 +641,20 @@ def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace
         log(f"GeoAI tiled extraction: {len(windows)} tiles, tile_size={args.tile_size}, overlap={args.overlap}")
 
         tile_gdfs = []
-        tile_dir = OUTPUT_DIR / "tiles" / "geoai"
+        cache_dir = tile_cache_dir(image_path, args.tile_size, args.overlap)
+        tile_dir = cache_dir / "rasters"
         for idx, window in windows:
+            vector_path = tile_vector_path(image_path, args.tile_size, args.overlap, idx)
+            empty_marker = tile_empty_marker_path(image_path, args.tile_size, args.overlap, idx)
+            if vector_path.exists():
+                log(f"GeoAI tile {idx + 1}/{len(windows)} already extracted: {vector_path.name}")
+                tile_gdfs.append(gpd.read_file(vector_path))
+                continue
+            if empty_marker.exists():
+                log(f"GeoAI tile {idx + 1}/{len(windows)} already extracted: empty")
+                tile_gdfs.append(empty_gdf_like(crs))
+                continue
+
             tile_path = tile_dir / f"tile_{idx:05d}.tif"
             write_tile(image_path, window, tile_path)
             log(f"GeoAI tile {idx + 1}/{len(windows)}: {tile_path.name}")
@@ -624,6 +663,12 @@ def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace
                 tile_gdf = extract_geoai_gdf(tile_path, model_path, args, tile_params)
                 if len(tile_gdf) > 0:
                     tile_gdf["tile_id"] = idx
+                    vector_path.parent.mkdir(parents=True, exist_ok=True)
+                    tile_gdf.to_file(vector_path, driver="GPKG")
+                    log(f"GeoAI tile {idx + 1}/{len(windows)} saved: {vector_path}")
+                else:
+                    empty_marker.parent.mkdir(parents=True, exist_ok=True)
+                    empty_marker.write_text(json.dumps({"tile_index": idx, "empty": True}), encoding="utf-8")
                 tile_gdfs.append(tile_gdf)
             except Exception as exc:
                 log(f"GeoAI tile {idx} failed: {exc}")
@@ -864,6 +909,36 @@ def copy_best(best: Optional[RunResult]) -> Optional[Path]:
     return target_base.with_suffix(".shp")
 
 
+def copy_shapefile_to_root(src_shp: Optional[Path], root_stem: str) -> Optional[Path]:
+    if src_shp is None or not src_shp.exists():
+        return None
+    target_base = OUTPUT_DIR / root_stem
+    for src in src_shp.parent.glob(src_shp.stem + ".*"):
+        if src.suffix.lower() == ".gpkg":
+            continue
+        shutil.copy2(src, target_base.with_suffix(src.suffix))
+    return target_base.with_suffix(".shp")
+
+
+def export_root_shapefiles(results: Sequence[RunResult], best: Optional[RunResult]) -> List[Path]:
+    exported: List[Path] = []
+    for item in results:
+        safe_model = safe_name(item.model)
+        safe_method = safe_name(item.method)
+        raw = copy_shapefile_to_root(item.raw_path, f"{safe_model}_{safe_method}_raw")
+        if raw:
+            exported.append(raw)
+        regularized = copy_shapefile_to_root(item.regularized_path, f"{safe_model}_{safe_method}_regularized")
+        if regularized:
+            exported.append(regularized)
+    best_path = copy_shapefile_to_root(best.regularized_path if best else None, "best_regularized")
+    if best_path:
+        exported.append(best_path)
+    if exported:
+        log("Root Shapefile exports: " + ", ".join(str(path) for path in exported))
+    return exported
+
+
 def make_preview(image_path: Path, result: RunResult) -> Optional[Path]:
     if result.regularized_path is None or not result.regularized_path.exists():
         return None
@@ -925,6 +1000,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--check-env", action="store_true", help="Only check Python dependencies.")
     add_bool_flag(parser, "validate", True, "Validate generated vector files.")
+    add_bool_flag(parser, "preview", True, "Create PNG preview images.")
     return parser
 
 
@@ -978,8 +1054,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     write_summary(results)
     best = choose_best(results)
     copy_best(best)
-    for item in results:
-        make_preview(run_image, item)
+    export_root_shapefiles(results, best)
+    if args.preview:
+        for item in results:
+            make_preview(run_image, item)
     if args.validate:
         validate_outputs(results)
 
