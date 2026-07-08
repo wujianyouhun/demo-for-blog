@@ -50,6 +50,12 @@ class SAMWrapper:
         "vit_h": {"vram": "8GB+", "params": "636M", "description": "大型模型"},
     }
 
+    _SAM1_FILENAMES = {
+        "vit_h": "sam_vit_h_4b8939.pth",
+        "vit_l": "sam_vit_l_0b3195.pth",
+        "vit_b": "sam_vit_b_01ec64.pth",
+    }
+
     def __init__(
         self,
         model_type: str = "vit_l",
@@ -336,11 +342,12 @@ class SAMWrapper:
             except ImportError:
                 print("[SAMWrapper] SamGeo2 不可用，回退到 SamGeo")
                 from samgeo import SamGeo
+                sam1_kwargs = self._sam1_fallback_kwargs(sam_kwargs)
                 self._sam = SamGeo(
                     model_type=self.model_type,
                     device=self.device,
                     automatic=self.automatic,
-                    **sam_kwargs,
+                    **sam1_kwargs,
                 )
         elif self.sam_version == "sam3":
             try:
@@ -365,6 +372,26 @@ class SAMWrapper:
             raise ValueError(f"不支持的 SAM 版本: {self.sam_version}")
 
         print(f"[SAMWrapper] 模型加载完成")
+
+    def _sam1_fallback_kwargs(self, sam_kwargs: dict) -> dict:
+        """Return kwargs that match SamGeo/SAM1 when SAM2 is unavailable."""
+        fallback_kwargs = dict(sam_kwargs)
+        filename = self._SAM1_FILENAMES.get(self.model_type)
+        if not filename:
+            fallback_kwargs.pop("checkpoint", None)
+            fallback_kwargs["checkpoint_dir"] = self.model_dir
+            return fallback_kwargs
+
+        sam1_checkpoint = os.path.join(self.model_dir, filename)
+        if os.path.isfile(sam1_checkpoint):
+            fallback_kwargs["checkpoint"] = sam1_checkpoint
+            fallback_kwargs.pop("checkpoint_dir", None)
+            print(f"[SAMWrapper] 使用 SAM1 回退权重: {sam1_checkpoint}")
+        else:
+            fallback_kwargs.pop("checkpoint", None)
+            fallback_kwargs["checkpoint_dir"] = self.model_dir
+            print(f"[SAMWrapper] 未找到 SAM1 回退权重，交给 SamGeo 从 {self.model_dir} 解析")
+        return fallback_kwargs
 
     def set_image(self, image_path: str) -> None:
         """

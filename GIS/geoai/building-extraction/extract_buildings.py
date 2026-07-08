@@ -4,6 +4,12 @@
 1. 公众号/教学演示：把原始 GeoTIFF 放到项目 `data/` 目录，直接运行命令生成成果；
 2. 大幅遥感影像处理：自动切片推理、合并瓦片结果、去除重叠重复建筑物。
 
+默认输入策略：
+- 不传 `--source-tif` 时自动扫描 `data/` 根目录下的所有 .tif/.tiff；
+- 找到一张就处理一张，找到多张就按文件名顺序串行处理；
+- 一张都找不到且启用 `--test-crop` 时生成一张合成测试图代替。
+- 一次运行处理多张图时，每张图各自得到 `outputs/<image_stem>/` 子目录，互不覆盖。
+
 为了让 `--check-env` 能在依赖不完整的环境里也正常执行，GIS 和深度学习相关
 依赖尽量放在函数内部延迟导入。这样用户可以先检查环境，再进入真正的模型推理。
 """
@@ -26,6 +32,7 @@ from urllib.request import Request, urlopen
 
 # ── 项目目录约定 ──────────────────────────────────────────────
 # 原始影像直接放在 data/ 根目录；模型与输出统一放在项目内，方便打包和复现。
+# 一次运行处理多张图时，每张图各自得到 outputs/<image_stem>/ 子目录，互不覆盖。
 PROJECT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = PROJECT_DIR.parent
 DATA_DIR = PROJECT_DIR / "data"
@@ -34,7 +41,8 @@ if not MODEL_DIR.is_absolute():
     MODEL_DIR = (REPO_ROOT / MODEL_DIR).resolve()
 OUTPUT_DIR = PROJECT_DIR / "outputs"
 SYNTHETIC_TIF = DATA_DIR / "synthetic_test.tif"
-DEFAULT_SOURCE_TIF = None
+# `data/` 缺图时优先用作 `--source-tif` 的回退占位，便于 CLI/IDE 提示。
+DEFAULT_SOURCE_TIF: Optional[Path] = None
 EXISTING_SAM_MODEL_DIR = REPO_ROOT / "sam" / "models"
 
 # 将 Hugging Face、PyTorch 等缓存固定到项目 models/ 下，避免默认写入系统盘。
@@ -93,7 +101,10 @@ OPTIONAL_PACKAGES = ["geoai", "matplotlib", "skimage", "scipy"]
 
 @dataclass
 class RunResult:
-    """单次模型运行的结果摘要，用于写统计表和挑选最佳成果。"""
+    """单次模型运行的结果摘要，用于写统计表和挑选最佳成果。
+
+    `image` 记录本次运行对应的原始影像，多图批处理时方便回溯。
+    """
 
     method: str
     model: str
@@ -107,6 +118,7 @@ class RunResult:
     elapsed_seconds: float
     status: str
     message: str = ""
+    image: Optional[Path] = None
 
 
 def log(message: str) -> None:
@@ -233,7 +245,10 @@ def same_path(left: Path, right: Path) -> bool:
 
 
 def find_data_tifs(data_dir: Path = DATA_DIR) -> List[Path]:
-    """查找直接放在项目 data/ 目录下的 GeoTIFF 影像。"""
+    """扫描 `data/` 根目录下的 GeoTIFF（不递归），返回按文件名排序的列表。
+
+    通过 `set` 去重以兼容大小写同名文件，调用方可以直接把结果作为批处理输入。
+    """
     seen = set()
     tifs: List[Path] = []
     for pattern in ("*.tif", "*.tiff", "*.TIF", "*.TIFF"):
@@ -253,37 +268,63 @@ def format_tif_choices(paths: Sequence[Path]) -> str:
     return "\n".join(f"  - {path}" for path in paths)
 
 
-def prepare_data(source_tif: Optional[Path], copy_data: bool, create_synthetic_if_missing: bool) -> Path:
-    """确定本次要处理的输入影像。
+def image_output_dir(image_path: Path) -> Path:
+    """单张影像的输出根目录：`outputs/<safe(image_stem)>/`。
 
-    默认行为是扫描项目 `data/` 根目录：
-    - 只有一张 tif/tiff 时直接使用；
-    - 多张时要求用户用 `--source-tif` 明确指定；
-    - 没有真实影像且启用 `--test-crop` 时生成合成测试图。
+    多图批处理时，每张图的所有模型成果、瓦片缓存、预览都收在各自子目录下。
+    """
+    return OUTPUT_DIR / safe_name(image_path.stem)
 
-    如果用户传入外部路径，默认直接读取外部影像；加 `--copy-data` 后复制到本项目
-    `data/` 目录，便于后续复现实验。
+
+def prepare_images(
+    source_tif: Optional[Path],
+    copy_data: bool,
+    create_synthetic_if_missing: bool,
+) -> List[Path]:
+    """确定本次要处理的输入影像列表。
+
+    - 用户显式传入 `--source-tif` 时，列表里只包含这一张图；
+    - 否则扫描项目 `data/` 根目录下的 .tif/.tiff：
+      * 找到 ≥1 张就全部加入处理列表（多张时按文件名顺序串行处理）；
+      * 一张都没找到，且启用 `--test-crop` 时生成合成测试图；
+      * 一张都没找到，且没启用 `--test-crop` 时直接报错。
+    加 `--copy-data` 后，外部传入的影像会被复制到本项目 `data/`，便于复现实验。
     """
     prepare_dirs()
-    if source_tif is None:
-        local_tifs = find_data_tifs()
-        if len(local_tifs) == 1:
-            log(f"Using project data image: {local_tifs[0]}")
-            return local_tifs[0]
-        if len(local_tifs) > 1:
-            raise ValueError(
-                "Found multiple GeoTIFF files under data/. Use --source-tif to choose one:\n"
-                f"{format_tif_choices(local_tifs)}"
-            )
-        if create_synthetic_if_missing:
-            log("No GeoTIFF found under data/. Creating a project-local synthetic test image.")
-            return create_synthetic_image(SYNTHETIC_TIF)
-        raise FileNotFoundError(
-            "No .tif/.tiff file found directly under data/. "
-            "Put the source GeoTIFF in data/ or pass --source-tif <path>."
-        )
+    if source_tif is not None:
+        return [resolve_source_image(Path(source_tif), copy_data, create_synthetic_if_missing)]
 
-    source_tif = Path(source_tif)
+    local_tifs = find_data_tifs()
+    if local_tifs:
+        if len(local_tifs) == 1:
+            log(f"Auto-detected 1 project data image: {local_tifs[0]}")
+        else:
+            log(f"Auto-detected {len(local_tifs)} project data images, will process all of them in sequence:")
+            for path in local_tifs:
+                log(f"  - {path}")
+        return list(local_tifs)
+
+    if create_synthetic_if_missing:
+        log("No GeoTIFF found under data/. Creating a project-local synthetic test image.")
+        return [create_synthetic_image(SYNTHETIC_TIF)]
+
+    raise FileNotFoundError(
+        "No .tif/.tiff file found directly under data/. "
+        "Put source GeoTIFFs in data/ or pass --source-tif <path>."
+    )
+
+
+def resolve_source_image(
+    source_tif: Path,
+    copy_data: bool,
+    create_synthetic_if_missing: bool,
+) -> Path:
+    """根据外部传入的 `--source-tif` 解析出实际使用的影像路径。
+
+    - 影像存在且位于 `data/` 根目录：直接使用；
+    - 影像存在但位于其他位置：按 `--copy-data` 决定是否复制到 `data/`；
+    - 影像不存在：按 `create_synthetic_if_missing` 决定是否回退到合成测试图。
+    """
     if source_tif.exists():
         local_tif = DATA_DIR / source_tif.name
         if same_path(source_tif, local_tif):
@@ -312,8 +353,8 @@ def safe_name(value: str) -> str:
 
 
 def tile_cache_dir(image_path: Path, tile_size: int, overlap: int) -> Path:
-    """生成瓦片缓存目录，目录名包含影像名、瓦片大小和重叠宽度。"""
-    return OUTPUT_DIR / "tiles" / safe_name(f"{image_path.stem}_ts{tile_size}_ov{overlap}")
+    """生成瓦片缓存目录，归在该影像专属子目录下。"""
+    return image_output_dir(image_path) / "tiles" / safe_name(f"ts{tile_size}_ov{overlap}")
 
 
 def tile_vector_path(image_path: Path, tile_size: int, overlap: int, tile_index: int) -> Path:
@@ -449,12 +490,17 @@ def ensure_models(models: Sequence[str], allow_download: bool) -> Dict[str, Path
     return paths
 
 
-def make_test_crop(image_path: Path, tile_size: int) -> Path:
-    """从影像中心裁剪一个 tile_size 大小的小图，用于快速验证流程。"""
+def make_test_crop(image_path: Path, tile_size: int, crop_path: Optional[Path] = None) -> Path:
+    """从影像中心裁剪一个 `tile_size` 大小的小图，用于快速验证流程。
+
+    `crop_path` 默认放在该影像专属子目录下，多图批处理时互不覆盖。
+    """
     import rasterio
     from rasterio.windows import Window
 
-    crop_path = OUTPUT_DIR / "test_crop.tif"
+    if crop_path is None:
+        crop_path = image_output_dir(image_path) / "test_crop.tif"
+    crop_path.parent.mkdir(parents=True, exist_ok=True)
     with rasterio.open(image_path) as src:
         width = min(tile_size, src.width)
         height = min(tile_size, src.height)
@@ -698,27 +744,33 @@ def extract_geoai_gdf(image_path: Path, model_path: Path, args: argparse.Namespa
     return normalize_gdf(gdf, "geoai", "geoai_building", params, args.min_area)
 
 
-def run_geoai(image_path: Path, model_path: Path, args: argparse.Namespace) -> RunResult:
-    """直接对整幅影像运行 GeoAI；适合小图或测试裁剪图。"""
+def run_geoai(image_path: Path, model_path: Path, args: argparse.Namespace, image_dir: Path, source_image: Path) -> RunResult:
+    """直接对整幅影像运行 GeoAI；适合小图或测试裁剪图。
+
+    `image_dir` 是该影像的输出子目录；`source_image` 用于在 `RunResult` 中记录原始影像。
+    """
     start = time.time()
-    run_dir = OUTPUT_DIR / "geoai"
+    run_dir = image_dir / "geoai"
     params = {"tile_size": args.tile_size, "overlap": args.overlap, "min_area": args.min_area}
     try:
         gdf = extract_geoai_gdf(image_path, model_path, args, params)
         raw_path, reg_path, gpkg_path, reg = save_outputs(gdf, run_dir, args.regularize, args.min_area, args.simplify)
         stats_gdf = reg if reg_path else gdf
-        return build_result("geoai", "geoai_building", params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok")
+        return build_result("geoai", "geoai_building", params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok", image=source_image)
     except Exception as exc:
-        return build_result("geoai", "geoai_building", params, None, None, None, None, start, "failed", str(exc))
+        return build_result("geoai", "geoai_building", params, None, None, None, None, start, "failed", str(exc), image=source_image)
 
 
-def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace) -> RunResult:
-    """对大幅影像执行切片 GeoAI 推理，再合并为最终建筑物结果。"""
+def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace, image_dir: Path, source_image: Path) -> RunResult:
+    """对大幅影像执行切片 GeoAI 推理，再合并为最终建筑物结果。
+
+    `image_dir` 是该影像的输出子目录；`source_image` 用于在 `RunResult` 中记录原始影像。
+    """
     import geopandas as gpd
     import rasterio
 
     start = time.time()
-    run_dir = OUTPUT_DIR / "geoai_tiled"
+    run_dir = image_dir / "geoai_tiled"
     params = {
         "tile_size": args.tile_size,
         "overlap": args.overlap,
@@ -768,9 +820,9 @@ def run_geoai_tiled(image_path: Path, model_path: Path, args: argparse.Namespace
         gdf = merge_tile_gdfs(tile_gdfs, crs, args.min_area, args.dedupe_iou)
         raw_path, reg_path, gpkg_path, reg = save_outputs(gdf, run_dir, args.regularize, args.min_area, args.simplify)
         stats_gdf = reg if reg_path else gdf
-        return build_result("geoai", "geoai_building_tiled", params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok")
+        return build_result("geoai", "geoai_building_tiled", params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok", image=source_image)
     except Exception as exc:
-        return build_result("geoai", "geoai_building_tiled", params, None, None, None, None, start, "failed", str(exc))
+        return build_result("geoai", "geoai_building_tiled", params, None, None, None, None, start, "failed", str(exc), image=source_image)
 
 
 def combine_sam_masks(masks: Any, shape: Tuple[int, int]) -> Any:
@@ -839,13 +891,13 @@ def read_rgb_for_sam(image_path: Path) -> Any:
     return out
 
 
-def run_sam(image_path: Path, model_key: str, checkpoint: Path, args: argparse.Namespace) -> List[RunResult]:
-    """运行 SAM 自动分割参数网格，并保存每组参数的矢量化结果。"""
+def run_sam(image_path: Path, model_key: str, checkpoint: Path, args: argparse.Namespace, image_dir: Path, source_image: Path) -> List[RunResult]:
+    """运行 SAM 自动分割参数网格，并保存每组参数的矢量化结果到 `image_dir`。"""
     results = []
     for params in SAM_PARAM_GRID:
         start = time.time()
         run_name = f"{model_key}_pps{params['points_per_side']}_iou{params['pred_iou_thresh']}"
-        run_dir = OUTPUT_DIR / run_name
+        run_dir = image_dir / run_name
         all_params = {**params, "min_area": args.min_area}
         try:
             import gc
@@ -886,9 +938,9 @@ def run_sam(image_path: Path, model_key: str, checkpoint: Path, args: argparse.N
             gdf = filter_building_like(gdf, args.min_area)
             raw_path, reg_path, gpkg_path, reg = save_outputs(gdf, run_dir, args.regularize, args.min_area, args.simplify)
             stats_gdf = reg if reg_path else gdf
-            results.append(build_result("sam", model_key, all_params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok"))
+            results.append(build_result("sam", model_key, all_params, raw_path, reg_path, gpkg_path, stats_gdf, start, "ok", image=source_image))
         except Exception as exc:
-            results.append(build_result("sam", model_key, all_params, None, None, None, None, start, "failed", str(exc)))
+            results.append(build_result("sam", model_key, all_params, None, None, None, None, start, "failed", str(exc), image=source_image))
         finally:
             if "generator" in locals():
                 del generator
@@ -918,6 +970,7 @@ def build_result(
     start: float,
     status: str,
     message: str = "",
+    image: Optional[Path] = None,
 ) -> RunResult:
     """根据输出矢量和耗时组装统一的 RunResult。"""
     count = 0
@@ -940,16 +993,24 @@ def build_result(
         elapsed_seconds=round(time.time() - start, 2),
         status=status,
         message=message,
+        image=image,
     )
 
 
-def write_summary(results: Sequence[RunResult]) -> Path:
-    """把所有模型运行结果写成 CSV，便于公众号文章或实验报告引用。"""
-    path = OUTPUT_DIR / "compare" / "summary.csv"
-    with path.open("w", newline="", encoding="utf-8-sig") as fh:
+def write_summary(results: Sequence[RunResult], output_path: Optional[Path] = None) -> Path:
+    """把所有模型运行结果写成 CSV，便于公众号文章或实验报告引用。
+
+    `output_path` 默认写到 `outputs/compare/summary.csv`；多图批处理时调用方
+    传入每张图自己的子目录 CSV，避免互相覆盖。
+    """
+    if output_path is None:
+        output_path = OUTPUT_DIR / "compare" / "summary.csv"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8-sig") as fh:
         writer = csv.DictWriter(
             fh,
             fieldnames=[
+                "image",
                 "method",
                 "model",
                 "params",
@@ -968,6 +1029,7 @@ def write_summary(results: Sequence[RunResult]) -> Path:
         for item in results:
             writer.writerow(
                 {
+                    "image": str(item.image or ""),
                     "method": item.method,
                     "model": item.model,
                     "params": json.dumps(item.params, ensure_ascii=False, sort_keys=True),
@@ -982,8 +1044,8 @@ def write_summary(results: Sequence[RunResult]) -> Path:
                     "gpkg_path": str(item.gpkg_path or ""),
                 }
             )
-    log(f"Wrote summary: {path}")
-    return path
+    log(f"Wrote summary: {output_path}")
+    return output_path
 
 
 def choose_best(results: Sequence[RunResult]) -> Optional[RunResult]:
@@ -997,23 +1059,26 @@ def choose_best(results: Sequence[RunResult]) -> Optional[RunResult]:
     return max(ok, key=lambda r: (r.count, r.total_area_m2))
 
 
-def copy_best(best: Optional[RunResult]) -> Optional[Path]:
-    """把最佳正则化 Shapefile 复制到 outputs/compare/best_regularized.*。"""
+def copy_best(best: Optional[RunResult], image_dir: Path) -> Optional[Path]:
+    """把最佳正则化 Shapefile 复制到该影像子目录的 `compare/best_regularized.*` 下。"""
     if best is None or best.regularized_path is None:
         log("No non-empty regularized result available for best_regularized.shp")
         return None
-    target_base = OUTPUT_DIR / "compare" / "best_regularized"
+    target_base = image_dir / "compare" / "best_regularized"
     for src in best.regularized_path.parent.glob(best.regularized_path.stem + ".*"):
         shutil.copy2(src, target_base.with_suffix(src.suffix))
     log(f"Best result copied from {best.regularized_path}")
     return target_base.with_suffix(".shp")
 
 
-def copy_shapefile_to_root(src_shp: Optional[Path], root_stem: str) -> Optional[Path]:
-    """复制 Shapefile 及其配套文件到 outputs/ 根目录，方便用户直接找到成果。"""
+def copy_shapefile_to_root(src_shp: Optional[Path], target_base: Path) -> Optional[Path]:
+    """复制 Shapefile 及其配套文件到 `target_base`（不含扩展名）对应的路径。
+
+    多图批处理时 `target_base` 通常是 `image_dir / <name>`，单图时也可以是
+    `OUTPUT_DIR / <name>`。GPKG 默认不复制，避免和 SHP 一起被误当成同一份。
+    """
     if src_shp is None or not src_shp.exists():
         return None
-    target_base = OUTPUT_DIR / root_stem
     for src in src_shp.parent.glob(src_shp.stem + ".*"):
         if src.suffix.lower() == ".gpkg":
             continue
@@ -1021,19 +1086,22 @@ def copy_shapefile_to_root(src_shp: Optional[Path], root_stem: str) -> Optional[
     return target_base.with_suffix(".shp")
 
 
-def export_root_shapefiles(results: Sequence[RunResult], best: Optional[RunResult]) -> List[Path]:
-    """为每个模型结果导出一份根目录 Shapefile 快捷副本。"""
+def export_root_shapefiles(results: Sequence[RunResult], best: Optional[RunResult], image_dir: Path) -> List[Path]:
+    """在该影像子目录根导出每个模型结果对应的快捷 Shapefile。
+
+    多图批处理时，root 指代的是 `image_dir` 而不是 `OUTPUT_DIR`。
+    """
     exported: List[Path] = []
     for item in results:
         safe_model = safe_name(item.model)
         safe_method = safe_name(item.method)
-        raw = copy_shapefile_to_root(item.raw_path, f"{safe_model}_{safe_method}_raw")
+        raw = copy_shapefile_to_root(item.raw_path, image_dir / f"{safe_model}_{safe_method}_raw")
         if raw:
             exported.append(raw)
-        regularized = copy_shapefile_to_root(item.regularized_path, f"{safe_model}_{safe_method}_regularized")
+        regularized = copy_shapefile_to_root(item.regularized_path, image_dir / f"{safe_model}_{safe_method}_regularized")
         if regularized:
             exported.append(regularized)
-    best_path = copy_shapefile_to_root(best.regularized_path if best else None, "best_regularized")
+    best_path = copy_shapefile_to_root(best.regularized_path if best else None, image_dir / "best_regularized")
     if best_path:
         exported.append(best_path)
     if exported:
@@ -1041,10 +1109,17 @@ def export_root_shapefiles(results: Sequence[RunResult], best: Optional[RunResul
     return exported
 
 
-def make_preview(image_path: Path, result: RunResult) -> Optional[Path]:
-    """生成影像叠加建筑物边界的 PNG 预览图。"""
+def make_preview(image_path: Path, result: RunResult, preview_dir: Optional[Path] = None) -> Optional[Path]:
+    """生成影像叠加建筑物边界的 PNG 预览图。
+
+    `preview_dir` 默认放在 `outputs/preview/`；多图批处理时调用方传入每张图
+    自己的子目录（如 `image_dir / "preview"`），避免预览图被互相覆盖。
+    """
     if result.regularized_path is None or not result.regularized_path.exists():
         return None
+    if preview_dir is None:
+        preview_dir = OUTPUT_DIR / "preview"
+    preview_dir.mkdir(parents=True, exist_ok=True)
     try:
         import geopandas as gpd
         import matplotlib.pyplot as plt
@@ -1055,7 +1130,7 @@ def make_preview(image_path: Path, result: RunResult) -> Optional[Path]:
         gdf = gpd.read_file(result.regularized_path)
         if len(gdf) == 0:
             return None
-        preview_path = OUTPUT_DIR / "preview" / f"{result.model}_{result.method}.png"
+        preview_path = preview_dir / f"{result.model}_{result.method}.png"
         with rasterio.open(image_path) as src:
             fig, ax = plt.subplots(figsize=(10, 10))
             show(src, ax=ax)
@@ -1093,7 +1168,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--source-tif",
         type=Path,
         default=DEFAULT_SOURCE_TIF,
-        help="Source GeoTIFF path. By default the script auto-detects one .tif/.tiff directly under data/.",
+        help="Source GeoTIFF path. By default the script auto-detects every .tif/.tiff directly under data/ and processes them in sequence.",
     )
     parser.add_argument("--copy-data", action="store_true", help="Copy source GeoTIFF into the project data/ directory.")
     parser.add_argument("--models", type=parse_models, default=parse_models("geoai"))
@@ -1126,7 +1201,7 @@ def add_bool_flag(parser: argparse.ArgumentParser, name: str, default: bool, hel
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    """命令行入口：检查环境、准备数据和模型、执行提取、写出成果。"""
+    """命令行入口：检查环境、准备数据和模型、对每张图执行提取、写出成果。"""
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -1141,51 +1216,124 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args.device = normalize_device(args.device)
     log(f"Using device: {args.device}")
 
-    # 确定输入影像和模型权重。这里不会触发推理，只做路径和文件准备。
-    image = prepare_data(args.source_tif, args.copy_data, create_synthetic_if_missing=args.test_crop)
+    # 收集本次要处理的影像列表，多张时按顺序串行处理。
+    images = prepare_images(args.source_tif, args.copy_data, create_synthetic_if_missing=args.test_crop)
     model_paths = ensure_models(args.models, args.download_models)
+
+    all_results: List[RunResult] = []
+    total_images = len(images)
+    for index, image in enumerate(images, start=1):
+        log(f"=== [{index}/{total_images}] Processing image: {image} ===")
+        image_dir = image_output_dir(image)
+        try:
+            results = process_image(image, model_paths, args, image_dir)
+        except Exception as exc:
+            log(f"Image processing failed for {image}: {exc}")
+            continue
+        all_results.extend(results)
+        log(f"=== [{index}/{total_images}] Done: {summarize_results(results)} ===")
+
+    # 多张图时再额外写一份跨图索引，方便用户一眼看完所有影像的状态。
+    if total_images > 1:
+        write_image_index(images, all_results)
+
+    # 如果所有模型都失败，返回非零退出码，便于脚本/CI 判断运行失败。
+    failed = [r for r in all_results if r.status != "ok"]
+    if all_results and len(failed) == len(all_results):
+        return 1
+    return 0
+
+
+def process_image(
+    image_path: Path,
+    model_paths: Dict[str, Path],
+    args: argparse.Namespace,
+    image_dir: Path,
+) -> List[RunResult]:
+    """对单张影像依次执行所有模型，并把成果写到 `image_path` 专属子目录。
+
+    返回本次运行的所有 `RunResult`，多图批处理时由 `main()` 统一汇总。
+    """
+    image_dir.mkdir(parents=True, exist_ok=True)
 
     # --test-crop 用于快速验证流程；正式运行时处理整幅影像。
     if args.test_crop:
-        run_image = make_test_crop(image, args.tile_size)
+        run_image = make_test_crop(image_path, args.tile_size, image_dir / "test_crop.tif")
         log(f"Processing test crop only: {run_image}")
     else:
-        run_image = image
+        run_image = image_path
         log(f"Processing full image extent: {run_image}")
 
     results: List[RunResult] = []
     if "geoai" in args.models:
         # 大图默认走切片流程，小图/测试裁剪图可以直接整图推理。
         if args.tile_full_image and not args.test_crop:
-            result = run_geoai_tiled(run_image, model_paths["geoai"], args)
+            result = run_geoai_tiled(run_image, model_paths["geoai"], args, image_dir, image_path)
         else:
-            result = run_geoai(run_image, model_paths["geoai"], args)
+            result = run_geoai(run_image, model_paths["geoai"], args, image_dir, image_path)
         log(f"GeoAI result: {result.status}, count={result.count}, message={result.message}")
         results.append(result)
 
     for model in args.models:
         if model.startswith("sam_"):
             # SAM 作为对比模型执行，通常更适合小图或裁剪区域。
-            for result in run_sam(run_image, model, model_paths[model], args):
+            for result in run_sam(run_image, model, model_paths[model], args, image_dir, image_path):
                 log(f"SAM result: {result.model}, {result.status}, count={result.count}, message={result.message}")
                 results.append(result)
 
-    # 汇总、挑选最佳成果、生成快捷 Shapefile 和预览图。
-    write_summary(results)
+    # 单图自己的汇总、最佳成果、快捷 Shapefile 和预览图。
+    write_summary(results, image_dir / "compare" / "summary.csv")
     best = choose_best(results)
-    copy_best(best)
-    export_root_shapefiles(results, best)
+    copy_best(best, image_dir)
+    export_root_shapefiles(results, best, image_dir)
     if args.preview:
         for item in results:
-            make_preview(run_image, item)
+            make_preview(run_image, item, image_dir / "preview")
     if args.validate:
         validate_outputs(results)
 
-    # 如果所有模型都失败，返回非零退出码，便于脚本/CI 判断运行失败。
-    failed = [r for r in results if r.status != "ok"]
-    if failed and len(failed) == len(results):
-        return 1
-    return 0
+    return results
+
+
+def summarize_results(results: Sequence[RunResult]) -> str:
+    """把一组 RunResult 压缩成一行简短摘要，方便在循环日志中查看。"""
+    parts = []
+    for item in results:
+        parts.append(f"{item.method}:{item.status}({item.count})")
+    return ", ".join(parts) if parts else "no results"
+
+
+def write_image_index(images: Sequence[Path], results: Sequence[RunResult]) -> Path:
+    """多图批处理时写一份跨图索引，列出来源影像、用到的模型、状态和最佳要素数。
+
+    不影响每张图自己的 `compare/summary.csv`，仅作为顶层概览。
+    """
+    path = OUTPUT_DIR / "image_index.csv"
+    by_image: Dict[str, List[RunResult]] = {}
+    for item in results:
+        if item.image is None:
+            continue
+        key = safe_name(item.image.stem)
+        by_image.setdefault(key, []).append(item)
+    with path.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["image_stem", "source_tif", "methods", "models", "best_count", "status"])
+        for image in images:
+            stem = safe_name(image.stem)
+            entries = by_image.get(stem, [])
+            methods = "|".join(sorted({e.method for e in entries})) or "-"
+            models = "|".join(sorted({e.model for e in entries})) or "-"
+            ok_entries = [e for e in entries if e.status == "ok" and e.count > 0]
+            best_count = max((e.count for e in ok_entries), default=0)
+            if ok_entries:
+                status = "ok"
+            elif entries:
+                status = "failed"
+            else:
+                status = "skipped"
+            writer.writerow([stem, str(image), methods, models, best_count, status])
+    log(f"Wrote image index: {path}")
+    return path
 
 
 if __name__ == "__main__":

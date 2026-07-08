@@ -20,6 +20,11 @@ _project_root = str(Path(__file__).resolve().parent.parent)
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
+try:
+    from config import MODEL_DIR
+except ImportError:
+    MODEL_DIR = str(Path(_project_root).parent / "models")
+
 
 class ImageService:
     """影像元数据与坐标转换服务。
@@ -160,9 +165,12 @@ class SAMService:
             return
 
         filename, expected_size = entry
-        local_path = os.path.join(_project_root, "models", filename)
+        local_path = os.path.join(MODEL_DIR, filename)
         if not os.path.isfile(local_path):
-            raise ImportError(f"SAM1 模型文件不存在: {local_path}，请先运行 python download_models.py --{self.model_type}")
+            raise ImportError(
+                f"SAM1 模型文件不存在: {local_path}，请先运行 "
+                f"python download_models.py --{self.model_type}，或设置 MODEL_DIR/GEOAI_MODELS_DIR"
+            )
 
         actual_size = os.path.getsize(local_path)
         if actual_size < expected_size * 0.95:

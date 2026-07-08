@@ -110,7 +110,9 @@ class GroundedSAMWrapper:
         # samgeo's LangSAM works better with this project's local SAM checkpoints
         # and avoids the geoai>=0.40 Transformers meta-tensor loading path.
         try:
-            from samgeo.text_sam import LangSAM
+            import samgeo.text_sam as text_sam
+            self._configure_langsam_groundingdino_cache(text_sam)
+            LangSAM = text_sam.LangSAM
             self._model = LangSAM(
                 model_type=self.sam_model_type,
                 checkpoint=self._resolve_sam_checkpoint(),
@@ -183,6 +185,83 @@ class GroundedSAMWrapper:
 
         self._use_langsam = getattr(self, "_use_langsam", False)
         self._use_samgeo_fallback = getattr(self, "_use_samgeo_fallback", False)
+
+    def _configure_langsam_groundingdino_cache(self, text_sam_module) -> None:
+        """Make samgeo LangSAM reuse this project's shared GroundingDINO cache."""
+        original_load_model_hf = text_sam_module.load_model_hf
+
+        def load_model_hf(repo_id: str, filename: str, ckpt_config_filename: str, device: str = "cpu"):
+            if repo_id == "ShilongLiu/GroundingDINO":
+                cached = self._load_groundingdino_from_cache(filename, ckpt_config_filename, device)
+                if cached is not None:
+                    return cached
+            return original_load_model_hf(repo_id, filename, ckpt_config_filename, device)
+
+        text_sam_module.load_model_hf = load_model_hf
+
+    def _load_groundingdino_from_cache(
+        self,
+        filename: str,
+        ckpt_config_filename: str,
+        device: str,
+    ):
+        """Load GroundingDINO from the shared HuggingFace cache when files exist locally."""
+        hub_dir = Path(os.environ.get("HF_HUB_CACHE", os.path.join(self.model_dir, "huggingface", "hub")))
+        repo_dir = hub_dir / "models--ShilongLiu--GroundingDINO"
+        refs_main = repo_dir / "refs" / "main"
+
+        snapshot_dirs = []
+        if refs_main.is_file():
+            revision = refs_main.read_text(encoding="utf-8").strip()
+            if revision:
+                snapshot_dirs.append(repo_dir / "snapshots" / revision)
+        snapshots_dir = repo_dir / "snapshots"
+        if snapshots_dir.is_dir():
+            snapshot_dirs.extend(path for path in snapshots_dir.iterdir() if path.is_dir())
+
+        config_path = None
+        checkpoint_candidates = []
+        for snapshot_dir in snapshot_dirs:
+            candidate = snapshot_dir / ckpt_config_filename
+            if candidate.is_file():
+                config_path = candidate
+            checkpoint = snapshot_dir / filename
+            if checkpoint.is_file():
+                checkpoint_candidates.append(checkpoint)
+
+        blobs_dir = repo_dir / "blobs"
+        if blobs_dir.is_dir():
+            checkpoint_candidates.extend(
+                path
+                for path in sorted(blobs_dir.iterdir(), key=lambda item: item.stat().st_size, reverse=True)
+                if path.is_file() and path.stat().st_size > 100 * 1024 * 1024
+            )
+
+        if config_path is None or not checkpoint_candidates:
+            return None
+
+        from groundingdino.models import build_model
+        from groundingdino.util.slconfig import SLConfig
+        from groundingdino.util.utils import clean_state_dict
+        import torch
+
+        args = SLConfig.fromfile(str(config_path))
+        last_error = None
+        for checkpoint_path in checkpoint_candidates:
+            try:
+                model = build_model(args)
+                model.to(device)
+                checkpoint = torch.load(str(checkpoint_path), map_location="cpu", weights_only=False)
+                model.load_state_dict(clean_state_dict(checkpoint["model"]), strict=False)
+                model.eval()
+                print(f"[GroundedSAM] 使用本地 GroundingDINO: {checkpoint_path}")
+                return model
+            except Exception as error:
+                last_error = error
+
+        if last_error is not None:
+            raise RuntimeError(f"本地 GroundingDINO 缓存存在但无法加载: {last_error}") from last_error
+        return None
 
     def _resolve_sam_checkpoint(self) -> Optional[str]:
         """Return a local SAM1 checkpoint when available for LangSAM."""
