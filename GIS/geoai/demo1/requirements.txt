@@ -1,0 +1,6 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9
+geopandas>=0.14
+numpy>=1.24
+langchain-openai>=0.1

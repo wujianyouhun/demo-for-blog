@@ -1,0 +1,7 @@
+pystac>=1.10
+planetary-computer>=1.0
+requests>=2.32
+rioxarray>=0.15
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9

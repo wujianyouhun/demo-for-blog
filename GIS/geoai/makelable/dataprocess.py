@@ -39,7 +39,7 @@ import matplotlib.pyplot as plt
 # =============================================================================
 
 # STAC API 基础地址
-STAC_API_BASE = "http://localhost:8010"
+STAC_API_BASE = os.getenv("STAC_API_BASE", "http://localhost:8010")
 
 # 影像数据STAC Item URL
 RASTER_ITEM_URL = f"{STAC_API_BASE}/collections/raster-default/items/0dcc269fd72a4c4e8a3c388564122fd1"

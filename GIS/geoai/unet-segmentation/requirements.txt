@@ -1,0 +1,12 @@
+torch>=2.5
+numpy>=2.0
+opencv-python>=4.10
+Pillow>=10
+scipy>=1.11
+matplotlib>=3.8
+rasterio>=1.4
+geopandas>=1.0
+shapely>=2.0
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9

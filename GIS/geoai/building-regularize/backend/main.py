@@ -21,7 +21,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel, Field
 from shapely.geometry import Polygon, mapping, shape
 
-from regularize import RegularizeConfig, RegularizePipeline
+from .regularize import RegularizeConfig, RegularizePipeline
 
 # ──────────────────────────────────────────────
 # App
@@ -305,6 +305,11 @@ async def compare_stats():
         "before": _stats(raw),
         "after": _stats(final),
     }
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "project": "building-regularize"}
 
 
 if __name__ == "__main__":

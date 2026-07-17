@@ -26,7 +26,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import uvicorn
 
-from checker import VectorQualityChecker, VectorAutoRepair, DEFAULT_REPAIR_CONFIG
+from .checker import VectorQualityChecker, VectorAutoRepair, DEFAULT_REPAIR_CONFIG
 
 app = FastAPI(title="矢量数据质量自动检查", version="1.0.0")
 
@@ -300,6 +300,11 @@ def export_result(fmt: str):
             raise HTTPException(400, f"不支持的格式: {fmt}")
     except Exception as e:
         raise HTTPException(500, f"导出失败: {e}")
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "project": "vector-quality-check"}
 
 
 if __name__ == "__main__":

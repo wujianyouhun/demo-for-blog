@@ -1,0 +1,1 @@
+import{createApp}from'vue';import ElementPlus from'element-plus';import'element-plus/dist/index.css';import ProjectApp from'../../../web_ui/ProjectApp.vue';import'../../../web_ui/style.css';import config from'./config';createApp(ProjectApp,{config}).use(ElementPlus).mount('#app')

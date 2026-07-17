@@ -13,6 +13,8 @@
 import os
 import sys
 import random
+import argparse
+import copy
 import numpy as np
 from pathlib import Path
 
@@ -136,9 +138,14 @@ def generate_dataset():
 
 
 class BuildingDataset(Dataset):
-    def __init__(self, img_dir, lbl_dir, augment=False):
+    def __init__(self, img_dir, lbl_dir, augment=False, indices=None):
         self.img_files = sorted(Path(img_dir).glob("*.png"))
         self.lbl_files = sorted(Path(lbl_dir).glob("*.png"))
+        if [p.stem for p in self.img_files] != [p.stem for p in self.lbl_files]:
+            raise ValueError("影像和标签文件没有严格配对")
+        if indices is not None:
+            self.img_files = [self.img_files[i] for i in indices]
+            self.lbl_files = [self.lbl_files[i] for i in indices]
         self.augment = augment
 
     def __len__(self):
@@ -169,7 +176,7 @@ class BuildingDataset(Dataset):
         return img, lbl
 
 
-def train():
+def train(encoder_weights=None):
     """训练 DeepLabV3+ 模型。"""
     import segmentation_models_pytorch as smp
 
@@ -179,26 +186,23 @@ def train():
     # 构建模型
     model = smp.DeepLabV3Plus(
         encoder_name="resnet50",
-        encoder_weights="imagenet",
+        encoder_weights=encoder_weights,
         in_channels=3,
         classes=NUM_CLASSES,
         activation=None,
     ).to(device)
 
     # 数据集
-    train_ds = BuildingDataset(IMG_DIR, LBL_DIR, augment=True)
-    val_ds = BuildingDataset(IMG_DIR, LBL_DIR, augment=False)
-
-    # 85/15 拆分
-    n_total = len(train_ds)
+    base_ds = BuildingDataset(IMG_DIR, LBL_DIR, augment=False)
+    n_total = len(base_ds)
     n_val = max(1, int(n_total * 0.15))
     n_train = n_total - n_val
-    train_subset, val_subset = torch.utils.data.random_split(
-        train_ds, [n_train, n_val], generator=torch.Generator().manual_seed(42)
-    )
+    indices = torch.randperm(n_total, generator=torch.Generator().manual_seed(42)).tolist()
+    train_ds = BuildingDataset(IMG_DIR, LBL_DIR, augment=True, indices=indices[:n_train])
+    val_ds = BuildingDataset(IMG_DIR, LBL_DIR, augment=False, indices=indices[n_train:])
 
-    train_loader = DataLoader(train_subset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_subset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
     print(f"训练集: {n_train}, 验证集: {n_val}")
 
@@ -210,6 +214,7 @@ def train():
 
     best_f1 = 0
     best_epoch = 0
+    best_state = copy.deepcopy(model.state_dict())
 
     for epoch in range(EPOCHS):
         # ── 训练 ──
@@ -269,12 +274,13 @@ def train():
         if f1 > best_f1:
             best_f1 = f1
             best_epoch = epoch + 1
+            best_state = copy.deepcopy(model.state_dict())
 
     # ── 保存模型 ──
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     save_path = MODEL_DIR / "best_model.pth"
     torch.save({
-        "model_state_dict": model.state_dict(),
+        "model_state_dict": best_state,
         "best_f1": best_f1,
         "best_epoch": best_epoch,
         "num_classes": NUM_CLASSES,
@@ -284,6 +290,19 @@ def train():
     print(f"模型已保存: {save_path} ({save_path.stat().st_size / 1024 / 1024:.1f} MB)")
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="生成离线合成样本并训练建筑分割模型")
+    parser.add_argument("--samples", type=int, default=NUM_SAMPLES)
+    parser.add_argument("--epochs", type=int, default=EPOCHS)
+    parser.add_argument("--batch-size", type=int, default=BATCH_SIZE)
+    parser.add_argument("--pretrained", action="store_true", help="使用 ImageNet 编码器权重（可能联网）")
+    parser.add_argument("--generate-only", action="store_true")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
+    NUM_SAMPLES, EPOCHS, BATCH_SIZE = args.samples, args.epochs, args.batch_size
     generate_dataset()
-    train()
+    if not args.generate_only:
+        train("imagenet" if args.pretrained else None)

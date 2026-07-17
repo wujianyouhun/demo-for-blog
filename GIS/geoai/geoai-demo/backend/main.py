@@ -1,4 +1,6 @@
-"""GeoAI Demo 后端"""
+"""GeoAI Demo 后端与统一项目门户。"""
+import json
+import urllib.request
 import sys
 from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -51,6 +53,20 @@ def list_files():
             for f in sorted(d.rglob("*")) if f.is_file() and not f.name.startswith(".")
         ] if d.exists() else []
     return result
+
+
+@app.get("/api/projects")
+def projects(probe: bool = False):
+    catalog_path = PROJECT_ROOT.parent / "projects.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    if probe:
+        for project in catalog["projects"]:
+            try:
+                with urllib.request.urlopen(project["backend"] + "/api/health", timeout=0.25) as response:
+                    project["runtime"] = "running" if response.status == 200 else "error"
+            except Exception:
+                project["runtime"] = "stopped"
+    return catalog
 
 
 if __name__ == "__main__":

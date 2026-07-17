@@ -15,6 +15,9 @@
         <el-col :span="10" class="panel-col">
           <el-card class="panel-card">
             <el-tabs v-model="activeTab" type="border-card">
+              <el-tab-pane label="示例导航" name="projects">
+                <ProjectsPanel />
+              </el-tab-pane>
               <el-tab-pane label="数据管理" name="data">
                 <DataPanel @status-change="onStatusChange" />
               </el-tab-pane>
@@ -59,8 +62,9 @@ import TrainPanel from './components/TrainPanel.vue'
 import ExtractPanel from './components/ExtractPanel.vue'
 import RegularizePanel from './components/RegularizePanel.vue'
 import MapView from './components/MapView.vue'
+import ProjectsPanel from './components/ProjectsPanel.vue'
 
-const activeTab = ref('data')
+const activeTab = ref('projects')
 const mapRef = ref(null)
 const statusMessage = ref('')
 

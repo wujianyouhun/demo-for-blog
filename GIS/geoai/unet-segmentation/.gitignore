@@ -1,0 +1,8 @@
+data/
+outputs/
+node_modules/
+frontend/dist/
+*.pth
+*.pt
+__pycache__/
+.pytest_cache/

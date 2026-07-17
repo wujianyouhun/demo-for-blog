@@ -1,12 +1,7 @@
-# GeoAI Agent Demo
+# GeoAI 空间 Agent
 
-## 启动后端
-cd backend
-pip install -r requirements.txt
-python main.py
+默认 local 模式不需要 API Key：它解析请求中的候选点数量，在演示边界内执行确定性空间计算并返回 GeoJSON。设置 OPENAI_API_KEY 后可选 openai 模式，但最终空间结果仍由可复现的本地工具生成。
 
-## 打开前端
-打开 frontend/index.html
+启动：conda activate geoai，然后运行 python start.py --no-install。
 
-## 示例输入
-帮我在 data/boundary.geojson 里选风电站
+默认前后端端口为 5186 / 8026。

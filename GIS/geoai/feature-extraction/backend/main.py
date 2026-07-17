@@ -27,9 +27,9 @@ from fastapi.responses import Response, FileResponse
 from pydantic import BaseModel
 import uvicorn
 
-from tiles import TIFTileServer
-from extractor import GeoAIExtractor, ExtractionConfig
-from geoai_extractor import GeoAILibraryExtractor, GeoAIConfig
+from .tiles import TIFTileServer
+from .extractor import GeoAIExtractor, ExtractionConfig
+from .geoai_extractor import GeoAILibraryExtractor, GeoAIConfig
 
 app = FastAPI(title="GeoAI 要素提取", version="1.0.0")
 app.add_middleware(
@@ -344,6 +344,12 @@ def export_result(fmt: str, target: Optional[str] = None):
                             media_type="application/zip")
     else:
         raise HTTPException(400, f"不支持的格式: {fmt}")
+
+
+@app.get("/api/health")
+def health():
+    tif = Path(TIF_PATH)
+    return {"status": "ok", "project": "feature-extraction", "input_exists": tif.is_file(), "input": str(tif)}
 
 
 if __name__ == "__main__":

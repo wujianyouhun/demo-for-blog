@@ -1,5 +1,7 @@
 # GeoAI 数据下载工具
 
+> 已补充独立 FastAPI + Vue 3 工作台：`python start.py --no-install`。Web 默认 `http://127.0.0.1:5180`，API 文档 `http://127.0.0.1:8020/docs`。历史目录名 `data-downlad` 为兼容引用而保留。
+
 ## 项目介绍
 
 GeoAI 数据下载工具是一个用于从多个数据源获取地理空间数据的工具，支持以下功能：

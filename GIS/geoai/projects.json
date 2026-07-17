@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "projects": [
+    {"id":"classification","name":"遥感影像分类","category":"模型训练","path":"Classification","backend":"http://127.0.0.1:8000","frontend":"http://127.0.0.1:8000","status":"ready"},
+    {"id":"building-regularize","name":"建筑轮廓正则化","category":"正则化与质检","path":"building-regularize","backend":"http://127.0.0.1:8001","frontend":"http://127.0.0.1:5174","status":"ready"},
+    {"id":"vector-quality-check","name":"矢量质量检查","category":"正则化与质检","path":"vector-quality-check","backend":"http://127.0.0.1:8002","frontend":"http://127.0.0.1:5175","status":"ready"},
+    {"id":"feature-extraction","name":"GeoAI 要素提取","category":"推理提取","path":"feature-extraction","backend":"http://127.0.0.1:8003","frontend":"http://127.0.0.1:5176","status":"ready"},
+    {"id":"geoai-demo","name":"GeoAI 示例门户","category":"综合工作台","path":"geoai-demo","backend":"http://127.0.0.1:8004","frontend":"http://127.0.0.1:5177","status":"ready"},
+    {"id":"change-detection","name":"遥感变化检测","category":"推理提取","path":"change-detection","backend":"http://127.0.0.1:8005","frontend":"http://127.0.0.1:5178","status":"ready"},
+    {"id":"sam","name":"SAM 交互式标注","category":"样本制作","path":"sam","backend":"http://127.0.0.1:8011","frontend":"http://127.0.0.1:5173","status":"ready"},
+    {"id":"data-download","name":"多源数据下载","category":"数据下载","path":"data-downlad","backend":"http://127.0.0.1:8020","frontend":"http://127.0.0.1:5180","status":"ready"},
+    {"id":"planetary-computer","name":"Planetary Computer 下载","category":"数据下载","path":"Planetary Computer","backend":"http://127.0.0.1:8021","frontend":"http://127.0.0.1:5181","status":"ready"},
+    {"id":"data-process","name":"栅格与矢量元数据处理","category":"数据处理","path":"data-process","backend":"http://127.0.0.1:8022","frontend":"http://127.0.0.1:5182","status":"ready"},
+    {"id":"makelable","name":"GeoAI 样本制作","category":"样本制作","path":"makelable","backend":"http://127.0.0.1:8023","frontend":"http://127.0.0.1:5183","status":"ready"},
+    {"id":"building2shp","name":"建筑分割转矢量","category":"推理提取","path":"building2shp","backend":"http://127.0.0.1:8024","frontend":"http://127.0.0.1:5184","status":"ready"},
+    {"id":"building-extraction","name":"整图建筑提取","category":"推理提取","path":"building-extraction","backend":"http://127.0.0.1:8025","frontend":"http://127.0.0.1:5185","status":"ready"},
+    {"id":"demo1","name":"GeoAI Agent","category":"智能体","path":"demo1","backend":"http://127.0.0.1:8026","frontend":"http://127.0.0.1:5186","status":"ready"},
+    {"id":"segmentation-baselines","name":"语义分割基线","category":"模型训练","path":"../geoai_segmentation","backend":"http://127.0.0.1:8027","frontend":"http://127.0.0.1:5187","status":"ready"},
+    {"id":"unet-segmentation","name":"U-Net 多类地物分割","category":"模型训练","path":"unet-segmentation","backend":"http://127.0.0.1:8028","frontend":"http://127.0.0.1:5188","status":"ready"}
+  ]
+}

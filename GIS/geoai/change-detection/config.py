@@ -68,5 +68,5 @@ INFERENCE_CONFIG = {
 COMPARE_CONFIG = {"opacity": 0.7, "change_color": "#FF0000", "swipe_position": 0.5}
 
 API_HOST = "0.0.0.0"
-API_PORT = 8000
-CORS_ORIGINS = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+API_PORT = int(_os.getenv("CHANGE_DETECTION_BACKEND_PORT", "8005"))
+CORS_ORIGINS = ["http://localhost:5178", "http://127.0.0.1:5178"]

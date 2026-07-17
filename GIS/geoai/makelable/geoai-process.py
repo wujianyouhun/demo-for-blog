@@ -1,3 +1,4 @@
+import os
 import shutil
 import zipfile
 from pathlib import Path
@@ -13,15 +14,15 @@ from shapely.geometry import box
 # STAC 配置
 # =========================================================
 
-RASTER_ITEM_URL = (
+RASTER_ITEM_URL = os.getenv("RASTER_ITEM_URL", (
     "http://localhost:8010/collections/raster-default/items/"
     "0dcc269fd72a4c4e8a3c388564122fd1"
-)
+))
 
-VECTOR_ITEM_URL = (
+VECTOR_ITEM_URL = os.getenv("VECTOR_ITEM_URL", (
     "http://localhost:8010/collections/vector-default/items/"
     "90dbe2fc21b84d83891b87fd61ed24e6"
-)
+))
 
 BASE_DIR = Path("./data")
 

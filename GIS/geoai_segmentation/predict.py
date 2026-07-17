@@ -1,30 +1,46 @@
-import torch
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
 import cv2
 import numpy as np
-import geopandas as gpd
-from shapely.geometry import Polygon
-from models.unet_plus_plus import UNetPlusPlus
+import rasterio
+import torch
+from PIL import Image
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model = UNetPlusPlus().to(device)
-model.load_state_dict(torch.load('best_model.pth', map_location=device))
-model.eval()
+from train import build_model
+from utils import mask_to_vectors, read_image
 
-# 读取图像
-img = cv2.imread('test.png')
-img = cv2.resize(img, (512,512))
-input = torch.tensor(img).permute(2,0,1).unsqueeze(0).float()/255.0
 
-# 推理
-with torch.no_grad():
-    pred = model(input.to(device))[0][0].cpu().numpy()
-mask = (pred > 0.5).astype(np.uint8)*255
+def predict(input_path: Path, checkpoint_path: Path, output_dir: Path, threshold=.5):
+    device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    state=torch.load(checkpoint_path,map_location=device,weights_only=False)
+    model=build_model(state["model"],state.get("base_channels",32)).to(device)
+    model.load_state_dict(state["state_dict"]); model.eval()
+    image=read_image(input_path); height,width=image.shape[:2]; size=int(state.get("size",256))
+    resized=cv2.resize(image,(size,size),interpolation=cv2.INTER_AREA)
+    tensor=torch.from_numpy(np.moveaxis(resized.astype(np.float32)/255,-1,0)).unsqueeze(0).to(device)
+    with torch.no_grad(): mask=model(tensor).argmax(1)[0].cpu().numpy().astype(np.uint8)
+    mask=cv2.resize(mask,(width,height),interpolation=cv2.INTER_NEAREST)
+    output_dir.mkdir(parents=True,exist_ok=True); preview=output_dir/"prediction.png"; Image.fromarray(mask*255).save(preview)
+    result={"preview":str(preview)}
+    if input_path.suffix.lower() in {".tif",".tiff"}:
+        with rasterio.open(input_path) as source: profile=source.profile.copy(); transform=source.transform; crs=source.crs
+        profile.update(count=1,dtype="uint8",nodata=255,compress="deflate")
+        mask_path=output_dir/"prediction.tif"
+        with rasterio.open(mask_path,"w",**profile) as sink: sink.write(mask,1)
+        vectors=mask_to_vectors(mask,transform,crs,output_dir/"prediction.gpkg")
+        result.update({"mask":str(mask_path),"vectors":vectors})
+    return result
 
-# 轮廓转矢量
-contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-polygons = [Polygon(c[:,0,:]) for c in contours if cv2.contourArea(c) > 100]
 
-# 保存 shp
-gdf = gpd.GeoDataFrame({'geometry': polygons})
-gdf.to_file('result.shp', encoding='utf-8')
-print("已生成：result.shp（可直接在 ArcGIS/QGIS 打开）")
+def parser():
+    result=argparse.ArgumentParser(description="语义分割基线推理")
+    result.add_argument("--input",required=True); result.add_argument("--checkpoint",required=True); result.add_argument("--output",default="outputs/prediction")
+    return result
+
+
+if __name__=="__main__":
+    args=parser().parse_args(); print(json.dumps(predict(Path(args.input),Path(args.checkpoint),Path(args.output)),ensure_ascii=False,indent=2))

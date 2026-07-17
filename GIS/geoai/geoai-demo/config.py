@@ -72,5 +72,5 @@ REGULARIZE_CONFIG = {
 }
 
 API_HOST = "0.0.0.0"
-API_PORT = 8000
-CORS_ORIGINS = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+API_PORT = int(_os.getenv("GEOAI_DEMO_BACKEND_PORT", "8004"))
+CORS_ORIGINS = ["http://localhost:5177", "http://127.0.0.1:5177"]
