@@ -47,6 +47,18 @@ except ImportError as e:
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
+from pathlib import Path
+
+def _default_building_model() -> str:
+    """优先解析共享模型目录下的本地建筑权重，避免触发 HuggingFace 下载。"""
+    repo_models = Path(__file__).resolve().parents[2] / "models"
+    models_dir = Path(os.getenv("GEOAI_MODELS_DIR", str(repo_models)))
+    local = models_dir / "geoai" / "building_footprints_usa.pth"
+    if local.is_file():
+        return str(local)
+    return "building_footprints_usa.pth"
+
+
 @dataclass
 class GeoAIConfig:
     """GeoAI 库提取配置"""
@@ -55,7 +67,7 @@ class GeoAIConfig:
     # 推理设备: cpu / cuda:0 / auto
     device: str = "cpu"
     # 建筑提取参数
-    building_model_path: str = "building_footprints_usa.pth"
+    building_model_path: str = field(default_factory=_default_building_model)
     building_repo_id: Optional[str] = None
     building_batch_size: int = 4
     building_confidence: float = 0.5

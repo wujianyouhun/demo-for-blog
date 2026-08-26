@@ -213,7 +213,7 @@ async def run_pipeline(req: RunRequest):
     # 计算主方向
     directions = []
     for p in pipeline.steps.get("3_direction_detect", _session["raw"]):
-        from regularize import get_main_direction
+        from .regularize import get_main_direction
         d = get_main_direction(p, cfg.use_pca)
         directions.append(round(d, 1))
 

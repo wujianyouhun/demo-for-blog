@@ -11,7 +11,7 @@ app=FastAPI(title='GeoAI Tiled Building Extraction',version='1.0.0');app.add_mid
 install_common_routes(app,tasks,'building-extraction',DATA_DIR,OUTPUT_DIR,{'ports':{'backend':8025,'frontend':5185},'models_dir':str(GEOAI_ROOT/'models')})
 class ExtractRequest(BaseModel):
  image_path:str;method:str='geoai';tile_size:int=Field(2048,ge=256,le=4096);overlap:int=Field(256,ge=0,le=1024)
-def command_job(command,*,update,cancel_event,stage):
+def command_job(command,*,update,cancel_event,stage,**_):
  process=subprocess.Popen(command,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,encoding='utf-8',errors='replace');lines=[]
  while True:
   line=process.stdout.readline() if process.stdout else ''

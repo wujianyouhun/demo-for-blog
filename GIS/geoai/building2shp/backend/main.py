@@ -11,7 +11,7 @@ app=FastAPI(title='Building2SHP',version='1.0.0');app.add_middleware(CORSMiddlew
 install_common_routes(app,tasks,'building2shp',DATA_DIR,OUTPUT_DIR,{'ports':{'backend':8024,'frontend':5184},'model_dir':str(MODEL_DIR)})
 class TrainRequest(BaseModel):samples:int=Field(200,ge=20,le=5000);epochs:int=Field(20,ge=1,le=200)
 class PredictRequest(BaseModel):image_path:str;model_path:str='';tile_size:int=256;overlap:int=32
-def run_command(command,*,update,cancel_event,stage):
+def run_command(command,*,update,cancel_event,stage,**_):
     process=subprocess.Popen(command,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,encoding='utf-8',errors='replace')
     lines=[]
     while True:

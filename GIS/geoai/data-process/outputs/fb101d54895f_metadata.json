@@ -1,0 +1,57 @@
+{
+  "kind": "raster",
+  "path": "F:\\study\\demo-for-blog\\GIS\\geoai\\makelable\\data\\uploads\\demo_image.tif",
+  "driver": "GTiff",
+  "width": 1024,
+  "height": 1024,
+  "count": 3,
+  "dtypes": [
+    "uint8",
+    "uint8",
+    "uint8"
+  ],
+  "nodata": null,
+  "crs": "EPSG:32649",
+  "transform": [
+    0.5,
+    0.0,
+    500000.0,
+    0.0,
+    -0.5,
+    3800000.0
+  ],
+  "bounds": [
+    500000.0,
+    3799488.0,
+    500512.0,
+    3800000.0
+  ],
+  "resolution": [
+    0.5,
+    0.5
+  ],
+  "band_stats": [
+    {
+      "band": 1,
+      "min": 35.0,
+      "max": 235.0,
+      "mean": 158.68905639648438,
+      "std": 32.10283043554543
+    },
+    {
+      "band": 2,
+      "min": 49.0,
+      "max": 228.0,
+      "mean": 164.17400741577148,
+      "std": 22.962464732129384
+    },
+    {
+      "band": 3,
+      "min": 30.0,
+      "max": 243.0,
+      "mean": 157.73671340942383,
+      "std": 35.23468784629795
+    }
+  ],
+  "preview": "F:\\study\\demo-for-blog\\GIS\\geoai\\data-process\\outputs\\fb101d54895f_preview.png"
+}
