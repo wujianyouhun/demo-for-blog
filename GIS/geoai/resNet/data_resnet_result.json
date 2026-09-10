@@ -1,0 +1,48 @@
+[
+  {
+    "geotiff": "data.tif",
+    "source_bands": [
+      3,
+      2,
+      1
+    ],
+    "source_shape": [
+      10980,
+      10980
+    ],
+    "crs": "EPSG:32647",
+    "bounds": [
+      399960.0,
+      4290240.0,
+      509760.0,
+      4400040.0
+    ],
+    "topk": [
+      {
+        "class_id": 970,
+        "class_name": "alp",
+        "probability": 0.173938
+      },
+      {
+        "class_id": 795,
+        "class_name": "ski",
+        "probability": 0.079955
+      },
+      {
+        "class_id": 537,
+        "class_name": "dogsled",
+        "probability": 0.037546
+      },
+      {
+        "class_id": 802,
+        "class_name": "snowmobile",
+        "probability": 0.036503
+      },
+      {
+        "class_id": 980,
+        "class_name": "volcano",
+        "probability": 0.029491
+      }
+    ]
+  }
+]

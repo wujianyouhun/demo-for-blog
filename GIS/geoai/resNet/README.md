@@ -2,6 +2,55 @@
 
 基于深度学习的遥感卫星图像地物分类项目，使用 **EuroSAT** 数据集，支持 ResNet50 / ResNet101 / ViT-Base 骨干网络，提供完整的训练、评估、推理和前后端服务。
 
+## ResNet 推理示例
+
+仓库提供了一个独立的 ResNet 推理示例：`scripts/resnet_inference_example.py`。
+它会优先加载 `models/Classification/checkpoints/best_model.pth`；如果该文件不存在，则使用 torchvision 的 ImageNet 预训练 ResNet50。
+
+```bash
+pip install torch torchvision pillow
+
+# 单张图片
+python scripts/resnet_inference_example.py --image path/to/image.jpg
+
+# 批量推理，并将结果保存为 JSON
+python scripts/resnet_inference_example.py --dir path/to/images --topk 3 --output results.json
+```
+
+### 可以使用什么数据？
+
+- **直接体验预训练模型**：使用普通 RGB 图片（JPG、JPEG、PNG、BMP、TIFF）即可。ImageNet 模型适合识别日常物体，类别名称是 ImageNet 的 1000 个类别。
+- **遥感分类**：推荐使用本项目的 **EuroSAT** 数据集。它包含 10 类 Sentinel-2 遥感影像：农田、森林、草本植被、公路、工业区、牧场、永久作物、居民区、河流、海湖。使用本项目训练得到的 checkpoint 时，输入应尽量与训练数据的裁剪大小和波段形式一致。
+- **自定义数据**：可以使用自己的 GeoTIFF/JPG/PNG 图像，但必须先用相同类别定义训练或微调 ResNet；未经训练的 ImageNet 模型不会自动理解自定义的遥感类别。
+
+注意：ImageNet 预训练 ResNet 通常只接受 3 通道 RGB 输入。如果是 Sentinel-2 的多光谱影像，应先选择 RGB 波段或修改模型第一层和预处理流程。
+
+## Landsat 8 ZIP 到分类格网
+
+`landsat8_pipeline.py` 将多个已经下载完成的 Landsat 8 Collection 2 Level-2 ZIP 文件按以下顺序处理：**解压 → 同波段镶嵌 → 裁剪 → 云/云影掩膜 → 反射率缩放 → B4/B3/B2 RGB 合成 → 滑窗切片 → ResNet 推理 → 空间分类格网**。
+
+先安装依赖：
+
+```bash
+pip install -r resNet/requirements_landsat8.txt
+```
+
+将所有 ZIP 放入同一个目录后运行。默认研究区是你给出的 `97.38, 36.48, 103.77, 39.73`（经度、纬度，WGS84）：
+
+```bash
+python resNet/landsat8_pipeline.py --input-zips D:/landsat8_zips --output-dir D:/landsat8_result --tile-size 64 --batch-size 32
+```
+
+输出结果：
+
+- `02_mosaic_clipped/`：先镶嵌、后裁剪的 B2/B3/B4 和 `QA_PIXEL`。
+- `03_rgb_reflectance.tif`：应用云/云影掩膜后的 B4/B3/B2 三波段地表反射率。
+- `04_inference/classification_grid.tif`：每个像元代表一个切片的预测类别；`-1` 表示云或无效像元过多而跳过。
+- `04_inference/confidence_grid.tif`：每个分类格网的最大类别概率。
+- `04_inference/tile_predictions.json`：每个格网的类别、置信度和行列号。
+
+`64 × 64` 的 Landsat 30 m 像元约为 `1.92 km × 1.92 km`。该研究区很大，建议先用较小范围试运行；正式处理时优先使用 CUDA，并根据显存调整 `--batch-size`。
+
 ---
 
 ## 📁 项目结构
