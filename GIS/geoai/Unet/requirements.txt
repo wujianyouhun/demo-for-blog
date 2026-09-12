@@ -1,0 +1,5 @@
+# U-Net 系列 GeoTIFF 批量推理依赖
+# 请按本机 CUDA 版本从 https://pytorch.org 获取匹配的 torch 安装命令。
+torch>=2.1
+numpy>=1.24
+rasterio>=1.3
