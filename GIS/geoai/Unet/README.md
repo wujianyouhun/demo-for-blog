@@ -1,30 +1,59 @@
-# 西安与 Sentinel-2 的 U-Net 批量推理
+# 祁连遥感影像 U-Net 五分类推理
 
-六个脚本分别使用经典 U-Net、ResUNet、Attention U-Net、U-Net++、TransUNet、Swin-UNet 对 `Unet/data` 的全部 GeoTIFF 进行像素级建筑/植被提取；脚本不包含训练。
+本目录包含经典 U-Net、ResUNet、Attention U-Net、U-Net++、TransUNet、Swin-UNet 六个推理入口。当前流程读取 `Unet/Data/Qilian.tif`，加载本项目训练得到的五分类权重，输出道路、居民地、耕地、裸地、光伏场分类结果。
 
-将西安高分影像、Sentinel-2 影像或其子目录直接放在 `Unet/data`。程序递归读取 `.tif`、`.tiff`，并跳过 `mask`、`label` 目录。
-
-```text
-Unet/data/xian/xian_rgb.tif
-Unet/data/sentinel2/s2_rgb.tif
-
-Unet/out/resunet/building/xian/xian_rgb_mask.tif
-Unet/out/resunet/building/xian/xian_rgb_mask_probability.tif
-Unet/out/resunet/vegetation/sentinel2/s2_rgb_mask.tif
-```
-
-输出掩膜为 `0=背景、1=目标`，同时产生 0–1 概率 GeoTIFF；两者继承输入影像的坐标系、空间范围和尺寸。模型位置为 `models/Unet/<模型>_building.pth` 与 `models/Unet/<模型>_vegetation.pth`。模型不存在时，仅会在指定对应下载地址后下载，避免不匹配权重。
+## 快速运行
 
 ```powershell
-# 批量建筑、植被提取，读取 Unet/data 并输出到 Unet/out/resunet
-python Unet/unet_example.py
-python Unet/resunet_example.py
-
-# 只提取建筑
-python Unet/attention_unet_example.py --task building
-
-# 本地模型不存在时下载，然后推理
-python Unet/swin_unet_example.py --building-weights-url https://your-server/swin_unet_building.pth --vegetation-weights-url https://your-server/swin_unet_vegetation.pth
+conda activate python12
+python Unet/resunet_example.py --device cpu
 ```
 
-其余入口为 `unetpp_example.py`、`transunet_example.py`。Sentinel-2 使用的波段由 checkpoint 中的 `bands` 字段确定。依赖：`torch`、`rasterio`、`numpy`。
+其他模型入口：
+
+```powershell
+python Unet/unet_example.py --device cpu
+python Unet/attention_unet_example.py --device cpu
+python Unet/unetpp_example.py --device cpu
+python Unet/transunet_example.py --device cpu
+python Unet/swin_unet_example.py --device cpu
+```
+
+权重默认读取：
+
+```text
+models/Unet/qilian_multiclass_5class_refined/<模型>/best.pth
+```
+
+五分类结果默认输出：
+
+```text
+Unet/out/qilian_multiclass_5class_refined/<模型>/classification.tif
+```
+
+分类编码为：`0=道路`、`1=居民地`、`2=耕地`、`3=裸地`、`4=光伏场`。
+
+## 建筑与植被/耕地提取
+
+建筑提取：
+
+```powershell
+python Unet/resunet_example.py --task building --device cpu
+```
+
+植被/耕地提取：
+
+```powershell
+python Unet/resunet_example.py --task vegetation --device cpu
+```
+
+输出为二值掩膜和概率图：
+
+```text
+building/building_mask.tif
+building/building_probability.tif
+vegetation/vegetation_mask.tif
+vegetation/vegetation_probability.tif
+```
+
+当前样本中没有单独的自然植被类，`vegetation` 目前对应 `cropland / 耕地`。如需真正植被提取，需要补充植被样本并重新训练。

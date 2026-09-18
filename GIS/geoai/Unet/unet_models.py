@@ -30,12 +30,12 @@ class ResidualConv(nn.Module):
 
 class UNetCore(nn.Module):
     """普通 U-Net 和 ResUNet 共用的编码器/解码器。"""
-    def __init__(self, block=Conv, in_channels=3, base=32):
+    def __init__(self, block=Conv, in_channels=3, base=32, num_classes=1):
         super().__init__(); w = [base, base*2, base*4, base*8]
         self.e1, self.e2, self.e3, self.e4 = block(in_channels,w[0]), block(w[0],w[1]), block(w[1],w[2]), block(w[2],w[3])
         self.pool = nn.MaxPool2d(2); self.mid = block(w[3], w[3]*2)
         self.d4, self.d3, self.d2, self.d1 = block(w[3]*3,w[3]), block(w[2]*3,w[2]), block(w[1]*3,w[1]), block(w[0]*3,w[0])
-        self.head = nn.Conv2d(w[0], 1, 1)
+        self.head = nn.Conv2d(w[0], num_classes, 1)
     def skips(self, x):
         e1=self.e1(x); e2=self.e2(self.pool(e1)); e3=self.e3(self.pool(e2)); e4=self.e4(self.pool(e3)); return e1,e2,e3,e4,self.mid(self.pool(e4))
     def decode(self, e1,e2,e3,e4,x):
@@ -62,11 +62,11 @@ class AttentionUNet(UNetCore):
 
 
 class UNetPlusPlus(nn.Module):
-    def __init__(self, in_channels=3, base=32):
+    def __init__(self, in_channels=3, base=32, num_classes=1):
         super().__init__(); b=base; self.pool=nn.MaxPool2d(2)
         self.x00,self.x10,self.x20,self.x30=Conv(in_channels,b),Conv(b,b*2),Conv(b*2,b*4),Conv(b*4,b*8)
         self.x01,self.x11,self.x21=Conv(b*3,b),Conv(b*6,b*2),Conv(b*12,b*4)
-        self.x02,self.x12=Conv(b*4,b),Conv(b*8,b*2); self.x03=Conv(b*5,b); self.head=nn.Conv2d(b,1,1)
+        self.x02,self.x12=Conv(b*4,b),Conv(b*8,b*2); self.x03=Conv(b*5,b); self.head=nn.Conv2d(b,num_classes,1)
     def forward(self,x):
         a=self.x00(x); b=self.x10(self.pool(a)); c=self.x20(self.pool(b)); d=self.x30(self.pool(c))
         a1=self.x01(torch.cat((a,_up(b,a)),1)); b1=self.x11(torch.cat((b,_up(c,b)),1)); c1=self.x21(torch.cat((c,_up(d,c)),1))
@@ -105,5 +105,5 @@ class SwinUNet(UNetCore):
 
 
 MODELS={"unet":UNetCore,"resunet":ResUNet,"attention_unet":AttentionUNet,"unetpp":UNetPlusPlus,"transunet":TransUNet,"swin_unet":SwinUNet}
-def build_model(name: str, in_channels=3, base=32):
-    return MODELS[name](in_channels=in_channels, base=base)
+def build_model(name: str, in_channels=3, base=32, num_classes=1):
+    return MODELS[name](in_channels=in_channels, base=base, num_classes=num_classes)

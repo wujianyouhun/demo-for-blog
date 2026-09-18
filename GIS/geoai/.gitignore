@@ -108,3 +108,7 @@ credentials/
 # ========================
 .ipynb_checkpoints/
 *.ipynb_checkpoints
+
+
+Unet/dataset/*
+Unet/out/
