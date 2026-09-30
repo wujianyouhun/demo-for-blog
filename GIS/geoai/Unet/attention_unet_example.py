@@ -7,7 +7,7 @@ def main() -> None:
     """Attention U-Net 五分类整图推理：下列参数可直接按项目需要修改。"""
     root = Path(__file__).resolve().parent
     model_name = "attention_unet"
-    input_image = root / "Data" / "Qilian.tif"
+    input_image = root / "DATA" / "Qilian.tif"
     # 改进版：基于当前样本训练 80 轮，最佳验证集 mIoU 为 0.444；旧流程权重保留不覆盖。
     weights_file = root.parent / "models" / "Unet" / "qilian_multiclass_5class_refined" / model_name / "best.pth"
     output_directory = root / "out" / "qilian_multiclass_5class_refined" / model_name

@@ -1,6 +1,6 @@
 """从 GeoTIFF 和分类面矢量制作对齐的 256×256 U-Net 多分类样本。
 
-默认输入：Unet/Data/裁剪.tif 与 Unet/Data/shp/polygon_rg.shp。
+默认输入：Unet/DATA/裁剪.tif 与 Unet/DATA/shp/polygon_rg.shp。
 输出：按空间列切分的 train / val / test 影像、标签、裁切矢量、格网和 manifest。
 """
 from __future__ import annotations
@@ -19,8 +19,8 @@ from rasterio.warp import Resampling, calculate_default_transform, reproject
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_IMAGE = ROOT / "Data" / "裁剪.tif"
-DEFAULT_VECTOR = ROOT / "Data" / "shp" / "polygon_rg.shp"
+DEFAULT_IMAGE = ROOT / "DATA" / "裁剪.tif"
+DEFAULT_VECTOR = ROOT / "DATA" / "shp" / "polygon_rg.shp"
 DEFAULT_OUTPUT = ROOT / "dataset" / "qilian_multiclass_5class"
 
 

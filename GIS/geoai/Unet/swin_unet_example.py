@@ -7,7 +7,7 @@ def main() -> None:
     """Swin-UNet 五分类整图推理：下列参数可直接按项目需要修改。"""
     root = Path(__file__).resolve().parent
     model_name = "swin_unet"
-    input_image = root / "Data" / "Qilian.tif"
+    input_image = root / "DATA" / "Qilian.tif"
     # 改进版权重：与 unet_example.py 使用相同的 80 轮训练条件。
     weights_file = root.parent / "models" / "Unet" / "qilian_multiclass_5class_refined" / model_name / "best.pth"
     output_directory = root / "out" / "qilian_multiclass_5class_refined" / model_name

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import shutil
 import tempfile
@@ -10,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import rasterio
 import torch
+from rasterio.features import shapes
 from rasterio.transform import Affine
 from rasterio.vrt import WarpedVRT
 from rasterio.warp import Resampling, calculate_default_transform
@@ -19,7 +21,7 @@ from unet_models import build_model
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_IMAGE = ROOT / "Data" / "Qilian.tif"
+DEFAULT_IMAGE = ROOT / "DATA" / "Qilian.tif"
 DEFAULT_WEIGHTS = ROOT.parent / "models" / "Unet" / "qilian_multiclass_5class"
 DEFAULT_OUTPUT = ROOT / "out" / "qilian_multiclass_5class"
 IGNORE_VALUE = 255
@@ -55,7 +57,7 @@ TARGET_EXTRACTS = {
 
 def parse_args(model_name: str, defaults: dict) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=f"{model_name} 五分类整图推理")
-    parser.add_argument("--input", type=Path, default=defaults["input"], help="默认 Unet/Data/Qilian.tif")
+    parser.add_argument("--input", type=Path, default=defaults["input"], help="默认 Unet/DATA/Qilian.tif")
     parser.add_argument("--weights", type=Path, default=defaults["weights"], help="默认使用本模型 best.pth")
     parser.add_argument("--output-dir", type=Path, default=None, help="模型结果目录")
     parser.add_argument("--tile-size", type=int, default=defaults["tile_size"])
@@ -70,6 +72,9 @@ def parse_args(model_name: str, defaults: dict) -> argparse.Namespace:
         help="multiclass 输出五分类；building/vegetation/both 额外输出二值提取结果。",
     )
     parser.add_argument("--overwrite", action="store_true", help="覆盖同名输出目录")
+    parser.add_argument("--no-vectors", action="store_true", help="不导出 GeoPackage 矢量结果")
+    parser.add_argument("--min-vector-area", type=float, default=0.0,
+                        help="删除面积小于此值（平方米）的面要素，默认保留全部")
     args = parser.parse_args()
     args.model_name = model_name
     args.output_dir = args.output_dir or defaults["output"]
@@ -79,6 +84,8 @@ def parse_args(model_name: str, defaults: dict) -> argparse.Namespace:
         parser.error("tile-size 必须能被 16 整除，stride 必须位于 1 到 tile-size。")
     if args.target_resolution <= 0:
         parser.error("target-resolution 必须为正数。")
+    if args.min_vector_area < 0:
+        parser.error("--min-vector-area 不能小于 0。")
     return args
 
 
@@ -131,6 +138,43 @@ def task_names(task: str) -> tuple[str, ...]:
     return (task,)
 
 
+def write_vector(
+    values: np.ndarray,
+    profile: dict,
+    output_path: Path,
+    *,
+    valid: np.ndarray,
+    class_names: tuple[str, ...] | list[str] | None,
+    min_area: float,
+    layer: str,
+) -> str:
+    """把分类或二值栅格转为带 CRS 的 GeoPackage 面图层。
+
+    ``rasterio.features.shapes`` 直接复用推理输出的 transform，因此生成的面与
+    classification.tif 像元严格对齐；这里不做平滑或拓扑修复，以避免无意改变模型结果。
+    """
+    try:
+        import geopandas as gpd
+        from shapely.geometry import shape
+    except ImportError as exc:
+        raise SystemExit("导出矢量结果需要 geopandas 和 shapely。请安装 requirements.txt 中的依赖后重试。") from exc
+
+    records = []
+    for geometry, value in shapes(values.astype("int16"), mask=valid, transform=profile["transform"]):
+        class_id = int(value)
+        record = {"class_id": class_id, "geometry": shape(geometry)}
+        if class_names is not None:
+            record["class_name"] = class_names[class_id]
+        records.append(record)
+    columns = ["class_id", *( ["class_name"] if class_names is not None else [] ), "geometry"]
+    vector = gpd.GeoDataFrame(records, columns=columns, crs=profile["crs"])
+    if min_area:
+        vector = vector[vector.geometry.area >= min_area].copy()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    vector.to_file(output_path, layer=layer, driver="GPKG")
+    return str(output_path)
+
+
 def write_target_extracts(args: argparse.Namespace, checkpoint: dict, probability_sum: np.ndarray,
                           classification: np.ndarray, profile: dict) -> dict[str, dict[str, str]]:
     class_names = list(checkpoint["class_names"])
@@ -159,9 +203,22 @@ def write_target_extracts(args: argparse.Namespace, checkpoint: dict, probabilit
         with rasterio.open(probability_path, "w", **probability_profile) as destination:
             destination.write(target_probability, 1)
 
+        vector_path = None
+        if not args.no_vectors:
+            vector_path = write_vector(
+                target_mask,
+                profile,
+                args.output_dir / f"{target}_vector.gpkg",
+                valid=target_mask == 1,
+                class_names=("background", target),
+                min_area=args.min_vector_area,
+                layer=target,
+            )
+
         outputs[target] = {
             "mask": str(mask_path),
             "probability": str(probability_path),
+            "vector": vector_path,
             "source_class_ids": class_ids,
             "source_class_names": list(config["class_names"]),
             "note": config["note"],
@@ -184,6 +241,8 @@ def run_inference(args: argparse.Namespace) -> None:
     model, checkpoint = load_model(args, device)
     source, vrt = build_vrt(args.input, args.target_crs, args.target_resolution)
     cache_dir = Path(tempfile.mkdtemp(prefix="unet_prob_", dir=args.output_dir))
+    probability_sum = None
+    visits = None
     try:
         if vrt.count < checkpoint["in_channels"]:
             raise ValueError(f"输入仅有 {vrt.count} 个波段，权重需要 {checkpoint['in_channels']} 个波段。")
@@ -226,6 +285,17 @@ def run_inference(args: argparse.Namespace) -> None:
         with rasterio.open(classification_path, "w", **profile) as destination:
             destination.write(classification, 1)
             destination.write_colormap(1, CLASS_COLORS)
+        classification_vector = None
+        if not args.no_vectors:
+            classification_vector = write_vector(
+                classification,
+                profile,
+                args.output_dir / "classification_vector.gpkg",
+                valid=np.ones(classification.shape, dtype=bool),
+                class_names=list(checkpoint["class_names"]),
+                min_area=args.min_vector_area,
+                layer="classification",
+            )
         probability_paths = {}
         profile.update(dtype="float32", nodata=np.nan)
         for index, class_name in enumerate(checkpoint["class_names"]):
@@ -236,7 +306,8 @@ def run_inference(args: argparse.Namespace) -> None:
         target_outputs = write_target_extracts(args, checkpoint, probability_sum, classification, profile)
         report = {
             "model": args.model_name, "input": str(args.input), "weights": str(args.weights),
-            "classification": str(classification_path), "probabilities": probability_paths,
+            "classification": str(classification_path), "classification_vector": classification_vector,
+            "probabilities": probability_paths,
             "task": args.task, "target_outputs": target_outputs,
             "crs": str(vrt.crs), "resolution": list(vrt.res), "shape": [height, width],
             "class_names": list(checkpoint["class_names"]), "normalisation": checkpoint.get("normalisation"),
@@ -246,6 +317,15 @@ def run_inference(args: argparse.Namespace) -> None:
         (args.output_dir / "inference_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"完成：{classification_path}")
     finally:
+        # Windows 上 numpy.memmap 存活时文件句柄仍被占用，必须在删临时目录前
+        # 主动释放映射；否则每次推理都会在输出目录遗留 unet_prob_* 缓存。
+        if probability_sum is not None:
+            probability_sum.flush()
+            del probability_sum
+        if visits is not None:
+            visits.flush()
+            del visits
+        gc.collect()
         vrt.close()
         source.close()
         shutil.rmtree(cache_dir, ignore_errors=True)
