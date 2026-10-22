@@ -75,3 +75,17 @@ vegetation_vector.gpkg       # 耕地（当前植被代理）面
 统一入口默认写入 `Unet/out/geoai_results/<模型>/`，不会覆盖原有模型输出。使用 `--model all --output-dir Unet/out/compare` 时，会自动写入 `compare/<模型>/`。
 
 当前样本中没有单独的自然植被类，`vegetation` 目前对应 `cropland / 耕地`。如需真正植被提取，需要补充植被样本并重新训练。
+
+## 效果对比与工程说明
+
+六种模型的验证集对比、GeoAI 调用优势、GIS 成果说明和生产化注意事项见：[GeoAI 调用 U-Net 的模型效果对比与工程化实践](GeoAI调用U-Net的模型效果对比与工程化实践.md)。
+
+## 六模型 GIF 对比
+
+运行以下命令可将 QGIS 对比目录中的 18 张 GeoTIFF 制作为三张 GIF。每张包含六个模型、每帧停留 1 秒，并内嵌模型名称和统一图例：
+
+```powershell
+python Unet/create_comparison_gifs.py
+```
+
+输出位于 `Unet/out/qilian_multiclass_5class_refined/qgis_compare/gifs/`：`classification_6_models_1s.gif`、`building_6_models_1s.gif` 与 `vegetation_6_models_1s.gif`。

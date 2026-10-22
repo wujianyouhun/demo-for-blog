@@ -1,0 +1,7 @@
+# torch 与 torchvision 请安装官方相互兼容的版本，CUDA 用户按官网选择安装命令。
+torch>=2.6
+torchvision>=0.21
+numpy>=1.24
+Pillow>=10.0
+rasterio>=1.3
+geopandas>=0.14
