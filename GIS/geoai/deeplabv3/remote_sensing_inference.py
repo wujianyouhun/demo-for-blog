@@ -41,7 +41,7 @@ def predict(image_path, output_path, checkpoint_path, device_name="auto", tile_s
                     valid &= np.isfinite(image).all(axis=0)
                     center = (slice(halo, halo + height), slice(halo, halo + width))
                     if valid[center].any():
-                        tensor = to_tensor(image, scale).unsqueeze(0).to(device)
+                        tensor = to_tensor(image, scale, checkpoint.get("normalization")).unsqueeze(0).to(device)
                         logits = model(tensor)["out"]
                         mask = logits.argmax(1)[0].cpu().numpy()[center].astype("uint8")
                         mask[~valid[center]] = IGNORE

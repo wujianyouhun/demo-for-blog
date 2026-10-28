@@ -143,3 +143,29 @@ python deeplabv3/train_remote_sensing.py --dataset-dir deeplabv3/data/landcover_
 数据集的 `dataset.json` 会自动提供六类名称、波段和缩放参数；不要沿用前文旧祁连五分类的类别顺序。样本已生成时，制作脚本会拒绝覆盖，请更换输出目录。
 
 详细核查、预览图、类别编码、验证划分和推理命令见 [六分类训练与数据核查](E:/study/demo-for-blog/GIS/geoai/deeplabv3/六分类训练与数据核查.md)。
+
+## 遥感分类优化
+
+现有五轮 DeepLabV3 权重在验证集只预测耕地和裸地。U-Net refined 是另外的五分类、四波段、80 轮实验，两者不能直接作为公平架构对比。诊断依据、改进优先级与完整命令见 [遥感分类效果诊断与优化指南](E:/study/demo-for-blog/GIS/geoai/deeplabv3/遥感分类效果诊断与优化指南.md)。
+
+新增入口：
+
+- `audit_classification.py`：核查类别占比、波段值域与现有实验。
+- `train_optimized.py`：同步空间增强、少数类采样、CE+Dice、分组学习率、完整断点与早停。
+- `evaluate_checkpoint.py`：固定切片的全局混淆矩阵与逐类评价。
+- `infer_optimized.py`：磁盘暂存的重叠概率融合、可选 TTA、最大概率输出。
+- `evaluate_raster.py`：严格同网格的分类栅格与真值评价。
+- `compare_evaluations.py`：校验验证集文件指纹与类别一致后比较两份结果。
+- `run_optimization.ps1`：核查、训练、评价、推理统一入口。
+
+```powershell
+python deeplabv3/audit_classification.py
+python deeplabv3/train_optimized.py --init-checkpoint models/deeplabv3/landcover_6class_best.pth --output-dir models/deeplabv3/landcover_6class_optimized --epochs 60
+python deeplabv3/test_optimization.py
+```
+
+优化入口允许显式选择四个输入波段，并将归一化参数保存到权重；第四波段的物理含义需要先确认。已有三通道权重仍可使用。概率融合改善拼接方式，实际精度收益需要独立验证。
+
+已完成 6 轮短程候选试验，mIoU 仅从 0.215706 变为 0.215951，道路、水体、光伏仍无预测，尚无实质改善。逐类结果见 [优化短程试验对比](E:/study/demo-for-blog/GIS/geoai/deeplabv3/优化短程试验对比.md)，不应把候选参数当作已经可用的模型。
+
+完整图文博客见 [DeepLabV3 遥感分类效果差怎么办？从问题诊断到优化实测](E:/study/demo-for-blog/GIS/geoai/deeplabv3/blog/DeepLabV3遥感分类效果差怎么办：从问题诊断到优化实测.md)，包含五张真实数据图表、同配置预测对照与可复现代码。

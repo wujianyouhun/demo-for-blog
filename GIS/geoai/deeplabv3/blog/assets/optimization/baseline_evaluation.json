@@ -1,0 +1,142 @@
+{
+  "checkpoint": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\deeplabv3\\landcover_6class_best.pth",
+  "dataset": "E:\\study\\demo-for-blog\\GIS\\geoai\\deeplabv3\\data\\landcover_6class",
+  "split": "val",
+  "tiles": 9,
+  "dataset_sha256": "8dbad1fa8db9cc3689fee93cd23900434e217e416111a77d4860ad9a4b2ad3b4",
+  "epoch": 4,
+  "metrics": {
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        3667,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        32122,
+        30,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        310673,
+        13841,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        42668,
+        70128,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1573,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        14947,
+        0,
+        0,
+        0
+      ]
+    ],
+    "per_class": [
+      {
+        "class_id": 0,
+        "name": "road",
+        "pixels": 3667,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 1,
+        "name": "built_up",
+        "pixels": 32152,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 2,
+        "name": "cropland",
+        "pixels": 324514,
+        "predicted_pixels": 405650,
+        "iou": 0.7405951498363493,
+        "precision": 0.7658646616541354,
+        "recall": 0.9573485273362629,
+        "f1": 0.8509677277981385
+      },
+      {
+        "class_id": 3,
+        "name": "bare_land",
+        "pixels": 112796,
+        "predicted_pixels": 83999,
+        "iou": 0.5536406483140834,
+        "precision": 0.8348670817509732,
+        "recall": 0.6217241746161212,
+        "f1": 0.7127010340709876
+      },
+      {
+        "class_id": 4,
+        "name": "water",
+        "pixels": 1573,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 5,
+        "name": "solar_farm",
+        "pixels": 14947,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    ],
+    "per_class_iou": [
+      0.0,
+      0.0,
+      0.7405951498363493,
+      0.5536406483140834,
+      0.0,
+      0.0
+    ],
+    "miou": 0.21570596635840547,
+    "accuracy": 0.7777019865250414,
+    "valid_pixels": 489649,
+    "zero_prediction_classes": [
+      "road",
+      "built_up",
+      "water",
+      "solar_farm"
+    ],
+    "ce_loss": 0.8787497763065992,
+    "objective": 0.8787497812037701
+  },
+  "note": "固定切片直接推理；概率融合/TTA 必须另用真值栅格评价，不能套用此分数。"
+}

@@ -18,10 +18,11 @@ from common import DEFAULT_CHECKPOINT, IGNORE, ROOT, choose_device, to_tensor, t
 class TileDataset(Dataset):
     """train/val 下 images/*.tif 对应 masks/<stem>_mask.tif。"""
 
-    def __init__(self, root, split, bands, scale, size, num_classes):
+    def __init__(self, root, split, bands, scale, size, num_classes, normalization=None):
         self.items = []
         self.bands, self.scale, self.size = bands, scale, size
         self.num_classes = num_classes
+        self.normalization = normalization
         for image in sorted((root / split / "images").glob("*.tif")):
             mask = root / split / "masks" / f"{image.stem}_mask.tif"
             if not mask.is_file():
@@ -38,6 +39,8 @@ class TileDataset(Dataset):
         with rasterio.open(image_path) as src, rasterio.open(mask_path) as labels:
             if labels.count != 1:
                 raise ValueError(f"标签必须是单波段类别编号栅格：{mask_path}")
+            if labels.nodata is not None and 0 <= labels.nodata < self.num_classes:
+                raise ValueError(f"标签 NoData 与有效类别冲突（尤其不能把道路 0 设为 NoData）：{mask_path}")
             if (src.shape != labels.shape or src.crs != labels.crs
                     or not src.transform.almost_equals(labels.transform)):
                 raise ValueError(f"标签与影像的像元网格不一致：{mask_path}")
@@ -53,7 +56,7 @@ class TileDataset(Dataset):
             raise ValueError(f"标签超出 0..{self.num_classes - 1}：{mask_path}")
         if mask.shape != (self.size, self.size):
             raise ValueError(f"切片须为 {self.size}×{self.size}：{image_path}")
-        return to_tensor(image, self.scale), torch.from_numpy(mask.copy())
+        return to_tensor(image, self.scale, self.normalization), torch.from_numpy(mask.copy())
 
 
 def run_epoch(model, loader, device, num_classes, optimizer=None, class_weights=None, return_details=False):

@@ -1,0 +1,855 @@
+[
+  {
+    "epoch": 1,
+    "learning_rates": [
+      1e-05,
+      0.0003
+    ],
+    "train_objective": 1.3360655976097275,
+    "train_ce": 0.7444523158008628,
+    "validation": {
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3667,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          32122,
+          30,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          318431,
+          6083,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          57778,
+          55018,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1573,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          14947,
+          0,
+          0,
+          0
+        ]
+      ],
+      "per_class": [
+        {
+          "class_id": 0,
+          "name": "road",
+          "pixels": 3667,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 1,
+          "name": "built_up",
+          "pixels": 32152,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 2,
+          "name": "cropland",
+          "pixels": 324514,
+          "predicted_pixels": 428518,
+          "iou": 0.7326973476821268,
+          "precision": 0.7430983062555132,
+          "recall": 0.9812550460072601,
+          "f1": 0.8457303275292418
+        },
+        {
+          "class_id": 3,
+          "name": "bare_land",
+          "pixels": 112796,
+          "predicted_pixels": 61131,
+          "iou": 0.46268995618498177,
+          "precision": 0.9000016358312477,
+          "recall": 0.48776552360012765,
+          "f1": 0.6326562293375957
+        },
+        {
+          "class_id": 4,
+          "name": "water",
+          "pixels": 1573,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 5,
+          "name": "solar_farm",
+          "pixels": 14947,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      ],
+      "per_class_iou": [
+        0.0,
+        0.0,
+        0.7326973476821268,
+        0.46268995618498177,
+        0.0,
+        0.0
+      ],
+      "miou": 0.19923121731118476,
+      "accuracy": 0.7626871493661787,
+      "valid_pixels": 489649,
+      "zero_prediction_classes": [
+        "road",
+        "built_up",
+        "water",
+        "solar_farm"
+      ],
+      "ce_loss": 0.9659003981678713,
+      "objective": 0.9659004119101388
+    },
+    "seconds": 33.06
+  },
+  {
+    "epoch": 2,
+    "learning_rates": [
+      9.330127018922195e-06,
+      0.0002799038105676658
+    ],
+    "train_objective": 1.2568963375879887,
+    "train_ce": 0.6625259858503026,
+    "validation": {
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3667,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          997,
+          31155,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          7028,
+          312556,
+          4930,
+          0,
+          0
+        ],
+        [
+          0,
+          18830,
+          39586,
+          54380,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1573,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          2699,
+          12248,
+          0,
+          0,
+          0
+        ]
+      ],
+      "per_class": [
+        {
+          "class_id": 0,
+          "name": "road",
+          "pixels": 3667,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 1,
+          "name": "built_up",
+          "pixels": 32152,
+          "predicted_pixels": 29554,
+          "iou": 0.016422606203363586,
+          "precision": 0.033734858225620896,
+          "recall": 0.031008957452102512,
+          "f1": 0.032314523709201695
+        },
+        {
+          "class_id": 2,
+          "name": "cropland",
+          "pixels": 324514,
+          "predicted_pixels": 400785,
+          "iou": 0.7572654169786042,
+          "precision": 0.7798595256808514,
+          "recall": 0.9631510504939694,
+          "f1": 0.8618680020239928
+        },
+        {
+          "class_id": 3,
+          "name": "bare_land",
+          "pixels": 112796,
+          "predicted_pixels": 59310,
+          "iou": 0.461920051645346,
+          "precision": 0.9168774237059518,
+          "recall": 0.48210929465583885,
+          "f1": 0.6319361323835311
+        },
+        {
+          "class_id": 4,
+          "name": "water",
+          "pixels": 1573,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 5,
+          "name": "solar_farm",
+          "pixels": 14947,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      ],
+      "per_class_iou": [
+        0.0,
+        0.016422606203363586,
+        0.7572654169786042,
+        0.461920051645346,
+        0.0,
+        0.0
+      ],
+      "miou": 0.20593467913788563,
+      "accuracy": 0.7514219369385008,
+      "valid_pixels": 489649,
+      "zero_prediction_classes": [
+        "road",
+        "water",
+        "solar_farm"
+      ],
+      "ce_loss": 0.9780604799305217,
+      "objective": 0.9780604869377488
+    },
+    "seconds": 70.36
+  },
+  {
+    "epoch": 3,
+    "learning_rates": [
+      7.500000000000002e-06,
+      0.000225
+    ],
+    "train_objective": 1.0593886407063817,
+    "train_ce": 0.6008607139756521,
+    "validation": {
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3667,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          32152,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          319933,
+          4569,
+          0,
+          0
+        ],
+        [
+          0,
+          326,
+          66184,
+          46286,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1573,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          14947,
+          0,
+          0,
+          0
+        ]
+      ],
+      "per_class": [
+        {
+          "class_id": 0,
+          "name": "road",
+          "pixels": 3667,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 1,
+          "name": "built_up",
+          "pixels": 32152,
+          "predicted_pixels": 338,
+          "iou": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 2,
+          "name": "cropland",
+          "pixels": 324514,
+          "predicted_pixels": 438456,
+          "iou": 0.7221360744136495,
+          "precision": 0.7296809714087616,
+          "recall": 0.9858835057963601,
+          "f1": 0.838651585252369
+        },
+        {
+          "class_id": 3,
+          "name": "bare_land",
+          "pixels": 112796,
+          "predicted_pixels": 50855,
+          "iou": 0.3943765177011886,
+          "precision": 0.9101563268115229,
+          "recall": 0.41035143090180504,
+          "f1": 0.5656671819909441
+        },
+        {
+          "class_id": 4,
+          "name": "water",
+          "pixels": 1573,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 5,
+          "name": "solar_farm",
+          "pixels": 14947,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      ],
+      "per_class_iou": [
+        0.0,
+        0.0,
+        0.7221360744136495,
+        0.3943765177011886,
+        0.0,
+        0.0
+      ],
+      "miou": 0.18608543201913966,
+      "accuracy": 0.7479214702776887,
+      "valid_pixels": 489649,
+      "zero_prediction_classes": [
+        "road",
+        "water",
+        "solar_farm"
+      ],
+      "ce_loss": 0.9761804501796184,
+      "objective": 0.9761804560245739
+    },
+    "seconds": 72.31
+  },
+  {
+    "epoch": 4,
+    "learning_rates": [
+      5.000000000000001e-06,
+      0.00015
+    ],
+    "train_objective": 1.1877074041686753,
+    "train_ce": 0.5976610397753775,
+    "validation": {
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3667,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          32110,
+          30,
+          0,
+          0
+        ],
+        [
+          0,
+          1852,
+          308820,
+          13842,
+          0,
+          0
+        ],
+        [
+          0,
+          3647,
+          39135,
+          70014,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1573,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          113,
+          14834,
+          0,
+          0,
+          0
+        ]
+      ],
+      "per_class": [
+        {
+          "class_id": 0,
+          "name": "road",
+          "pixels": 3667,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 1,
+          "name": "built_up",
+          "pixels": 32152,
+          "predicted_pixels": 5624,
+          "iou": 0.00031776294884016526,
+          "precision": 0.0021337126600284497,
+          "recall": 0.0003732271709380443,
+          "f1": 0.0006353240152477764
+        },
+        {
+          "class_id": 2,
+          "name": "cropland",
+          "pixels": 324514,
+          "predicted_pixels": 400139,
+          "iou": 0.7426539019269754,
+          "precision": 0.7717818058224767,
+          "recall": 0.9516384501130922,
+          "f1": 0.8523251818456558
+        },
+        {
+          "class_id": 3,
+          "name": "bare_land",
+          "pixels": 112796,
+          "predicted_pixels": 83886,
+          "iou": 0.5527362869864528,
+          "precision": 0.8346327158286245,
+          "recall": 0.6207135004787404,
+          "f1": 0.7119512715957739
+        },
+        {
+          "class_id": 4,
+          "name": "water",
+          "pixels": 1573,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 5,
+          "name": "solar_farm",
+          "pixels": 14947,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      ],
+      "per_class_iou": [
+        0.0,
+        0.00031776294884016526,
+        0.7426539019269754,
+        0.5527362869864528,
+        0.0,
+        0.0
+      ],
+      "miou": 0.21595132531037808,
+      "accuracy": 0.7737093305612797,
+      "valid_pixels": 489649,
+      "zero_prediction_classes": [
+        "road",
+        "water",
+        "solar_farm"
+      ],
+      "ce_loss": 0.9542982694938109,
+      "objective": 0.9542982552962757
+    },
+    "seconds": 73.59
+  },
+  {
+    "epoch": 5,
+    "learning_rates": [
+      2.500000000000002e-06,
+      7.500000000000002e-05
+    ],
+    "train_objective": 1.2205099031286815,
+    "train_ce": 0.6299405984052784,
+    "validation": {
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3667,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          32122,
+          30,
+          0,
+          0
+        ],
+        [
+          0,
+          818,
+          311307,
+          12389,
+          0,
+          0
+        ],
+        [
+          0,
+          966,
+          43968,
+          67862,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1573,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          14947,
+          0,
+          0,
+          0
+        ]
+      ],
+      "per_class": [
+        {
+          "class_id": 0,
+          "name": "road",
+          "pixels": 3667,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 1,
+          "name": "built_up",
+          "pixels": 32152,
+          "predicted_pixels": 1784,
+          "iou": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 2,
+          "name": "cropland",
+          "pixels": 324514,
+          "predicted_pixels": 407584,
+          "iou": 0.7398138268166382,
+          "precision": 0.7637861152547696,
+          "recall": 0.9593022180861226,
+          "f1": 0.8504517154807143
+        },
+        {
+          "class_id": 3,
+          "name": "bare_land",
+          "pixels": 112796,
+          "predicted_pixels": 80281,
+          "iou": 0.5419638222257717,
+          "precision": 0.8453058631556657,
+          "recall": 0.6016348097450264,
+          "f1": 0.702952707986969
+        },
+        {
+          "class_id": 4,
+          "name": "water",
+          "pixels": 1573,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 5,
+          "name": "solar_farm",
+          "pixels": 14947,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      ],
+      "per_class_iou": [
+        0.0,
+        0.0,
+        0.7398138268166382,
+        0.5419638222257717,
+        0.0,
+        0.0
+      ],
+      "miou": 0.213629608173735,
+      "accuracy": 0.7743689867639881,
+      "valid_pixels": 489649,
+      "zero_prediction_classes": [
+        "road",
+        "water",
+        "solar_farm"
+      ],
+      "ce_loss": 0.8961171835590392,
+      "objective": 0.8961171919152708
+    },
+    "seconds": 74.83
+  },
+  {
+    "epoch": 6,
+    "learning_rates": [
+      6.698729810778067e-07,
+      2.009618943233419e-05
+    ],
+    "train_objective": 1.104443172153301,
+    "train_ce": 0.5957994947754068,
+    "validation": {
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3667,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          32122,
+          30,
+          0,
+          0
+        ],
+        [
+          0,
+          304,
+          313591,
+          10619,
+          0,
+          0
+        ],
+        [
+          0,
+          673,
+          46766,
+          65357,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1573,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          14947,
+          0,
+          0,
+          0
+        ]
+      ],
+      "per_class": [
+        {
+          "class_id": 0,
+          "name": "road",
+          "pixels": 3667,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 1,
+          "name": "built_up",
+          "pixels": 32152,
+          "predicted_pixels": 977,
+          "iou": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 2,
+          "name": "cropland",
+          "pixels": 324514,
+          "predicted_pixels": 412666,
+          "iou": 0.7403190356690094,
+          "precision": 0.7599147979237446,
+          "recall": 0.9663404352354598,
+          "f1": 0.8507854255405736
+        },
+        {
+          "class_id": 3,
+          "name": "bare_land",
+          "pixels": 112796,
+          "predicted_pixels": 76006,
+          "iou": 0.5294422617359957,
+          "precision": 0.8598926400547325,
+          "recall": 0.5794265754104756,
+          "f1": 0.6923337676507664
+        },
+        {
+          "class_id": 4,
+          "name": "water",
+          "pixels": 1573,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        {
+          "class_id": 5,
+          "name": "solar_farm",
+          "pixels": 14947,
+          "predicted_pixels": 0,
+          "iou": 0.0,
+          "precision": null,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      ],
+      "per_class_iou": [
+        0.0,
+        0.0,
+        0.7403190356690094,
+        0.5294422617359957,
+        0.0,
+        0.0
+      ],
+      "miou": 0.21162688290083417,
+      "accuracy": 0.7739176430463455,
+      "valid_pixels": 489649,
+      "zero_prediction_classes": [
+        "road",
+        "water",
+        "solar_farm"
+      ],
+      "ce_loss": 0.8744993503956405,
+      "objective": 0.8744993550381538
+    },
+    "seconds": 77.89
+  }
+]

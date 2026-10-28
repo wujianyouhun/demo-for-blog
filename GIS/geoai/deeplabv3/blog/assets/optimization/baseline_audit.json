@@ -1,0 +1,343 @@
+{
+  "checkpoint": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\deeplabv3\\landcover_6class_best.pth",
+  "dataset": "E:\\study\\demo-for-blog\\GIS\\geoai\\deeplabv3\\data\\landcover_6class",
+  "model": {
+    "architecture": "deeplabv3_resnet50",
+    "class_names": [
+      "road",
+      "built_up",
+      "cropland",
+      "bare_land",
+      "water",
+      "solar_farm"
+    ],
+    "bands": [
+      1,
+      2,
+      3
+    ],
+    "scale": 10000.0,
+    "epoch": 4,
+    "val_miou": 0.21570596635840547,
+    "normalization": null,
+    "in_channels": null
+  },
+  "splits": {
+    "train": {
+      "tiles": 48,
+      "pixels": [
+        20990,
+        116264,
+        1083068,
+        1303907,
+        15701,
+        19867
+      ],
+      "fractions": [
+        0.008199868723750114,
+        0.045419227331876755,
+        0.42310699820518494,
+        0.5093790888786316,
+        0.006133689545094967,
+        0.007761162240058184
+      ],
+      "tiles_containing_class": [
+        22,
+        28,
+        29,
+        41,
+        7,
+        2
+      ],
+      "example": {
+        "crs": "EPSG:4326",
+        "resolution": [
+          0.00011612929969574274,
+          8.9549944693574e-05
+        ],
+        "bands": 4,
+        "dtype": "uint16"
+      }
+    },
+    "val": {
+      "tiles": 9,
+      "pixels": [
+        3667,
+        32152,
+        324514,
+        112796,
+        1573,
+        14947
+      ],
+      "fractions": [
+        0.007489038165658712,
+        0.06566336005926132,
+        0.6627482175827026,
+        0.23036092519760132,
+        0.00321250525303185,
+        0.030525948852300644
+      ],
+      "tiles_containing_class": [
+        3,
+        9,
+        9,
+        8,
+        2,
+        3
+      ],
+      "example": {
+        "crs": "EPSG:4326",
+        "resolution": [
+          0.00011612929969574274,
+          8.9549944693574e-05
+        ],
+        "bands": 4,
+        "dtype": "uint16"
+      }
+    }
+  },
+  "unet_experiments": [
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class\\training_summary.json",
+      "model": "unet",
+      "epochs": 3,
+      "best_epoch": 3,
+      "miou": 0.02744002250685538
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class\\training_summary.json",
+      "model": "resunet",
+      "epochs": 3,
+      "best_epoch": 3,
+      "miou": 0.0335090077362625
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class\\training_summary.json",
+      "model": "attention_unet",
+      "epochs": 3,
+      "best_epoch": 1,
+      "miou": 0.015370123821902743
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class\\training_summary.json",
+      "model": "unetpp",
+      "epochs": 3,
+      "best_epoch": 1,
+      "miou": 0.15099641637417055
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class\\training_summary.json",
+      "model": "transunet",
+      "epochs": 3,
+      "best_epoch": 3,
+      "miou": 0.02992996296052885
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class\\training_summary.json",
+      "model": "swin_unet",
+      "epochs": 3,
+      "best_epoch": 3,
+      "miou": 0.015710455690430475
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class_refined\\training_summary.json",
+      "model": "resunet",
+      "epochs": 80,
+      "best_epoch": 49,
+      "miou": 0.45247032899916795
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class_refined\\training_summary.json",
+      "model": "unetpp",
+      "epochs": 80,
+      "best_epoch": 50,
+      "miou": 0.48663267447539305
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class_refined\\training_summary.json",
+      "model": "transunet",
+      "epochs": 80,
+      "best_epoch": 31,
+      "miou": 0.5016767677039267
+    },
+    {
+      "source": "E:\\study\\demo-for-blog\\GIS\\geoai\\models\\Unet\\qilian_multiclass_5class_refined\\training_summary.json",
+      "model": "swin_unet",
+      "epochs": 80,
+      "best_epoch": 34,
+      "miou": 0.45785075669995773
+    }
+  ],
+  "train_input_sample": {
+    "stride": 16,
+    "percentiles_0_2_50_98_100": [
+      [
+        1097.0,
+        1819.8000000000002,
+        3286.0,
+        4044.0,
+        6528.0
+      ],
+      [
+        1207.0,
+        1822.0,
+        2870.0,
+        3472.0,
+        5552.0
+      ],
+      [
+        1015.0,
+        1483.0,
+        2434.0,
+        2942.0,
+        5860.0
+      ]
+    ],
+    "below_zero": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "above_scale": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "saved_validation": {
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        3667,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        32122,
+        30,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        310673,
+        13841,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        42668,
+        70128,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1573,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        14947,
+        0,
+        0,
+        0
+      ]
+    ],
+    "per_class": [
+      {
+        "class_id": 0,
+        "name": "road",
+        "pixels": 3667,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 1,
+        "name": "built_up",
+        "pixels": 32152,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 2,
+        "name": "cropland",
+        "pixels": 324514,
+        "predicted_pixels": 405650,
+        "iou": 0.7405951498363493,
+        "precision": 0.7658646616541354,
+        "recall": 0.9573485273362629,
+        "f1": 0.8509677277981385
+      },
+      {
+        "class_id": 3,
+        "name": "bare_land",
+        "pixels": 112796,
+        "predicted_pixels": 83999,
+        "iou": 0.5536406483140834,
+        "precision": 0.8348670817509732,
+        "recall": 0.6217241746161212,
+        "f1": 0.7127010340709876
+      },
+      {
+        "class_id": 4,
+        "name": "water",
+        "pixels": 1573,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "class_id": 5,
+        "name": "solar_farm",
+        "pixels": 14947,
+        "predicted_pixels": 0,
+        "iou": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    ],
+    "per_class_iou": [
+      0.0,
+      0.0,
+      0.7405951498363493,
+      0.5536406483140834,
+      0.0,
+      0.0
+    ],
+    "miou": 0.21570596635840547,
+    "accuracy": 0.7777019865250414,
+    "valid_pixels": 489649,
+    "zero_prediction_classes": [
+      "road",
+      "built_up",
+      "water",
+      "solar_farm"
+    ]
+  },
+  "interpretation": [
+    "U-Net 与 DeepLabV3 类别、样本、通道、归一化和训练预算不同，不能直接排序。",
+    "输入波段顺序/缩放须核实，百分位不能证明波段含义。",
+    "相邻验证条带不代表独立区域测试。"
+  ]
+}

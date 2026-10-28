@@ -1,0 +1,18 @@
+[
+  {
+    "file": "baseline_evaluation.json",
+    "sha256": "72a2426851eea91c27f930d9e44b18bbecf0e4e233e1a6226af0701096bf6d71"
+  },
+  {
+    "file": "trial_evaluation.json",
+    "sha256": "ce01fd4d180a8b0359b70eb84281e1155ea622623a65c7eeb829ee19fcb339c5"
+  },
+  {
+    "file": "baseline_audit.json",
+    "sha256": "3de419d2f82910e5e7c7e859d59506de1aacde1b3d76c10d462002003f7e849c"
+  },
+  {
+    "file": "trial_history.json",
+    "sha256": "e1570fd2000d7547542a7fdf291d6a3b58103cf8d7dc319d8c626fae526c5383"
+  }
+]
